@@ -116,3 +116,4 @@ androidDynamicFeature = { id = "com.android.dynamic-feature", version.ref = "agp
 mapsplatform-secrets-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsPlugin"}
 
 [bundles]
+ktor = ["ktor-client-auth", "ktor-client-cio", "ktor-client-content-negotiation","ktor-client-core", "ktor-client-logging", "ktor-serialization-kotlinx-json"]
