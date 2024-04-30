@@ -1,4 +1,4 @@
-package com.cadrikmdev.cere.presentation.ui
+package com.cadrikmdev.core.presentation.ui
 
 import org.junit.Test
 

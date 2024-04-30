@@ -1,4 +1,4 @@
-package com.cadrikmdev.cere.presentation.ui
+package com.cadrikmdev.core.presentation.ui
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
