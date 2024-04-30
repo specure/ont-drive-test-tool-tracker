@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
 import com.cadrikmdev.convention.configureAndroidCompose
 import org.gradle.api.Plugin
