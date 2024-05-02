@@ -44,7 +44,7 @@ annotation = "1.7.1"
 # Project versions
 projectApplicationId = "com.cadrikmdev.runique"
 projectVersionName = "1.0"
-projectMinSdkVersion = "25"
+projectMinSdkVersion = "26"
 projectTargetSdkVersion = "34"
 projectCompileSdkVersion = "34"
 projectVersionCode = "1"
