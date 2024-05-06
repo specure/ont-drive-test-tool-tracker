@@ -128,7 +128,7 @@ private fun RegisterScreen(
                         start = offset,
                         end = offset
                     ).firstOrNull()?.let {
-                        onAction(RegisterAction.OnRegisterClick)
+                        onAction(RegisterAction.OnLoginClick)
                     }
                 }
             )
