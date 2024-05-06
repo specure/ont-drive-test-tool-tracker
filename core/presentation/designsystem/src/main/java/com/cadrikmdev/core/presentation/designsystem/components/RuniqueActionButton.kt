@@ -105,7 +105,7 @@ fun RuniqueOutlinedActionButton(
             )
             Text(
                 text = text,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .alpha(if (isLoading) 0f else 1f),
                 fontWeight = FontWeight.Medium
