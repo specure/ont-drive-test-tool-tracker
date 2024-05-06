@@ -2,6 +2,7 @@ package com.cadrikmdev.runique
 
 import android.app.Application
 import com.cadrikmdev.auth.data.di.authDataModule
+import com.cadrikmdev.core.data.di.coreDataModule
 import com.cadrikmdev.presentation.di.authViewModelModule
 import com.cadrikmdev.runique.di.appModule
 import org.koin.android.ext.koin.androidContext
@@ -23,7 +24,8 @@ class RuniqueApp : Application() {
             modules(
                 appModule,
                 authDataModule,
-                authViewModelModule
+                authViewModelModule,
+                coreDataModule,
             )
         }
     }
