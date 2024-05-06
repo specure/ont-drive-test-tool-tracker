@@ -35,8 +35,8 @@ fun IntroScreenRoot(
     IntroScreen(
         onAction = { action ->
             when (action) {
-                IntroAction.OnSingInClick -> onSignInClick
-                IntroAction.OnSingUpClick -> onSignUpClick
+                IntroAction.OnSingInClick -> onSignInClick()
+                IntroAction.OnSingUpClick -> onSignUpClick()
             }
         }
     )
