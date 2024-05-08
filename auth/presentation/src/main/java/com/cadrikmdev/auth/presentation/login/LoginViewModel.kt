@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class)
 
-package com.cadrikmdev.presentation.login
+package com.cadrikmdev.auth.presentation.login
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
@@ -43,12 +43,12 @@ class LoginViewModel(
 
     private fun login() {
         viewModelScope.launch {
-            state = state.copy(isLogingIn = true)
+            state = state.copy(isLoggingIn = true)
             val result = repository.register(
                 email = state.email.text.toString().trim(),
                 password = state.password.text.toString()
             )
-            state = state.copy(isLogingIn = false)
+            state = state.copy(isLoggingIn = false)
 
             when (result) {
                 is Result.Error -> {

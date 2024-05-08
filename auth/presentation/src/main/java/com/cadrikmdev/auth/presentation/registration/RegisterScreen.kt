@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class)
 
-package com.cadrikmdev.presentation.registration
+package com.cadrikmdev.auth.presentation.registration
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi

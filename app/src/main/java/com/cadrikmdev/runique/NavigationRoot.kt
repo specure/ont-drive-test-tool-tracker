@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.cadrikmdev.presentation.intro.IntroScreenRoot
-import com.cadrikmdev.presentation.login.LoginScreenRoot
-import com.cadrikmdev.presentation.registration.RegisterScreenRoot
+import com.cadrikmdev.auth.presentation.intro.IntroScreenRoot
+import com.cadrikmdev.auth.presentation.login.LoginScreenRoot
+import com.cadrikmdev.auth.presentation.registration.RegisterScreenRoot
 
 @Composable
 fun NavigationRoot(
@@ -52,7 +52,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
         }
         composable(route = "login") {
             LoginScreenRoot(
-                onSingUpClick = {
+                onSignUpClick = {
                     navController.navigate("register") {
                         popUpTo("login") {
                             inclusive = true

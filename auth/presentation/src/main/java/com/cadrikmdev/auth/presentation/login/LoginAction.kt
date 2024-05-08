@@ -1,4 +1,5 @@
-package com.cadrikmdev.presentation.login
+package com.cadrikmdev.auth.presentation.login
+
 
 sealed interface LoginAction {
     data object OnTogglePasswordVisibilityClick : LoginAction

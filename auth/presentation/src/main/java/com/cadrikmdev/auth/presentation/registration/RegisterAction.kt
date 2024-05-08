@@ -1,4 +1,4 @@
-package com.cadrikmdev.presentation.registration
+package com.cadrikmdev.auth.presentation.registration
 
 sealed interface RegisterAction {
     data object OnTogglePasswordVisibilityClick : RegisterAction

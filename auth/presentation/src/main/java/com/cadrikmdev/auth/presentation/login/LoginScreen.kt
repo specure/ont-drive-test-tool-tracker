@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class)
 
-package com.cadrikmdev.presentation.login
+package com.cadrikmdev.auth.presentation.login
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -44,31 +44,39 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun LoginScreenRoot(
     onLoginSuccess: () -> Unit,
-    onSingUpClick: () -> Unit,
+    onSignUpClick: () -> Unit,
     viewModel: LoginViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    ObserveAsEvents(flow = viewModel.events) { event ->
+    ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is LoginEvent.Error -> {
                 keyboardController?.hide()
-                Toast.makeText(context, event.error.asString(context), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    event.error.asString(context),
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             LoginEvent.LoginSuccess -> {
                 keyboardController?.hide()
-                Toast.makeText(context, R.string.youre_logged_in, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    R.string.youre_logged_in,
+                    Toast.LENGTH_LONG
+                ).show()
+
                 onLoginSuccess()
             }
         }
     }
-
     LoginScreen(
         state = viewModel.state,
         onAction = { action ->
             when (action) {
-                is LoginAction.OnRegisterClick -> onSingUpClick()
+                is LoginAction.OnRegisterClick -> onSignUpClick()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -100,15 +108,17 @@ private fun LoginScreen(
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
             Spacer(modifier = Modifier.height(48.dp))
+
             RuniqueTextField(
                 state = state.email,
                 startIcon = EmailIcon,
                 endIcon = null,
+                keyboardType = KeyboardType.Email,
                 hint = stringResource(id = R.string.example_email),
                 title = stringResource(id = R.string.email),
-                modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.Email
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
             RuniquePasswordTextField(
@@ -124,13 +134,13 @@ private fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
             RuniqueActionButton(
                 text = stringResource(id = R.string.login),
-                isLoading = state.isLogingIn,
-                enabled = state.canLogin,
-                modifier = Modifier.fillMaxWidth(),
+                isLoading = state.isLoggingIn,
+                enabled = state.canLogin && !state.isLoggingIn,
                 onClick = {
                     onAction(LoginAction.OnLoginClick)
-                }
+                },
             )
+
             val annotatedString = buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
@@ -182,8 +192,7 @@ private fun LoginScreen(
 private fun LoginScreenPreview() {
     RuniqueTheme {
         LoginScreen(
-            state = LoginState(
-            ),
+            state = LoginState(),
             onAction = {}
         )
     }

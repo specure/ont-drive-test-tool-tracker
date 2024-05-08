@@ -1,4 +1,4 @@
-package com.cadrikmdev.presentation.intro
+package com.cadrikmdev.auth.presentation.intro
 
 sealed interface IntroAction {
 

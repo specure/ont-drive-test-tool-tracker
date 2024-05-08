@@ -1,4 +1,4 @@
-package com.cadrikmdev.presentation.login
+package com.cadrikmdev.auth.presentation.login
 
 import com.cadrikmdev.core.presentation.ui.UiText
 

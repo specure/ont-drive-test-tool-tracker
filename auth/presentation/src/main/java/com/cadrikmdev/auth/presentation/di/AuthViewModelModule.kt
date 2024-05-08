@@ -1,7 +1,7 @@
-package com.cadrikmdev.presentation.di
+package com.cadrikmdev.auth.presentation.di
 
-import com.cadrikmdev.presentation.login.LoginViewModel
-import com.cadrikmdev.presentation.registration.RegisterViewModel
+import com.cadrikmdev.auth.presentation.login.LoginViewModel
+import com.cadrikmdev.auth.presentation.registration.RegisterViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 

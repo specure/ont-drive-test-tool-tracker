@@ -1,4 +1,4 @@
-package com.cadrikmdev.presentation.intro
+package com.cadrikmdev.auth.presentation.intro
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
