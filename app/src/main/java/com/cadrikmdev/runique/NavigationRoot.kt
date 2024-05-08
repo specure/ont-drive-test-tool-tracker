@@ -1,5 +1,6 @@
 package com.cadrikmdev.runique
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -19,6 +20,7 @@ fun NavigationRoot(
         startDestination = "auth"
     ) {
         authGraph(navController = navController)
+        runGraph(navController = navController)
     }
 }
 
@@ -63,12 +65,23 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                     }
                 },
                 onLoginSuccess = {
-                    navController.navigate("login") {
+                    navController.navigate("run") {
                         popUpTo("auth") {
                             inclusive = true
                         }
                     }
                 })
+        }
+    }
+}
+
+private fun NavGraphBuilder.runGraph(navController: NavHostController) {
+    navigation(
+        startDestination = "run_overview",
+        route = "run"
+    ) {
+        composable("run_overview") {
+            Text(text = "Run overview")
         }
     }
 }
