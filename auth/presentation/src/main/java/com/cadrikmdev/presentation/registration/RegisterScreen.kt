@@ -40,7 +40,6 @@ import com.cadrikmdev.core.presentation.designsystem.CrossIcon
 import com.cadrikmdev.core.presentation.designsystem.EmailIcon
 import com.cadrikmdev.core.presentation.designsystem.Poppins
 import com.cadrikmdev.core.presentation.designsystem.RuniqueDarkRed
-import com.cadrikmdev.core.presentation.designsystem.RuniqueGray
 import com.cadrikmdev.core.presentation.designsystem.RuniqueGreen
 import com.cadrikmdev.core.presentation.designsystem.RuniqueTheme
 import com.cadrikmdev.core.presentation.designsystem.components.GradientBackground
@@ -101,7 +100,7 @@ private fun RegisterScreen(
                 withStyle(
                     style = SpanStyle(
                         fontFamily = Poppins,
-                        color = RuniqueGray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     append(stringResource(id = R.string.already_have_an_account) + " ")
