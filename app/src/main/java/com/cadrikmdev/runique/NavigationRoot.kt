@@ -9,6 +9,7 @@ import androidx.navigation.navigation
 import com.cadrikmdev.auth.presentation.intro.IntroScreenRoot
 import com.cadrikmdev.auth.presentation.login.LoginScreenRoot
 import com.cadrikmdev.auth.presentation.registration.RegisterScreenRoot
+import com.cadrikmdev.run.presentation.active_run.ActiveRunScreenRoot
 import com.cadrikmdev.run.presentation.overview.RunOverviewScreenRoot
 
 @Composable
@@ -83,6 +84,13 @@ private fun NavGraphBuilder.runGraph(navController: NavHostController) {
     ) {
         composable("run_overview") {
             RunOverviewScreenRoot(
+                onStartRunClick = {
+                    navController.navigate("active_run")
+                }
+            )
+        }
+        composable("active_run") {
+            ActiveRunScreenRoot(
 
             )
         }
