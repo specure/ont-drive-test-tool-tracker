@@ -1,7 +1,6 @@
 package com.cadrikmdev.run.domain
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
@@ -9,7 +8,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 class RunningTracker(
-    private val locationObserver: LocationObserver
+    private val locationObserver: LocationObserver,
+    private val applicationScope: CoroutineScope,
 ) {
     private val isObservingLocation = MutableStateFlow(false)
 
@@ -20,9 +20,11 @@ class RunningTracker(
             } else flowOf()
         }
         .stateIn(
-            CoroutineScope(Dispatchers.Main),
+            applicationScope,
             SharingStarted.Lazily,
             null
         )
+
+    fun
 
 }
