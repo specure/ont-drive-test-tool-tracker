@@ -25,6 +25,11 @@ class RunningTracker(
             null
         )
 
-    fun
+    fun startObservingLocation() {
+        isObservingLocation.value = true
+    }
 
+    fun stopObservingLocation() {
+        isObservingLocation.value = false
+    }
 }
