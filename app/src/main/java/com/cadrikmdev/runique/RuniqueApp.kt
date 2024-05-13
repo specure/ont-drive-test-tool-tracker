@@ -4,6 +4,7 @@ import android.app.Application
 import com.cadrikmdev.auth.data.di.authDataModule
 import com.cadrikmdev.auth.presentation.di.authViewModelModule
 import com.cadrikmdev.core.data.di.coreDataModule
+import com.cadrikmdev.run.location.di.locationModule
 import com.cadrikmdev.run.presentation.di.runViewModelModule
 import com.cadrikmdev.runique.di.appModule
 import org.koin.android.ext.koin.androidContext
@@ -28,6 +29,7 @@ class RuniqueApp : Application() {
                 authViewModelModule,
                 coreDataModule,
                 runViewModelModule,
+                locationModule,
             )
         }
     }
