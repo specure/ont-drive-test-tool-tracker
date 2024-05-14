@@ -4,6 +4,7 @@ import android.app.Application
 import com.cadrikmdev.auth.data.di.authDataModule
 import com.cadrikmdev.auth.presentation.di.authViewModelModule
 import com.cadrikmdev.core.data.di.coreDataModule
+import com.cadrikmdev.core.database.di.databaseModule
 import com.cadrikmdev.run.location.di.locationModule
 import com.cadrikmdev.run.presentation.di.runPresentationModule
 import com.cadrikmdev.runique.di.appModule
@@ -35,6 +36,7 @@ class RuniqueApp : Application() {
                 authDataModule,
                 authViewModelModule,
                 coreDataModule,
+                databaseModule,
                 runPresentationModule,
                 locationModule,
             )
