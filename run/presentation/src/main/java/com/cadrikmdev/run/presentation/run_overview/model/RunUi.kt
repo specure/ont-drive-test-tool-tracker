@@ -1,4 +1,4 @@
-package com.cadrikmdev.run.presentation.run_overview
+package com.cadrikmdev.run.presentation.run_overview.model
 
 data class RunUi(
     val id: String, // null if new run

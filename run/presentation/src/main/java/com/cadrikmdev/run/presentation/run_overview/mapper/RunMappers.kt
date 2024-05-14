@@ -6,7 +6,7 @@ import com.cadrikmdev.core.presentation.ui.toFormattedKm
 import com.cadrikmdev.core.presentation.ui.toFormattedKmh
 import com.cadrikmdev.core.presentation.ui.toFormattedMeters
 import com.cadrikmdev.core.presentation.ui.toFormattedPace
-import com.cadrikmdev.run.presentation.run_overview.RunUi
+import com.cadrikmdev.run.presentation.run_overview.model.RunUi
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
