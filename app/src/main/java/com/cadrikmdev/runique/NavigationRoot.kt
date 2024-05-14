@@ -13,7 +13,7 @@ import com.cadrikmdev.auth.presentation.login.LoginScreenRoot
 import com.cadrikmdev.auth.presentation.registration.RegisterScreenRoot
 import com.cadrikmdev.run.presentation.active_run.ActiveRunScreenRoot
 import com.cadrikmdev.run.presentation.active_run.service.ActiveRunService
-import com.cadrikmdev.run.presentation.overview.RunOverviewScreenRoot
+import com.cadrikmdev.run.presentation.run_overview.RunOverviewScreenRoot
 
 @Composable
 fun NavigationRoot(

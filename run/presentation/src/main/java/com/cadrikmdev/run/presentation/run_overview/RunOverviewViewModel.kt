@@ -1,4 +1,4 @@
-package com.cadrikmdev.run.presentation.overview
+package com.cadrikmdev.run.presentation.run_overview
 
 import androidx.lifecycle.ViewModel
 
