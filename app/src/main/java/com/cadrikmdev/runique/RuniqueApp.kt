@@ -6,6 +6,7 @@ import com.cadrikmdev.auth.presentation.di.authViewModelModule
 import com.cadrikmdev.core.data.di.coreDataModule
 import com.cadrikmdev.core.database.di.databaseModule
 import com.cadrikmdev.run.location.di.locationModule
+import com.cadrikmdev.run.network.di.runNetworkModule
 import com.cadrikmdev.run.presentation.di.runPresentationModule
 import com.cadrikmdev.runique.di.appModule
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,7 @@ class RuniqueApp : Application() {
                 authViewModelModule,
                 coreDataModule,
                 databaseModule,
+                runNetworkModule,
                 runPresentationModule,
                 locationModule,
             )
