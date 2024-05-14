@@ -36,7 +36,7 @@ import com.google.maps.android.compose.rememberMarkerState
 fun TrackerMap(
     isRunFinished: Boolean,
     currentLocation: Location?,
-    location: List<List<LocationTimestamp>>,
+    locations: List<List<LocationTimestamp>>,
     onSnapshot: (Bitmap) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -84,6 +84,10 @@ fun TrackerMap(
             zoomControlsEnabled = false,
         )
     ) {
+        RuniquePolylines(
+            locations = locations
+        )
+
         if (!isRunFinished && currentLocation != null) {
             MarkerComposable(
                 currentLocation,

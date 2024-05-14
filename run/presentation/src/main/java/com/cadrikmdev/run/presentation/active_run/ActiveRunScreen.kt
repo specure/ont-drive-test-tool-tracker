@@ -146,7 +146,7 @@ private fun ActiveRunScreen(
             TrackerMap(
                 isRunFinished = state.isRunFinished,
                 currentLocation = state.currentLocation,
-                location = state.runData.locations,
+                locations = state.runData.locations,
                 onSnapshot = {},
                 modifier = Modifier
                     .fillMaxSize()

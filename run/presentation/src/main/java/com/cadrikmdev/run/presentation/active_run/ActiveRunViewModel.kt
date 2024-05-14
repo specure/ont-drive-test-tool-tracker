@@ -91,7 +91,7 @@ class ActiveRunViewModel(
                 )
             }
 
-            ActiveRunAction.OnToggleRunClick -> {
+            ActiveRunAction.OnBackClick -> {
                 state = state.copy(
                     shouldTrack = false
                 )
