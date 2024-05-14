@@ -33,6 +33,7 @@ import com.cadrikmdev.core.presentation.designsystem.components.RuniqueScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.RuniqueToolbar
 import com.cadrikmdev.run.presentation.R
 import com.cadrikmdev.run.presentation.active_run.components.RunDataCard
+import com.cadrikmdev.run.presentation.active_run.maps.TrackerMap
 import com.cadrikmdev.run.presentation.util.hasLocationPermission
 import com.cadrikmdev.run.presentation.util.hasNotificationPermission
 import com.cadrikmdev.run.presentation.util.shouldShowLocationPermissionRationale
@@ -142,6 +143,14 @@ private fun ActiveRunScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
+            TrackerMap(
+                isRunFinished = state.isRunFinished,
+                currentLocation = state.currentLocation,
+                location = state.runData.locations,
+                onSnapshot = {},
+                modifier = Modifier
+                    .fillMaxSize()
+            )
             RunDataCard(
                 elapsedTime = state.elapsedTime,
                 runData = state.runData,
