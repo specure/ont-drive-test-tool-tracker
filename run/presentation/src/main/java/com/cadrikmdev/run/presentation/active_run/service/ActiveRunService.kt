@@ -22,6 +22,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.android.inject
+import kotlin.time.Duration
 
 
 class ActiveRunService : Service() {
@@ -34,6 +35,7 @@ class ActiveRunService : Service() {
         NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(com.cadrikmdev.core.presentation.designsystem.R.drawable.logo)
             .setContentTitle(getString(R.string.active_run))
+            .setOnlyAlertOnce(true)
     }
 
     private val runningTracker: RunningTracker by inject<RunningTracker>()
@@ -84,11 +86,15 @@ class ActiveRunService : Service() {
     }
 
     private fun updateNotification() {
+        var previousElapsedTime = Duration.ZERO
         runningTracker.elapsedTime.onEach { elapsedTime ->
-            val notification = baseNotification
-                .setContentText(elapsedTime.formatted())
-                .build()
-            notificationManager.notify(1, notification)
+            if (elapsedTime.inWholeSeconds > previousElapsedTime.inWholeSeconds) {
+                val notification = baseNotification
+                    .setContentText(elapsedTime.formatted())
+                    .build()
+                notificationManager.notify(1, notification)
+                previousElapsedTime = elapsedTime
+            }
         }.launchIn(serviceScope)
     }
 
@@ -105,7 +111,7 @@ class ActiveRunService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 getString(R.string.active_run),
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_LOW
             )
             notificationManager.createNotificationChannel(channel)
         }
