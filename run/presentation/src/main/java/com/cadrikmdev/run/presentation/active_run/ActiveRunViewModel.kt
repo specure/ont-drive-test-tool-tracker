@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.core.domain.locaiton.Location
 import com.cadrikmdev.core.domain.run.Run
+import com.cadrikmdev.core.domain.run.RunRepository
+import com.cadrikmdev.core.domain.util.Result
+import com.cadrikmdev.core.presentation.ui.asUiText
 import com.cadrikmdev.run.domain.LocationDataCalculator
 import com.cadrikmdev.run.domain.RunningTracker
 import com.cadrikmdev.run.presentation.active_run.service.ActiveRunService
@@ -25,6 +28,7 @@ import java.time.ZonedDateTime
 
 class ActiveRunViewModel(
     private val runningTracker: RunningTracker,
+    private val runRepository: RunRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf(
@@ -167,9 +171,19 @@ class ActiveRunViewModel(
                 totalElevationMeters = LocationDataCalculator.getTotalDistanceInMeters(locations),
                 mapPictureUrl = null
             )
-            // TODO: Save run in repository
 
             runningTracker.finishRun()
+
+            when (val result = runRepository.upsertRun(run, mapPictureBytes)) {
+                is Result.Error -> {
+                    eventChannel.send(ActiveRunEvent.Error(result.error.asUiText()))
+                }
+
+                is Result.Success -> {
+                    eventChannel.send(ActiveRunEvent.RunSaved)
+                }
+            }
+
             state = state.copy(
                 isSavingRun = false
             )

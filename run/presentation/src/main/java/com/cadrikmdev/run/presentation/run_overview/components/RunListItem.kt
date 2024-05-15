@@ -103,8 +103,7 @@ fun RunListItem(
                 showDropDown = false
                 onDeleteClick()
             },
-
-            )
+        )
     }
 }
 
