@@ -54,7 +54,7 @@ class OfflineFirstRunRepository(
         )
         return when (remoteResult) {
             is Result.Error -> {
-                Result.Success(Unit) // todo: finish later
+                Result.Success(Unit)
             }
 
             is Result.Success -> {

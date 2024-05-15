@@ -5,6 +5,7 @@ import com.cadrikmdev.auth.data.di.authDataModule
 import com.cadrikmdev.auth.presentation.di.authViewModelModule
 import com.cadrikmdev.core.data.di.coreDataModule
 import com.cadrikmdev.core.database.di.databaseModule
+import com.cadrikmdev.run.data.di.runDataModule
 import com.cadrikmdev.run.location.di.locationModule
 import com.cadrikmdev.run.network.di.runNetworkModule
 import com.cadrikmdev.run.presentation.di.runPresentationModule
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
@@ -32,12 +34,14 @@ class RuniqueApp : Application() {
         startKoin {
             androidLogger()
             androidContext(this@RuniqueApp)
+            workManagerFactory()
             modules(
                 appModule,
                 authDataModule,
                 authViewModelModule,
                 coreDataModule,
                 databaseModule,
+                runDataModule,
                 runNetworkModule,
                 runPresentationModule,
                 locationModule,
