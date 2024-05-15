@@ -65,10 +65,19 @@ class OfflineFirstRunRepository(
         }
     }
 
-    override suspend fun deleteRun(id: RunId): EmptyResult<DataError> {
+    override suspend fun deleteRun(id: RunId) {
         localRunDataSource.deleteRun(id)
 
-        return applicationScope.async {
+        // Edge case where the run is created in offline mode,
+        // and then deleted in offline mode as well,
+        // in that case we do not need to sync anything
+        val isPendingSync = runPendingSyncDao.getRunPendingSyncEntity(id) != null
+        if (isPendingSync) {
+            runPendingSyncDao.deleteRunPendingSyncEntity(id)
+            return
+        }
+
+        applicationScope.async {
             remoteRunDataSource.deleteRun(id)
         }.await()
     }
