@@ -14,4 +14,5 @@ interface RunRepository {
 
     suspend fun deleteRun(id: RunId): EmptyResult<DataError>
 
+    suspend fun syncPendingRuns()
 }
