@@ -10,4 +10,6 @@ dependencies {
 
     implementation(projects.analytics.domain)
 
+    implementation(libs.bundles.koin)
+
 }
