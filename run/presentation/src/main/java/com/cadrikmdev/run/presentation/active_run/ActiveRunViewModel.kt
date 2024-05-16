@@ -168,7 +168,7 @@ class ActiveRunViewModel(
                 distanceMeters = state.runData.distanceMeters,
                 location = state.currentLocation ?: Location(0.0, 0.0),
                 maxSpeedKmh = LocationDataCalculator.getMaxSpeedKmh(locations),
-                totalElevationMeters = LocationDataCalculator.getTotalDistanceInMeters(locations),
+                totalElevationMeters = LocationDataCalculator.getTotalElevationMeters(locations),
                 mapPictureUrl = null
             )
 
