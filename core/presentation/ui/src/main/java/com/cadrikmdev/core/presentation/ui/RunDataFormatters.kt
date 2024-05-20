@@ -9,7 +9,7 @@ fun Duration.formatted(): String {
     val totalSeconds = inWholeSeconds
     val hours = String.format("%02d", totalSeconds / 3600)
     val minutes = String.format("%02d", (totalSeconds % 3600) / 60)
-    val seconds = String.format("%02d", totalSeconds % 60)
+    val seconds = String.format("%02d", (totalSeconds % 60))
     return "$hours:$minutes:$seconds"
 }
 
@@ -18,7 +18,7 @@ fun Double.toFormattedKm(): String {
 }
 
 fun Double.toFormattedKmh(): String {
-    return "${this.roundToDecimals(1)} kmh"
+    return "${this.roundToDecimals(1)} km/h"
 }
 
 fun Int.toFormattedMeters(): String {
@@ -31,7 +31,7 @@ fun Duration.toFormattedPace(distanceKm: Double): String {
     }
     val secondsPerKm = (this.inWholeSeconds / distanceKm).roundToInt()
     val avgPaceMinutes = secondsPerKm / 60
-    val avgPaceSeconds = String.format("%02d", secondsPerKm % 60)
+    val avgPaceSeconds = String.format("%02d", (secondsPerKm % 60))
 
     return "$avgPaceMinutes:$avgPaceSeconds / km"
 }

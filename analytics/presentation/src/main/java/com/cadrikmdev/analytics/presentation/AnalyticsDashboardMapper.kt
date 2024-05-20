@@ -5,7 +5,7 @@ import com.cadrikmdev.core.presentation.ui.formatted
 import com.cadrikmdev.core.presentation.ui.toFormattedKm
 import com.cadrikmdev.core.presentation.ui.toFormattedKmh
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 
 
@@ -23,6 +23,6 @@ fun AnalyticsValues.toAnalyticsDashboardState(): AnalyticsDashboardState {
         totalTimeRun = totalTimeRun.toFormattedTotalTime(),
         fastestRunEver = fastestEverRun.toFormattedKmh(),
         avgDistance = (avgDistancePerRun / 1000.0).toFormattedKm(),
-        avgPace = avgPacePerRun.seconds.formatted()
+        avgPace = avgPacePerRun.minutes.formatted()
     )
 }

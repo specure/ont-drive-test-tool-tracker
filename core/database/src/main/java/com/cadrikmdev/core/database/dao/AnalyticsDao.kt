@@ -18,7 +18,7 @@ interface AnalyticsDao {
     @Query("SELECT AVG(distanceMeters) FROM runentity")
     suspend fun getAvgDistancePerRun(): Double
 
-    @Query("SELECT AVG((durationMillis / 60000.0) / (distanceMeters / 1000)) FROM runentity")
+    @Query("SELECT AVG((durationMillis / 60000.0) / (distanceMeters / 1000.0)) FROM runentity")
     suspend fun getAvgPacePerRun(): Double
 }
 
