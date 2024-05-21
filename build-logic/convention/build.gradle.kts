@@ -2,7 +2,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "com.cadrikmdev.runique.buildlogic"
+group = "com.cadrikmdev.signaltracker.buildlogic"
 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
@@ -15,39 +15,39 @@ dependencies {
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = "runique.android.application"
+            id = "signaltracker.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidApplicationCompose") {
-            id = "runique.android.application.compose"
+            id = "signaltracker.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
         register("androidLibrary") {
-            id = "runique.android.library"
+            id = "signaltracker.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
         }
         register("androidLibraryCompose") {
-            id = "runique.android.library.compose"
+            id = "signaltracker.android.library.compose"
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
         register("androidFeatureUi") {
-            id = "runique.android.feature.ui"
+            id = "signaltracker.android.feature.ui"
             implementationClass = "AndroidFeatureUiConventionPlugin"
         }
         register("androidRoom") {
-            id = "runique.android.room"
+            id = "signaltracker.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
         }
         register("androidDynamicFeature") {
-            id = "runique.android.dynamic.feature"
+            id = "signaltracker.android.dynamic.feature"
             implementationClass = "AndroidDynamicFeatureConventionPlugin"
         }
         register("jvmLibrary") {
-            id = "runique.jvm.library"
+            id = "signaltracker.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
         }
         register("jvmKtor") {
-            id = "runique.jvm.ktor"
+            id = "signaltracker.jvm.ktor"
             implementationClass = "JvmKtorConventionPlugin"
         }
     }

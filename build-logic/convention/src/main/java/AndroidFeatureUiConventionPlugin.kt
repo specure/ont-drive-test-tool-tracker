@@ -6,7 +6,7 @@ import org.gradle.kotlin.dsl.dependencies
 class AndroidFeatureUiConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            pluginManager.apply("runique.android.library.compose")
+            pluginManager.apply("signaltracker.android.library.compose")
 
             dependencies {
                 addUiLayerDependencies(target)

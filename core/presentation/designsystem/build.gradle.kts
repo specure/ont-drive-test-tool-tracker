@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.runique.android.library.compose)
+    alias(libs.plugins.signaltracker.android.library.compose)
 }
 
 android {

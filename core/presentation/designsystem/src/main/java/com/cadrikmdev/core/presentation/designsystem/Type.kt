@@ -35,7 +35,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 20.sp,
-        color = RuniqueGray
+        color = SignalTrackerGray
     ),
     bodyMedium = TextStyle(
         fontFamily = Poppins,
@@ -55,12 +55,12 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 24.sp,
-        color = RuniqueGray
+        color = SignalTrackerGray
     ),
     headlineMedium = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
-        color = RuniqueWhite
+        color = SignalTrackerWhite
     ),
 )

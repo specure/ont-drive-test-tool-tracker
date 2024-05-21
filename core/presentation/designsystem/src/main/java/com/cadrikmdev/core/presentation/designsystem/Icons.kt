@@ -78,15 +78,15 @@ val PauseIcon: ImageVector
 
 val PersonIcon: ImageVector
     @Composable
-    get() = ImageVector.vectorResource(id = R.drawable.person)
+    get() = ImageVector.vectorResource(id = R.drawable.signal)
 
-val RunOutlinedIcon: ImageVector
+val TrackOutlinedIcon: ImageVector
     @Composable
-    get() = ImageVector.vectorResource(id = R.drawable.run_outlined)
+    get() = ImageVector.vectorResource(id = R.drawable.measure_outlined)
 
-val RunIcon: ImageVector
+val TrackIcon: ImageVector
     @Composable
-    get() = ImageVector.vectorResource(id = R.drawable.run)
+    get() = ImageVector.vectorResource(id = R.drawable.measure)
 
 val StartIcon: ImageVector
     @Composable

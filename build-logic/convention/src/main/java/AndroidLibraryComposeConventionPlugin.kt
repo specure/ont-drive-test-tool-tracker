@@ -7,7 +7,7 @@ import org.gradle.kotlin.dsl.getByType
 class AndroidLibraryComposeConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            pluginManager.apply("runique.android.library")
+            pluginManager.apply("signaltracker.android.library")
             val extension = extensions.getByType<LibraryExtension>()
             configureAndroidCompose(extension)
         }

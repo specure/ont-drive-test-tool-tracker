@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="signaltracker">SignalTracker</string>
+    <string name="logout">Logout</string>
+    <string name="active_track">Active track</string>
+    <string name="pause_track">Pause track</string>
+    <string name="start_track">Start track</string>
+    <string name="duration">Duration</string>
+    <string name="distance">Distance</string>
+    <string name="pace">Pace</string>
+    <string name="permission_required">Permission required</string>
+    <string name="location_notification_rationale">In order to track your location, this app needs your permission for that. Please click on \"Okay\" to grant it.</string>
+    <string name="location_rationale">In order to track your location, this app needs your permission for that. Please click on \"Okay\" to grant it.</string>
+    <string name="notification_rationale">In order to display the current signal as a notification, this app needs your permission for that. Please click on \"Okay\" to grant it.</string>
+    <string name="ok">Ok</string>
+    <string name="tracking_is_paused">Tracking is paused</string>
+    <string name="resume_or_finish_track">Do you want to resume or finish your tracking?</string>
+    <string name="resume">Resume</string>
+    <string name="finish">Finish</string>
+    <string name="track_map">Track map</string>
+    <string name="total_tracking_time">Total tracking time</string>
+    <string name="avg_speed">Ø Speed</string>
+    <string name="max_speed">Max Speed</string>
+    <string name="total_elevation">Total Elevation</string>
+    <string name="delete">Delete</string>
+</resources>

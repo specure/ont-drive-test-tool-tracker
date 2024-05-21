@@ -38,12 +38,12 @@ import com.cadrikmdev.core.presentation.designsystem.ArrowLeftIcon
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
 import com.cadrikmdev.core.presentation.designsystem.Poppins
 import com.cadrikmdev.core.presentation.designsystem.R
-import com.cadrikmdev.core.presentation.designsystem.RuniqueGreen
-import com.cadrikmdev.core.presentation.designsystem.RuniqueTheme
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerBlue
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.components.util.DropDownItem
 
 @Composable
-fun RuniqueToolbar(
+fun SignalTrackerToolbar(
     showBackButton: Boolean,
     title: String,
     modifier: Modifier = Modifier,
@@ -131,15 +131,15 @@ fun RuniqueToolbar(
 
 @Preview
 @Composable
-fun RuniqueToolbarPreview() {
-    RuniqueTheme {
-        RuniqueToolbar(
+fun SignalTrackerToolbarPreview() {
+    SignalTrackerTheme {
+        SignalTrackerToolbar(
             showBackButton = true,
-            title = "Runique",
+            title = "SignalTracker",
             modifier = Modifier.fillMaxWidth(),
             startContent = {
                 Icon(
-                    imageVector = LogoIcon, contentDescription = null, tint = RuniqueGreen,
+                    imageVector = LogoIcon, contentDescription = null, tint = SignalTrackerBlue,
                     modifier = Modifier.size(35.dp)
                 )
             },

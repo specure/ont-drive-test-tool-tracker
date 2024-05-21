@@ -1,9 +1,9 @@
 package com.cadrikmdev.core.database.di
 
 import androidx.room.Room
-import com.cadrikmdev.core.database.RoomLocalRunDataSource
-import com.cadrikmdev.core.database.RunDatabase
-import com.cadrikmdev.core.domain.run.LocalRunDataSource
+import com.cadrikmdev.core.database.RoomLocalTrackDataSource
+import com.cadrikmdev.core.database.TrackDatabase
+import com.cadrikmdev.core.domain.track.LocalTrackDataSource
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -13,13 +13,13 @@ val databaseModule = module {
     single {
         Room.databaseBuilder(
             androidApplication(),
-            RunDatabase::class.java,
+            TrackDatabase::class.java,
             "run.db"
         ).build()
     }
 
-    single { get<RunDatabase>().runDao }
-    single { get<RunDatabase>().runPendingSyncDao }
+    single { get<TrackDatabase>().trackDao }
+    single { get<TrackDatabase>().trackPendingSyncDao }
 
-    singleOf(::RoomLocalRunDataSource).bind<LocalRunDataSource>()
+    singleOf(::RoomLocalTrackDataSource).bind<LocalTrackDataSource>()
 }

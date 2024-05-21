@@ -42,7 +42,7 @@ playServicesMaps = "18.2.0"
 annotation = "1.7.1"
 
 # Project versions
-projectApplicationId = "com.cadrikmdev.runique"
+projectApplicationId = "com.cadrikmdev.signaltracker"
 projectVersionName = "1.0"
 projectMinSdkVersion = "26"
 projectTargetSdkVersion = "34"
@@ -122,15 +122,15 @@ jetbrainsKotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbr
 androidDynamicFeature = { id = "com.android.dynamic-feature", version.ref = "agp" }
 mapsplatform-secrets-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsPlugin"}
 
-runique-android-application = { id = "runique.android.application", version = "unspecified" }
-runique-android-application-compose = { id = "runique.android.application.compose", version = "unspecified" }
-runique-android-library = { id = "runique.android.library", version = "unspecified" }
-runique-android-library-compose = { id = "runique.android.library.compose", version = "unspecified" }
-runique-android-feature-ui = { id = "runique.android.feature.ui", version = "unspecified" }
-runique-android-room = { id = "runique.android.room", version = "unspecified" }
-runique-android-dynamic-feature = { id = "runique.android.dynamic.feature", version = "unspecified" }
-runique-jvm-library = { id = "runique.jvm.library", version = "unspecified" }
-runique-jvm-ktor = { id = "runique.jvm.ktor", version = "unspecified" }
+signaltracker-android-application = { id = "signaltracker.android.application", version = "unspecified" }
+signaltracker-android-application-compose = { id = "signaltracker.android.application.compose", version = "unspecified" }
+signaltracker-android-library = { id = "signaltracker.android.library", version = "unspecified" }
+signaltracker-android-library-compose = { id = "signaltracker.android.library.compose", version = "unspecified" }
+signaltracker-android-feature-ui = { id = "signaltracker.android.feature.ui", version = "unspecified" }
+signaltracker-android-room = { id = "signaltracker.android.room", version = "unspecified" }
+signaltracker-android-dynamic-feature = { id = "signaltracker.android.dynamic.feature", version = "unspecified" }
+signaltracker-jvm-library = { id = "signaltracker.jvm.library", version = "unspecified" }
+signaltracker-jvm-ktor = { id = "signaltracker.jvm.ktor", version = "unspecified" }
 
 [bundles]
 compose = [

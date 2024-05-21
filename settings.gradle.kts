@@ -22,24 +22,18 @@ dependencyResolutionManagement {
 
 gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:testClasses"))
 
-rootProject.name = "Runique"
+rootProject.name = "SignalTracker"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
-include(":auth:data")
-include(":auth:presentation")
-include(":auth:domain")
 include(":core:presentation:designsystem")
 include(":core:presentation:ui")
 include(":core:domain")
 include(":core:data")
 include(":core:database")
-include(":run:data")
-include(":run:domain")
-include(":run:presentation")
-include(":run:location")
-include(":run:network")
-include(":analytics:data")
-include(":analytics:domain")
-include(":analytics:presentation")
-include(":analytics:analytics_feature")
+include(":track:data")
+include(":track:domain")
+include(":track:presentation")
+include(":track:location")
+include(":track:network")
+

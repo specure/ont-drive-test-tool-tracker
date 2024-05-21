@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import com.cadrikmdev.core.presentation.designsystem.RuniqueTheme
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 
 @Composable
 fun GradientBackground(
@@ -95,7 +95,7 @@ fun GradientBackground(
 @PreviewScreenSizes
 @Composable
 private fun GradientBackgroundPreview() {
-    RuniqueTheme {
+    SignalTrackerTheme {
         GradientBackground(
             modifier = Modifier.fillMaxSize()
         ) {

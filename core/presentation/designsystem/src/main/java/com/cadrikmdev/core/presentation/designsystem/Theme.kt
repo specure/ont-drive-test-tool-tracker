@@ -9,22 +9,22 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 val DarkColorScheme = darkColorScheme(
-    primary = RuniqueGreen,
-    background = RuniqueBlack,
-    surface = RuniqueDarkGray,
-    secondary = RuniqueWhite,
-    tertiary = RuniqueWhite,
-    primaryContainer = RuniqueGreen30,
-    onPrimary = RuniqueBlack,
-    onBackground = RuniqueWhite,
-    onSurface = RuniqueWhite,
-    onSurfaceVariant = RuniqueGray,
-    error = RuniqueDarkRed,
-    errorContainer = RuniqueDarkRed5,
+    primary = SignalTrackerBlue,
+    background = SignalTrackerBlack,
+    surface = SignalTrackerDarkGray,
+    secondary = SignalTrackerWhite,
+    tertiary = SignalTrackerWhite,
+    primaryContainer = SignalTrackerBlue30,
+    onPrimary = SignalTrackerBlack,
+    onBackground = SignalTrackerWhite,
+    onSurface = SignalTrackerWhite,
+    onSurfaceVariant = SignalTrackerGray,
+    error = SignalTrackerDarkRed,
+    errorContainer = SignalTrackerDarkRed5,
 )
 
 @Composable
-fun RuniqueTheme(
+fun SignalTrackerTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = DarkColorScheme

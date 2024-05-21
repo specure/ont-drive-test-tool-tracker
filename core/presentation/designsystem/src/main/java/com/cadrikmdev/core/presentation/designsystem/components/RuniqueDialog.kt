@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun RuniqueDialog(
+fun SignalTrackerDialog(
     title: String,
     onDismiss: () -> Unit,
     description: String,

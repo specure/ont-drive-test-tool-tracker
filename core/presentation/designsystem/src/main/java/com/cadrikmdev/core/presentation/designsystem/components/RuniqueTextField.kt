@@ -42,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cadrikmdev.core.presentation.designsystem.CheckIcon
 import com.cadrikmdev.core.presentation.designsystem.EmailIcon
-import com.cadrikmdev.core.presentation.designsystem.RuniqueTheme
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 
 @Composable
-fun RuniqueTextField(
+fun SignalTrackerTextField(
     state: TextFieldState,
     startIcon: ImageVector?,
     endIcon: ImageVector?,
@@ -169,9 +169,9 @@ fun RuniqueTextField(
 
 @Preview
 @Composable
-private fun RuniqueTextFieldPreview() {
-    RuniqueTheme {
-        RuniqueTextField(
+private fun SignalTrackerTextFieldPreview() {
+    SignalTrackerTheme {
+        SignalTrackerTextField(
             state = rememberTextFieldState(),
             startIcon = EmailIcon,
             endIcon = CheckIcon,

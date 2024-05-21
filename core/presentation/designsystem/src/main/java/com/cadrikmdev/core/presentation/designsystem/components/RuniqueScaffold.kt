@@ -6,11 +6,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.cadrikmdev.core.presentation.designsystem.RuniqueTheme
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 
 
 @Composable
-fun RuniqueScaffold(
+fun SignalTrackerScaffold(
     withGradient: Boolean = true,
     modifier: Modifier = Modifier,
     topAppBar: @Composable () -> Unit = {},
@@ -36,9 +36,9 @@ fun RuniqueScaffold(
 
 @Preview
 @Composable
-fun RuniqueScaffoldPreview() {
-    RuniqueTheme {
-        RuniqueScaffold(
+fun SignalTrackerScaffoldPreview() {
+    SignalTrackerTheme {
+        SignalTrackerScaffold(
             content = {
 
             }

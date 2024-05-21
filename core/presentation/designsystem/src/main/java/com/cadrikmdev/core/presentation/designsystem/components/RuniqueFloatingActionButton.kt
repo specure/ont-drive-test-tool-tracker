@@ -16,11 +16,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.cadrikmdev.core.presentation.designsystem.RunIcon
-import com.cadrikmdev.core.presentation.designsystem.RuniqueTheme
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
+import com.cadrikmdev.core.presentation.designsystem.TrackIcon
 
 @Composable
-fun RuniqueFloatingActionButton(
+fun SignalTrackerFloatingActionButton(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -56,12 +56,12 @@ fun RuniqueFloatingActionButton(
 
 @Preview
 @Composable
-fun RuniqueFloatingActionButtonPreview(
+fun SignalTrackerFloatingActionButtonPreview(
 
 ) {
-    RuniqueTheme {
-        RuniqueFloatingActionButton(
-            icon = RunIcon,
+    SignalTrackerTheme {
+        SignalTrackerFloatingActionButton(
+            icon = TrackIcon,
             onClick = {}
         )
     }

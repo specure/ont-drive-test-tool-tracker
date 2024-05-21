@@ -1,10 +1,10 @@
 plugins {
-    alias(libs.plugins.runique.android.application.compose)
-    alias(libs.plugins.runique.jvm.ktor)
+    alias(libs.plugins.signaltracker.android.application.compose)
+    alias(libs.plugins.signaltracker.jvm.ktor)
 }
 
 android {
-    namespace = "com.cadrikmdev.runique"
+    namespace = "com.cadrikmdev.signaltracker"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -18,7 +18,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    dynamicFeatures += setOf(":analytics:analytics_feature")
 }
 
 dependencies {
@@ -71,14 +70,10 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.database)
 
-    implementation(projects.auth.presentation)
-    implementation(projects.auth.domain)
-    implementation(projects.auth.data)
-
-    implementation(projects.run.presentation)
-    implementation(projects.run.domain)
-    implementation(projects.run.data)
-    implementation(projects.run.location)
-    implementation(projects.run.network)
+    implementation(projects.track.presentation)
+    implementation(projects.track.domain)
+    implementation(projects.track.data)
+    implementation(projects.track.location)
+    implementation(projects.track.network)
 
 }

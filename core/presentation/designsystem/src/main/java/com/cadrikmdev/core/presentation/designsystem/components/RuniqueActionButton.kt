@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.cadrikmdev.core.presentation.designsystem.RuniqueBlack
-import com.cadrikmdev.core.presentation.designsystem.RuniqueGray
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerBlack
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerGray
 
 @Composable
-fun RuniqueActionButton(
+fun SignalTrackerActionButton(
     text: String,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
@@ -37,8 +37,8 @@ fun RuniqueActionButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = RuniqueGray,
-            disabledContentColor = RuniqueBlack
+            disabledContainerColor = SignalTrackerGray,
+            disabledContentColor = SignalTrackerBlack
         ),
         shape = RoundedCornerShape(100f),
         modifier = modifier
@@ -69,7 +69,7 @@ fun RuniqueActionButton(
 }
 
 @Composable
-fun RuniqueOutlinedActionButton(
+fun SignalTrackerOutlinedActionButton(
     text: String,
     isLoading: Boolean,
     modifier: Modifier = Modifier,

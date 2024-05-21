@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".RuniqueApp"
+        android:name=".SignalTrackerApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -30,8 +30,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data
-                    android:host="active_run"
-                    android:scheme="runique" />
+                    android:host="active_track"
+                    android:scheme="signaltracker" />
             </intent-filter>
         </activity>
 

@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.runique.android.library)
-    alias(libs.plugins.runique.jvm.ktor)
+    alias(libs.plugins.signaltracker.android.library)
+    alias(libs.plugins.signaltracker.jvm.ktor)
 }
 
 android {

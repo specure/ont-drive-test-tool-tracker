@@ -43,10 +43,10 @@ import com.cadrikmdev.core.presentation.designsystem.EyeClosedIcon
 import com.cadrikmdev.core.presentation.designsystem.EyeOpenedIcon
 import com.cadrikmdev.core.presentation.designsystem.LockIcon
 import com.cadrikmdev.core.presentation.designsystem.R
-import com.cadrikmdev.core.presentation.designsystem.RuniqueTheme
+import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 
 @Composable
-fun RuniquePasswordTextField(
+fun SignalTrackerPasswordTextField(
     state: TextFieldState,
     isPasswordVisible: Boolean,
     onTogglePasswordVisibility: () -> Unit,
@@ -158,9 +158,9 @@ fun RuniquePasswordTextField(
 
 @Preview
 @Composable
-private fun RuniquePasswordTextFieldPreview() {
-    RuniqueTheme {
-        RuniquePasswordTextField(
+private fun SignalTrackerPasswordTextFieldPreview() {
+    SignalTrackerTheme {
+        SignalTrackerPasswordTextField(
             state = rememberTextFieldState(),
             hint = "example@test.com",
             title = "Password",
