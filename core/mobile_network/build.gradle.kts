@@ -9,6 +9,7 @@ android {
 dependencies {
 
     implementation(libs.bundles.koin)
+    implementation(libs.netmonster.core)
 
     implementation(projects.core.domain)
 }
