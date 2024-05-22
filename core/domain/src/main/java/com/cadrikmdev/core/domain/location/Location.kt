@@ -1,4 +1,4 @@
-package com.cadrikmdev.core.domain.locaiton
+package com.cadrikmdev.core.domain.location
 
 import kotlin.math.atan2
 import kotlin.math.cos

@@ -7,7 +7,7 @@ import android.location.LocationManager
 import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
-import com.cadrikmdev.core.domain.locaiton.LocationWithAltitude
+import com.cadrikmdev.core.domain.location.LocationWithAltitude
 import com.cadrikmdev.track.domain.LocationObserver
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest

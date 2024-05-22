@@ -1,7 +1,7 @@
 package com.cadrikmdev.core.database.mappers
 
 import com.cadrikmdev.core.database.entity.TrackEntity
-import com.cadrikmdev.core.domain.locaiton.Location
+import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.track.Track
 import org.bson.types.ObjectId
 import java.time.Instant

@@ -2,7 +2,7 @@ package com.cadrikmdev.track.presentation.active_track.maps
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.cadrikmdev.core.domain.locaiton.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Polyline

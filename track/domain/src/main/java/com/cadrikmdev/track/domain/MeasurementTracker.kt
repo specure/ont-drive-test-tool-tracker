@@ -1,7 +1,7 @@
 package com.cadrikmdev.track.domain
 
 import com.cadrikmdev.core.domain.Timer
-import com.cadrikmdev.core.domain.locaiton.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationTimestamp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

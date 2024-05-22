@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2e1104f3b4937a2be8b098266a80b02a",
+    "identityHash": "aecbbed53f01fae12c87b7060facbbf7",
     "entities": [
       {
-        "tableName": "TrackEntity",
+        "tableName": "track_entity",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`durationMillis` INTEGER NOT NULL, `distanceMeters` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `avgSpeedKmh` REAL NOT NULL, `maxSpeedKmh` REAL NOT NULL, `totalElevationMeters` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -73,7 +73,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "TrackPendingSyncEntity",
+        "tableName": "track_pending_sync_entity",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackId` TEXT NOT NULL, `userId` TEXT NOT NULL, `durationMillis` INTEGER NOT NULL, `distanceMeters` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `avgSpeedKmh` REAL NOT NULL, `maxSpeedKmh` REAL NOT NULL, `totalElevationMeters` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`trackId`))",
         "fields": [
           {
@@ -153,7 +153,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "DeleteTrackSyncEntity",
+        "tableName": "delete_track_sync_entity",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackId` TEXT NOT NULL, `userId` TEXT NOT NULL, PRIMARY KEY(`trackId`))",
         "fields": [
           {
@@ -182,7 +182,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2e1104f3b4937a2be8b098266a80b02a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aecbbed53f01fae12c87b7060facbbf7')"
     ]
   }
 }

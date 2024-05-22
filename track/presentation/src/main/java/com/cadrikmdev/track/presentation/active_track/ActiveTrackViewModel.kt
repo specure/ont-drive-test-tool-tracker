@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cadrikmdev.core.domain.locaiton.Location
+import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.track.Track
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.domain.util.Result

@@ -3,8 +3,11 @@ package com.cadrikmdev.core.database.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.cadrikmdev.core.database.Tables
 
-@Entity
+@Entity(
+    tableName = Tables.TRACK_PENDING_SYNC_ENTITY
+)
 data class TrackPendingSyncEntity(
     @Embedded val track: TrackEntity,
     @PrimaryKey(autoGenerate = false)

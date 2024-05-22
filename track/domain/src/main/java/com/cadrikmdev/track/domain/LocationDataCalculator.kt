@@ -1,6 +1,6 @@
 package com.cadrikmdev.track.domain
 
-import com.cadrikmdev.core.domain.locaiton.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationTimestamp
 import kotlin.math.roundToInt
 import kotlin.time.DurationUnit
 

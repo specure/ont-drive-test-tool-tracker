@@ -3,7 +3,7 @@ package com.cadrikmdev.track.presentation.active_track.maps
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
-import com.cadrikmdev.core.domain.locaiton.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationTimestamp
 import kotlin.math.abs
 
 object PolylineColorCalculator {

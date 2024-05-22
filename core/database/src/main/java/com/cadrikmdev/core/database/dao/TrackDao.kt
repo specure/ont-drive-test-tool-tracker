@@ -15,12 +15,12 @@ interface TrackDao {
     @Upsert
     suspend fun upsertTracks(runs: List<TrackEntity>)
 
-    @Query("SELECT * FROM trackentity ORDER BY dateTimeUtc DESC")
+    @Query("SELECT * FROM track_entity ORDER BY dateTimeUtc DESC")
     fun getTracks(): Flow<List<TrackEntity>>
 
-    @Query("DELETE FROM trackentity WHERE id=:id")
+    @Query("DELETE FROM track_entity WHERE id=:id")
     suspend fun deleteTrack(id: String)
 
-    @Query("DELETE FROM trackentity")
+    @Query("DELETE FROM track_entity")
     suspend fun deleteAllTracks()
 }

@@ -1,6 +1,6 @@
 package com.cadrikmdev.track.presentation.active_track
 
-import com.cadrikmdev.core.domain.locaiton.Location
+import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.track.domain.TrackData
 import kotlin.time.Duration
 

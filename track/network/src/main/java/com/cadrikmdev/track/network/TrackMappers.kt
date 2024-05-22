@@ -1,6 +1,6 @@
 package com.cadrikmdev.track.network
 
-import com.cadrikmdev.core.domain.locaiton.Location
+import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.track.Track
 import java.time.Instant
 import java.time.ZoneId

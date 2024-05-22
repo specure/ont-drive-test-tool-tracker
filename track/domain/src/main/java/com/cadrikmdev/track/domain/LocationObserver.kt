@@ -1,6 +1,6 @@
 package com.cadrikmdev.track.domain
 
-import com.cadrikmdev.core.domain.locaiton.LocationWithAltitude
+import com.cadrikmdev.core.domain.location.LocationWithAltitude
 import kotlinx.coroutines.flow.Flow
 
 interface LocationObserver {

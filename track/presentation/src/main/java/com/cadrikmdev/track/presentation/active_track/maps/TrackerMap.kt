@@ -26,8 +26,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.cadrikmdev.core.domain.locaiton.Location
-import com.cadrikmdev.core.domain.locaiton.LocationTimestamp
+import com.cadrikmdev.core.domain.location.Location
+import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.presentation.designsystem.TrackIcon
 import com.cadrikmdev.track.presentation.R
 import com.google.android.gms.maps.CameraUpdateFactory
