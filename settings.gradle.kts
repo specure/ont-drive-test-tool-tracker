@@ -37,3 +37,4 @@ include(":track:presentation")
 include(":track:location")
 include(":track:network")
 
+include(":core:mobile_network")
