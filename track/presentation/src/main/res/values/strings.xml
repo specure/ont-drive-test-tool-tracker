@@ -23,4 +23,7 @@
     <string name="max_speed">Max Speed</string>
     <string name="total_elevation">Total Elevation</string>
     <string name="delete">Delete</string>
+    <string name="internetConnection">Internet connection:</string>
+    <string name="available">Available</string>
+    <string name="unavailable">Unavailable</string>
 </resources>

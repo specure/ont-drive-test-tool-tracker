@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
+import com.cadrikmdev.permissions.presentation.screen.permissions.PermissionsScreen
+import com.cadrikmdev.permissions.presentation.util.openAppSettings
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackScreenRoot
 import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
 import com.cadrikmdev.track.presentation.track_overview.TrackOverviewScreenRoot
@@ -21,6 +23,9 @@ fun NavigationRoot(
         startDestination = "track"
     ) {
         trackGraph(
+            navController = navController,
+        )
+        permissionsGraph(
             navController = navController,
         )
     }
@@ -71,6 +76,27 @@ private fun NavGraphBuilder.trackGraph(
                             )
                         )
                     }
+                }
+            )
+        }
+    }
+}
+
+private fun NavGraphBuilder.permissionsGraph(
+    navController: NavHostController,
+) {
+    navigation(
+        startDestination = "permissions_screen",
+        route = "permissions"
+    ) {
+        composable("permissions_screen") {
+            val context = LocalContext.current
+            PermissionsScreen(
+                onBackPressed = {
+                    navController.navigateUp()
+                },
+                openAppSettings = {
+                    context.openAppSettings()
                 }
             )
         }

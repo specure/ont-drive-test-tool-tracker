@@ -2,6 +2,8 @@ package com.cadrikmdev.signaltracker
 
 import android.app.Application
 import android.content.Context
+import com.cadrikmdev.core.connectivty.mobile_network.di.mobileNetworkModule
+import com.cadrikmdev.core.connectivty.network.di.connectivityModule
 import com.cadrikmdev.core.data.di.coreDataModule
 import com.cadrikmdev.core.database.di.databaseModule
 import com.cadrikmdev.signaltracker.di.appModule
@@ -35,8 +37,10 @@ class SignalTrackerApp : Application() {
             workManagerFactory()
             modules(
                 appModule,
+                connectivityModule,
                 coreDataModule,
                 databaseModule,
+                mobileNetworkModule,
                 trackDataModule,
                 trackNetworkModule,
                 trackPresentationModule,

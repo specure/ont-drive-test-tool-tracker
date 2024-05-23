@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.core.domain.SessionStorage
+import com.cadrikmdev.core.domain.connectivity.ConnectivityObserver
 import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.track.presentation.track_overview.mapper.toTrackUi
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.time.Duration.Companion.minutes
 
 class TrackOverviewViewModel(
@@ -20,6 +22,7 @@ class TrackOverviewViewModel(
     private val syncTrackScheduler: SyncTrackScheduler,
     private val applicationScope: CoroutineScope,
     private val sessionStorage: SessionStorage,
+    private val connectivityObserver: ConnectivityObserver,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -31,6 +34,12 @@ class TrackOverviewViewModel(
                 type = SyncTrackScheduler.SyncType.FetchTracks(30.minutes)
             )
         }
+
+        connectivityObserver.observeBasicConnectivity().onEach {
+            Timber.d("Online status changes - is online: $it")
+            onOnlineStatusChange(it)
+
+        }.launchIn(viewModelScope)
 
         trackRepository.getTracks().onEach { tracks ->
             val trackUis = tracks.map { it.toTrackUi() }
@@ -55,6 +64,13 @@ class TrackOverviewViewModel(
 
             else -> Unit
         }
+    }
+
+
+    fun onOnlineStatusChange(isOnline: Boolean) {
+        this.state = state.copy(
+            isOnline = isOnline
+        )
     }
 
     private fun logout() {

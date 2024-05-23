@@ -3,8 +3,8 @@ package com.cadrikmdev.core.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.cadrikmdev.core.database.Tables
-import com.cadrikmdev.core.domain.networking.TransportType
-import com.cadrikmdev.core.domain.networking.mobile.CellTechnology
+import com.cadrikmdev.core.domain.connectivity.TransportType
+import com.cadrikmdev.core.domain.connectivity.mobile.CellTechnology
 
 @Entity(
     tableName = Tables.CELL_INFO

@@ -69,6 +69,11 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.database)
+    implementation(projects.core.connectivity)
+
+    implementation(projects.permissions.presentation)
+    implementation(projects.permissions.domain)
+    implementation(projects.permissions.data)
 
     implementation(projects.track.presentation)
     implementation(projects.track.domain)

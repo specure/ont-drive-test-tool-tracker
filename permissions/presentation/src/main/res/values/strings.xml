@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="granted">Granted</string>
+    <string name="not_granted">Not granted</string>
+    <string name="resolve">Resolve</string>
+    <string name="permission_required">Permission required</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="permission_fine_location_rationale">It seems you permanently declined fine location permission. You can go to app settings to grant it.</string>
+    <string name="permission_fine_location_description">This app needs access to your fine location so that your measurement can be placed to correct location.</string>
+    <string name="permission_background_location_rationale">It seems you permanently declined background location permission. You can go to app settings to grant it.</string>
+    <string name="permission_background_location_description">This app needs access to your background location so that your measurement can be executed on the background too.</string>
+    <string name="permission_read_phone_state_rationale">It seems you permanently declined read phone state permission. You can go to app settings to grant it.</string>
+    <string name="permission_read_phone_state_description">This app needs access to your phone state so that app can determine mobile network parameters.</string>
+</resources>
