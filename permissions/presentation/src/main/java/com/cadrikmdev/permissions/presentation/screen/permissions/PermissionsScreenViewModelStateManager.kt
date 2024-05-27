@@ -1,4 +1,4 @@
-package com.cadrikmdev.permissions.presentation.screen.permissions.viewmodel.state
+package com.cadrikmdev.permissions.presentation.screen.permissions
 
 import com.cadrikmdev.permissions.domain.model.Permission
 import kotlinx.coroutines.flow.MutableStateFlow

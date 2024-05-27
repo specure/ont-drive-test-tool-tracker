@@ -1,9 +1,9 @@
-package com.cadrikmdev.permissions.presentation.screen.permissions.viewmodel
+package com.cadrikmdev.permissions.presentation
 
 import android.Manifest
 import android.os.Build
 import com.cadrikmdev.permissions.domain.model.Permission
-import com.cadrikmdev.permissions.presentation.AndroidPermission
+import com.cadrikmdev.permissions.presentation.model.AndroidPermission
 
 val appPermissions = linkedMapOf<String, Permission>(
     Pair(

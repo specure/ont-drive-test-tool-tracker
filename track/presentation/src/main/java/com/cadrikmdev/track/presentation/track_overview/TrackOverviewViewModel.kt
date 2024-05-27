@@ -9,6 +9,8 @@ import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.connectivity.ConnectivityObserver
 import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
+import com.cadrikmdev.permissions.domain.PermissionHandler
+import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.presentation.track_overview.mapper.toTrackUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
@@ -23,6 +25,7 @@ class TrackOverviewViewModel(
     private val applicationScope: CoroutineScope,
     private val sessionStorage: SessionStorage,
     private val connectivityObserver: ConnectivityObserver,
+    private val permissionHandler: PermissionHandler,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -34,6 +37,10 @@ class TrackOverviewViewModel(
                 type = SyncTrackScheduler.SyncType.FetchTracks(30.minutes)
             )
         }
+
+        permissionHandler.setPermissionsNeeded(
+            appPermissions
+        )
 
         connectivityObserver.observeBasicConnectivity().onEach {
             Timber.d("Online status changes - is online: $it")
@@ -66,6 +73,20 @@ class TrackOverviewViewModel(
         }
     }
 
+    fun onEvent(event: TrackOverviewEvent) {
+        when (event) {
+            TrackOverviewEvent.OnUpdatePermissionStatus -> {
+                permissionHandler.checkPermissionsState()
+                updatePermissionsState()
+            }
+        }
+    }
+
+    private fun updatePermissionsState() {
+        state = state.copy(
+            isPermissionRequired = permissionHandler.getNotGrantedPermissionList().isNotEmpty()
+        )
+    }
 
     fun onOnlineStatusChange(isOnline: Boolean) {
         this.state = state.copy(

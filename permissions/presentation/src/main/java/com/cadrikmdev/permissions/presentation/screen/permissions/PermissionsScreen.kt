@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.cadrikmdev.permissions.presentation.screen.permissions
 
 import android.Manifest
@@ -7,7 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,20 +18,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
+import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
 import com.cadrikmdev.permissions.domain.model.Permission
-import com.cadrikmdev.permissions.presentation.AndroidPermission
+import com.cadrikmdev.permissions.presentation.R
+import com.cadrikmdev.permissions.presentation.model.AndroidPermission
 import com.cadrikmdev.permissions.presentation.screen.permissions.components.PermissionRationale
 import com.cadrikmdev.permissions.presentation.screen.permissions.components.dialog.PermissionResolver
-import com.cadrikmdev.permissions.presentation.screen.permissions.viewmodel.PermissionsScreenViewModel
-import com.cadrikmdev.permissions.presentation.screen.permissions.viewmodel.event.PermissionsScreenEvent
-import com.cadrikmdev.permissions.presentation.screen.permissions.viewmodel.state.PermissionsScreenViewModelState
 import com.cadrikmdev.permissions.presentation.util.findActivity
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -37,56 +43,63 @@ fun PermissionsScreen(
     openAppSettings: () -> Unit,
     viewModel: PermissionsScreenViewModel = koinViewModel(),
 ) {
-//    val lifecycleOwner = LocalLifecycleOwner.current
-//    LaunchedEffect(lifecycleOwner.lifecycle) {
-//        viewModel.viewModelToActivityEventFlow.collectLatest { event ->
-//            when (event) {
-//                is PermissionsScreenEvent.PermissionsViewModelToActivityEvent.OnBack -> {
-//                    onBackPressed()
-//                }
-//
-//                PermissionsScreenEvent.PermissionsViewModelToActivityEvent.OnOpenAppSettings -> {
-//                    openAppSettings()
-//                }
-//            }
-//        }
-//    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        viewModel.actions.collectLatest { action ->
+            when (action) {
+                is PermissionsScreenAction.OnBackClicked -> {
+                    onBackPressed()
+                }
+
+                is PermissionsScreenAction.OnOpenAppSettingsClicked -> {
+                    openAppSettings()
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
+    val state = viewModel.stateFlow.collectAsStateWithLifecycle()
 
     PermissionsScreenContent(
-        viewModel.state,
+        state.value,
         onBack = { onBackPressed() },
         onPermissionResult = { isPermissionGranted ->
-            viewModel.sendScreenToViewModelEvent(
-                PermissionsScreenEvent.PermissionsScreenToViewModelEvent.OnPermissionResult(
+            viewModel.onEvent(
+                PermissionsScreenEvent.OnPermissionResult(
                     isPermissionGranted = isPermissionGranted,
                 )
             )
         },
         onDismiss = { permission ->
-            viewModel.sendScreenToViewModelEvent(
-                PermissionsScreenEvent.PermissionsScreenToViewModelEvent.OnDismiss(
+            viewModel.onAction(
+                PermissionsScreenAction.OnDismiss(
                     permission
                 )
             )
         },
         onOpenAppSettingsClicked = {
+            viewModel.onAction(
+                PermissionsScreenAction.OnOpenAppSettingsClicked
+            )
             openAppSettings()
         },
         onCheckShouldShowRationale = { shouldShowRationale ->
-            viewModel.sendScreenToViewModelEvent(
-                PermissionsScreenEvent.PermissionsScreenToViewModelEvent.OnCheckShouldShowRationaleResult(
+            viewModel.onEvent(
+                PermissionsScreenEvent.OnCheckShouldShowRationaleResult(
                     shouldShowRationale
                 )
             )
         },
         updatePermissionState = {
-            viewModel.sendScreenToViewModelEvent(
-                PermissionsScreenEvent.PermissionsScreenToViewModelEvent.OnUpdatePermissionState
+            viewModel.onEvent(
+                PermissionsScreenEvent.OnUpdatePermissionState
             )
         },
         onResolvePermissionClick = { permission ->
-            viewModel.sendScreenToViewModelEvent(
-                PermissionsScreenEvent.PermissionsScreenToViewModelEvent.OnResolvePermissionClick(
+            viewModel.onAction(
+                PermissionsScreenAction.OnResolvePermissionClick(
                     permission
                 )
             )
@@ -138,32 +151,44 @@ fun PermissionsScreenContent(
         onCheckShouldShowRationale(shouldShowRationaleMap)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-
-        Text(text = "Permissions denied")
-        LazyColumn {
-            items(state.permissions.size) { i ->
-                val permission = state.permissions.elementAt(i)
-                PermissionRationale(
-                    permission = permission,
-                    onResolveClick = {
-                        onResolvePermissionClick(permission)
-                    }
-                )
+    SignalTrackerScaffold(
+        topAppBar = {
+            SignalTrackerToolbar(
+                showBackButton = true,
+                title = stringResource(id = R.string.permissions_needed),
+                scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+                onBackClick = {
+                    onBack()
+                }
+            )
+        },
+    ) { padding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(top = 8.dp)
+        ) {
+            LazyColumn {
+                items(state.permissions.size) { i ->
+                    val permission = state.permissions.elementAt(i)
+                    PermissionRationale(
+                        permission = permission,
+                        onResolveClick = {
+                            onResolvePermissionClick(permission)
+                        }
+                    )
+                }
             }
         }
-    }
 
-    PermissionResolver(
-        permission = state.permission,
-        onPermissionResult = onPermissionResult,
-        onDismiss = onDismiss,
-        onOpenAppSettingsClicked = onOpenAppSettingsClicked,
-    )
+        PermissionResolver(
+            permission = state.permission,
+            onPermissionResult = onPermissionResult,
+            onDismiss = onDismiss,
+            onOpenAppSettingsClicked = onOpenAppSettingsClicked,
+        )
+    }
 
 }
 

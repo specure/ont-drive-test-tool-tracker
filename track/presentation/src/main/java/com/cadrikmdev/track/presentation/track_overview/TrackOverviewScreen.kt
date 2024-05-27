@@ -19,15 +19,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.TrackIcon
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerFloatingActionButton
+import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
 import com.cadrikmdev.track.presentation.R
@@ -37,6 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TrackOverviewScreenRoot(
     onStartTrackClick: () -> Unit,
+    onResolvePermissionClick: () -> Unit,
     viewModel: TrackOverviewViewModel = koinViewModel(),
 ) {
     TrackOverviewScreen(
@@ -44,22 +52,42 @@ fun TrackOverviewScreenRoot(
         onAction = { action ->
             when (action) {
                 TrackOverviewAction.OnStartClick -> onStartTrackClick()
+                TrackOverviewAction.OnResolvePermissionClick -> onResolvePermissionClick()
                 else -> Unit
             }
             viewModel.onAction(action)
-        }
+        },
+        onEvent = viewModel::onEvent
     )
 }
 
 @Composable
 private fun TrackOverviewScreen(
     state: TrackOverviewState,
-    onAction: (TrackOverviewAction) -> Unit
+    onAction: (TrackOverviewAction) -> Unit,
+    onEvent: (TrackOverviewEvent) -> Unit
 ) {
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = topAppBarState
     )
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+    LaunchedEffect(lifecycleState) {
+
+        when (lifecycleState) {
+            Lifecycle.State.RESUMED -> {
+                onEvent(TrackOverviewEvent.OnUpdatePermissionStatus)
+            }
+
+            Lifecycle.State.DESTROYED,
+            Lifecycle.State.INITIALIZED,
+            Lifecycle.State.CREATED,
+            Lifecycle.State.STARTED -> { // nothing to do }
+            }
+        }
+    }
+
     SignalTrackerScaffold(
         topAppBar = {
             SignalTrackerToolbar(
@@ -103,6 +131,26 @@ private fun TrackOverviewScreen(
                     )
 
             }
+            if (state.isPermissionRequired) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(text = stringResource(id = R.string.permission_required))
+                    if (state.isPermissionRequired) {
+                        SignalTrackerOutlinedActionButton(
+                            modifier = Modifier.padding(start = 16.dp),
+                            text = stringResource(id = com.cadrikmdev.permissions.presentation.R.string.resolve),
+                            isLoading = false
+                        ) {
+                            onAction(TrackOverviewAction.OnResolvePermissionClick)
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -138,8 +186,11 @@ private fun TrackOverviewScreen(
 private fun TrackOverviewScreenPreview() {
     SignalTrackerTheme {
         TrackOverviewScreen(
-            state = TrackOverviewState(),
-            onAction = {}
+            state = TrackOverviewState(
+                isPermissionRequired = true
+            ),
+            onAction = {},
+            onEvent = {}
         )
     }
 }

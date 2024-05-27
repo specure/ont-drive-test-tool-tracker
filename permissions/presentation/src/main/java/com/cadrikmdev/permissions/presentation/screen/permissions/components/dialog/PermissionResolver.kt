@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import com.cadrikmdev.permissions.domain.model.Permission
-import com.cadrikmdev.permissions.presentation.AndroidPermission
+import com.cadrikmdev.permissions.presentation.model.AndroidPermission
 import com.cadrikmdev.permissions.presentation.util.findActivity
 import timber.log.Timber
 

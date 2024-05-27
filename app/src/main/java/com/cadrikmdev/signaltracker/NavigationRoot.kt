@@ -43,6 +43,9 @@ private fun NavGraphBuilder.trackGraph(
                 onStartTrackClick = {
                     navController.navigate("active_track")
                 },
+                onResolvePermissionClick = {
+                    navController.navigate("permissions")
+                }
             )
         }
         composable(
@@ -93,7 +96,11 @@ private fun NavGraphBuilder.permissionsGraph(
             val context = LocalContext.current
             PermissionsScreen(
                 onBackPressed = {
-                    navController.navigateUp()
+                    navController.navigate("track_overview") {
+                        popUpTo("permissions") {
+                            inclusive = true
+                        }
+                    }
                 },
                 openAppSettings = {
                     context.openAppSettings()

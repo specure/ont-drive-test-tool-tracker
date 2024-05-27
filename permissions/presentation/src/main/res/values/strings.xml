@@ -11,4 +11,9 @@
     <string name="permission_background_location_description">This app needs access to your background location so that your measurement can be executed on the background too.</string>
     <string name="permission_read_phone_state_rationale">It seems you permanently declined read phone state permission. You can go to app settings to grant it.</string>
     <string name="permission_read_phone_state_description">This app needs access to your phone state so that app can determine mobile network parameters.</string>
+    <string name="permissions_needed">Permissions needed</string>
+    <string name="location_permission">Use location</string>
+    <string name="notification_permission">Post notification</string>
+    <string name="background_location">Use location on background</string>
+    <string name="read_phone_state">Read phone data</string>
 </resources>

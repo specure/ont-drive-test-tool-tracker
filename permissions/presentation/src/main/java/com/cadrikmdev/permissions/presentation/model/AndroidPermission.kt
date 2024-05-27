@@ -1,4 +1,4 @@
-package com.cadrikmdev.permissions.presentation
+package com.cadrikmdev.permissions.presentation.model
 
 import android.os.Build
 import com.cadrikmdev.permissions.domain.model.Permission
