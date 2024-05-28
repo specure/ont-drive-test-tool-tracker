@@ -12,5 +12,5 @@ data class AndroidPermission(
     override var isAsked: Boolean = false,
     override val isTargetApiToBeAsked: Boolean = Build.VERSION.SDK_INT in minimumApiRequired..maximumApiRequired,
     override var shouldShowRationale: Boolean = false,
-    override var shouldCheckShouldShowRationale: Boolean = false
+    override var shouldCheckShouldShowRationale: Boolean = false,
 ) : Permission()

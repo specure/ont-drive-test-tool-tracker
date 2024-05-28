@@ -8,7 +8,9 @@ import com.cadrikmdev.permissions.presentation.model.AndroidPermission
 val appPermissions = linkedMapOf<String, Permission>(
     Pair(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        AndroidPermission(name = Manifest.permission.ACCESS_FINE_LOCATION)
+        AndroidPermission(
+            name = Manifest.permission.ACCESS_FINE_LOCATION,
+        )
     ),
     Pair(
         Manifest.permission.ACCESS_BACKGROUND_LOCATION,

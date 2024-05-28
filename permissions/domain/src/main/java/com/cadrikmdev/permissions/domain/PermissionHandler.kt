@@ -19,6 +19,8 @@ interface PermissionHandler {
 
     fun isPermissionGranted(permission: String): Boolean
 
+    fun isDependentPermissionGranted(permission: String): Boolean
+
     fun isUpdateForShouldShowRationaleNeeded(): Boolean
 
     fun getNotGrantedPermissionList(): List<Permission>

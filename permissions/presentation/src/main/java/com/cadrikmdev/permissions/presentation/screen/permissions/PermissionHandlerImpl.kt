@@ -77,6 +77,23 @@ class PermissionHandlerImpl(
         return permissions[permission]?.isGranted == true
     }
 
+    override fun isDependentPermissionGranted(permission: String): Boolean {
+        val permission = permissions[permission]
+        if (permission?.dependsOn.isNullOrEmpty()) {
+            return true
+        }
+
+        val prePermission = try {
+            permissions.getValue(permission?.dependsOn!!)
+        } catch (e: NoSuchElementException) {
+            return true
+        }
+        prePermission?.let {
+            return it.isGranted
+        }
+        return true
+    }
+
     override fun isUpdateForShouldShowRationaleNeeded(): Boolean {
         return permissions.values.any { permission -> permission.shouldCheckShouldShowRationale }
     }
@@ -87,7 +104,7 @@ class PermissionHandlerImpl(
 //            if (permissions[permission]?.shouldCheckShouldShowRationale == true) {
 //                throw Exception("Incorrect permission manager state, please update if it should show rationale")
 //            }
-            if (!isPermissionGranted(permission)) {
+            if (!isPermissionGranted(permission) && isDependentPermissionGranted(permission)) {
                 permissions[permission]?.let { permissionsNotGrantedList.add(it) }
             }
         }
@@ -100,7 +117,10 @@ class PermissionHandlerImpl(
 //            if (permissions[permission]?.shouldCheckShouldShowRationale == true) {
 //                throw Exception("Incorrect permission manager state, please update if it should show rationale")
 //            }
-            if (!isPermissionGranted(permission) && !isPermissionPermanentlyDenied(permission)) {
+            if (!isPermissionGranted(permission) && !isPermissionPermanentlyDenied(permission) && isDependentPermissionGranted(
+                    permission
+                )
+            ) {
                 permissions[permission]?.let { permissionsToBeAskedList.add(it) }
             }
         }
@@ -113,7 +133,10 @@ class PermissionHandlerImpl(
 //            if (permissions[permission]?.shouldCheckShouldShowRationale == true) {
 //                throw Exception("Incorrect permission manager state, please update if it should show rationale")
 //            }
-            if (!isPermissionGranted(permission) && !isPermissionPermanentlyDenied(permission) && permissions[permission]?.shouldShowRationale == true) {
+            if (!isPermissionGranted(permission) && !isPermissionPermanentlyDenied(permission) && isDependentPermissionGranted(
+                    permission
+                ) && permissions[permission]?.shouldShowRationale == true
+            ) {
                 permissions[permission]?.let { permissionsToBeShownRationale.add(it) }
             }
         }
