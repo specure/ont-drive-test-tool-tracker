@@ -91,15 +91,7 @@ class PermissionHandlerImpl(
                 permissions[permission]?.let { permissionsNotGrantedList.add(it) }
             }
         }
-        val sortedPermissionsNotGrantedList = permissionsNotGrantedList
-            .sortedWith(
-                compareByDescending<Permission> {
-                    it.isGranted
-                }.thenByDescending {
-                    it.isAsked
-                }
-            )
-        return sortedPermissionsNotGrantedList
+        return permissionsNotGrantedList
     }
 
     override fun getPermissionsToBeAskedList(): List<Permission> {
@@ -112,15 +104,7 @@ class PermissionHandlerImpl(
                 permissions[permission]?.let { permissionsToBeAskedList.add(it) }
             }
         }
-        val sortedPermissionsToBeAskedList = permissionsToBeAskedList
-            .sortedWith(
-                compareByDescending<Permission> {
-                    it.isGranted
-                }.thenByDescending {
-                    it.isAsked
-                }
-            )
-        return sortedPermissionsToBeAskedList
+        return permissionsToBeAskedList
     }
 
     override fun getPermissionsToBeShownRationale(): List<Permission> {
@@ -133,15 +117,7 @@ class PermissionHandlerImpl(
                 permissions[permission]?.let { permissionsToBeShownRationale.add(it) }
             }
         }
-        val sortedPermissionsToBeShownRationale = permissionsToBeShownRationale
-            .sortedWith(
-                compareByDescending<Permission> {
-                    it.isGranted
-                }.thenByDescending {
-                    it.isAsked
-                }
-            )
-        return sortedPermissionsToBeShownRationale
+        return permissionsToBeShownRationale
     }
 
     private fun updatePermissionState(permission: String, isGranted: Boolean) {
