@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.connectivity.ConnectivityObserver
+import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
+import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.presentation.track_overview.mapper.toTrackUi
@@ -26,6 +28,8 @@ class TrackOverviewViewModel(
     private val sessionStorage: SessionStorage,
     private val connectivityObserver: ConnectivityObserver,
     private val permissionHandler: PermissionHandler,
+    private val gpsLocationService: ServiceChecker,
+    private val locationServiceObserver: LocationServiceObserver,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -57,6 +61,13 @@ class TrackOverviewViewModel(
             trackRepository.syncPendingTracks()
             trackRepository.fetchTracks()
         }
+
+        viewModelScope.launch {
+            locationServiceObserver.observeLocationServiceStatus().collect { serviceStatus ->
+                val isAvailable = gpsLocationService.isServiceAvailable()
+                updateGpsLocationServiceStatus(serviceStatus.isGpsEnabled, isAvailable)
+            }
+        }
     }
 
     fun onAction(action: TrackOverviewAction) {
@@ -69,6 +80,10 @@ class TrackOverviewViewModel(
                 }
             }
 
+            TrackOverviewAction.OnResolveLocationService -> {
+                gpsLocationService.resolve()
+            }
+
             else -> Unit
         }
     }
@@ -79,7 +94,21 @@ class TrackOverviewViewModel(
                 permissionHandler.checkPermissionsState()
                 updatePermissionsState()
             }
+
+            TrackOverviewEvent.OnUpdateLocationServiceStatus -> {
+                val isGpsEnabled = gpsLocationService.isServiceEnabled()
+                val isAvailable = gpsLocationService.isServiceAvailable()
+
+                updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
+            }
         }
+    }
+
+    private fun updateGpsLocationServiceStatus(isGpsEnabled: Boolean, isAvailable: Boolean) {
+        this.state = state.copy(
+            isLocationServiceEnabled = isGpsEnabled && isAvailable,
+            isLocationServiceResolvable = isAvailable
+        )
     }
 
     private fun updatePermissionsState() {

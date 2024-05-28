@@ -18,4 +18,5 @@ dependencies {
     implementation(projects.track.domain)
     implementation(projects.permissions.domain)
     implementation(projects.permissions.presentation)
+    implementation(projects.core.presentation.service)
 }

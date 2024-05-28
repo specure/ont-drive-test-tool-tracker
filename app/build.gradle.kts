@@ -66,14 +66,15 @@ dependencies {
 
     implementation(projects.core.presentation.designsystem)
     implementation(projects.core.presentation.ui)
+
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.database)
     implementation(projects.core.connectivity)
 
     implementation(projects.permissions.presentation)
-    implementation(projects.permissions.domain)
-    implementation(projects.permissions.data)
+    implementation(projects.track.domain)
+    implementation(projects.track.data)
 
     implementation(projects.track.presentation)
     implementation(projects.track.domain)

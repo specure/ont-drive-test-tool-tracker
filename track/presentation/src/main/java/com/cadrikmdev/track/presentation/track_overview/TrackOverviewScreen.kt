@@ -74,10 +74,10 @@ private fun TrackOverviewScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
     LaunchedEffect(lifecycleState) {
-
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
                 onEvent(TrackOverviewEvent.OnUpdatePermissionStatus)
+                onEvent(TrackOverviewEvent.OnUpdateLocationServiceStatus)
             }
 
             Lifecycle.State.DESTROYED,
@@ -151,6 +151,34 @@ private fun TrackOverviewScreen(
                     }
                 }
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = stringResource(id = R.string.location_service))
+                if (state.isLocationServiceEnabled) {
+                    Text(
+                        text = stringResource(id = R.string.available)
+                    )
+                } else if (state.isLocationServiceResolvable) {
+                    SignalTrackerOutlinedActionButton(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = stringResource(id = com.cadrikmdev.permissions.presentation.R.string.resolve),
+                        isLoading = false
+                    ) {
+                        onAction(TrackOverviewAction.OnResolveLocationService)
+                    }
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.unavailable),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
 
 
@@ -187,7 +215,9 @@ private fun TrackOverviewScreenPreview() {
     SignalTrackerTheme {
         TrackOverviewScreen(
             state = TrackOverviewState(
-                isPermissionRequired = true
+                isPermissionRequired = true,
+                isLocationServiceEnabled = false,
+                isLocationServiceResolvable = true,
             ),
             onAction = {},
             onEvent = {}

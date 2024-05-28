@@ -26,4 +26,5 @@
     <string name="internetConnection">Internet connection:</string>
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
+    <string name="location_service">Location service</string>
 </resources>

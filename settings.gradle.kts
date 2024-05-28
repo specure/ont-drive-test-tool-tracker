@@ -27,6 +27,7 @@ rootProject.name = "SignalTracker"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":core:presentation:designsystem")
+include(":core:presentation:service")
 include(":core:presentation:ui")
 include(":core:data")
 include(":core:database")

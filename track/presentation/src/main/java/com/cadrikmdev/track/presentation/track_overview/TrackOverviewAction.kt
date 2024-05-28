@@ -6,6 +6,7 @@ sealed interface TrackOverviewAction {
     data object OnStartClick : TrackOverviewAction
     data object OnLogoutClick : TrackOverviewAction
     data object OnResolvePermissionClick : TrackOverviewAction
+    data object OnResolveLocationService : TrackOverviewAction
 
 
     data class DeleteTrack(val trackUi: TrackUi) : TrackOverviewAction

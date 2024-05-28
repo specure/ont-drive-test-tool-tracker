@@ -6,4 +6,8 @@ data class TrackOverviewState(
     val tracks: List<TrackUi> = emptyList(),
     val isOnline: Boolean = false,
     val isPermissionRequired: Boolean = false,
-)
+    val isLocationServiceEnabled: Boolean = false,
+    val isLocationServiceResolvable: Boolean = false,
+) {
+
+}
