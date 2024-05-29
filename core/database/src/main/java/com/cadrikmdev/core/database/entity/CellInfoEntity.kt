@@ -3,8 +3,6 @@ package com.cadrikmdev.core.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.cadrikmdev.core.database.Tables
-import com.cadrikmdev.core.domain.connectivity.TransportType
-import com.cadrikmdev.core.domain.connectivity.mobile.CellTechnology
 
 @Entity(
     tableName = Tables.CELL_INFO
@@ -19,9 +17,9 @@ data class CellInfoEntity(
     val channelNumber: Int?,
     val frequency: Double?,
     val registered: Boolean,
-    val transportType: TransportType,
+    val transportType: Int,
     // another more for mobile cell
-    val cellTechnology: CellTechnology?,
+    val cellTechnology: String?,
     val areaCode: Int?,
     val locationId: Long?,
     val mcc: Int?,

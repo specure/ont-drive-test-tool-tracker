@@ -8,11 +8,12 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object Timer {
 
+    private const val TIMER_DELAYS_MILLIS = 1000L
     fun timeAndEmit(): Flow<Duration> {
         return flow {
             var lastEmitTime = System.currentTimeMillis()
             while (true) {
-                delay(200L)
+                delay(TIMER_DELAYS_MILLIS)
                 val currentTime = System.currentTimeMillis()
                 val elapsedTime = currentTime - lastEmitTime
                 emit(elapsedTime.milliseconds)
