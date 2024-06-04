@@ -18,7 +18,7 @@ package com.cadrikmdev.core.connectivty.domain.connectivity
 /**
  * Base class that represents network information
  */
-abstract class NetworkInfo(val type: com.cadrikmdev.core.connectivty.domain.connectivity.TransportType, val cellUUID: String) {
+abstract class NetworkInfo(val type: TransportType, val cellUUID: String) {
 
     /**
      * Name of network

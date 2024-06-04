@@ -1,5 +1,6 @@
 package com.cadrikmdev.track.presentation.track_overview
 
+import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
 import com.cadrikmdev.track.presentation.track_overview.model.TrackUi
 
 data class TrackOverviewState(
@@ -8,6 +9,7 @@ data class TrackOverviewState(
     val isPermissionRequired: Boolean = false,
     val isLocationServiceEnabled: Boolean = false,
     val isLocationServiceResolvable: Boolean = false,
+    val mobileNetworkInfo: MobileNetworkInfo? = null,
 ) {
 
 }

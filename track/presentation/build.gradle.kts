@@ -19,5 +19,5 @@ dependencies {
     implementation(projects.permissions.domain)
     implementation(projects.permissions.presentation)
     implementation(projects.core.presentation.service)
-    implementation(project(":core:connectivity"))
+    implementation(projects.core.connectivity)
 }

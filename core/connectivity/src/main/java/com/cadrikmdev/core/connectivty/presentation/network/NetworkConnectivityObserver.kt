@@ -107,7 +107,7 @@ class NetworkConnectivityObserver(
         }.distinctUntilChanged()
     }
 
-    override fun observeDetailedConnectivity(): Flow<com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver.Status> {
+    override fun observeDetailedConnectivity(): Flow<ConnectivityObserver.Status> {
         return callbackFlow {
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {

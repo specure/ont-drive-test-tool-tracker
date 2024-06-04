@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver
+import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
+import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.SyncTrackScheduler
@@ -30,6 +32,7 @@ class TrackOverviewViewModel(
     private val permissionHandler: PermissionHandler,
     private val gpsLocationService: ServiceChecker,
     private val locationServiceObserver: LocationServiceObserver,
+    private val mobileNetworkObserver: NetworkTracker,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -62,10 +65,18 @@ class TrackOverviewViewModel(
             trackRepository.fetchTracks()
         }
 
+        locationServiceObserver.observeLocationServiceStatus().onEach { serviceStatus ->
+            val isAvailable = gpsLocationService.isServiceAvailable()
+            updateGpsLocationServiceStatus(serviceStatus.isGpsEnabled, isAvailable)
+        }.launchIn(viewModelScope)
+
         viewModelScope.launch {
-            locationServiceObserver.observeLocationServiceStatus().collect { serviceStatus ->
-                val isAvailable = gpsLocationService.isServiceAvailable()
-                updateGpsLocationServiceStatus(serviceStatus.isGpsEnabled, isAvailable)
+            mobileNetworkObserver.observeNetwork().collect {
+                if (it.isEmpty()) {
+                    state = state.copy(mobileNetworkInfo = null)
+                } else {
+                    state = state.copy(mobileNetworkInfo = it.first() as MobileNetworkInfo)
+                }
             }
         }
     }

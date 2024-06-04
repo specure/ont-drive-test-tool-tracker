@@ -8,7 +8,7 @@ interface ConnectivityObserver {
     fun observerInternetAvailability(): Flow<Boolean>
     fun observeBasicConnectivity(): Flow<Boolean>
 
-    fun observeDetailedConnectivity(): Flow<com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver.Status>
+    fun observeDetailedConnectivity(): Flow<Status>
 
     enum class Status {
         AVAILABLE,

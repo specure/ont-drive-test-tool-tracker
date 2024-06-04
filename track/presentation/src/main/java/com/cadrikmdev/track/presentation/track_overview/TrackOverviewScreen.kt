@@ -3,15 +3,19 @@
 package com.cadrikmdev.track.presentation.track_overview
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
+import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkType
+import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.PrimaryDataSubscription
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.TrackIcon
@@ -179,7 +186,52 @@ private fun TrackOverviewScreen(
                     )
                 }
             }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp)
+                    .padding(16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(16.dp),
+                    )
+            ) {
+                Text(
+                    text = state.mobileNetworkInfo?.name.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = state.mobileNetworkInfo?.simOperatorMccMnc.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = state.mobileNetworkInfo?.simCountryIso.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = state.mobileNetworkInfo?.networkType.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = state.mobileNetworkInfo?.isRoaming.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = state.mobileNetworkInfo?.obtainedTimestampMillis.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = state.mobileNetworkInfo?.isPrimaryDataSubscription.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = state.mobileNetworkInfo?.simCount.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
+
 
 
         LazyColumn(
@@ -218,6 +270,21 @@ private fun TrackOverviewScreenPreview() {
                 isPermissionRequired = true,
                 isLocationServiceEnabled = false,
                 isLocationServiceResolvable = true,
+                mobileNetworkInfo = MobileNetworkInfo(
+                    name = "O2",
+                    networkType = MobileNetworkType.LTE_CA,
+                    simDisplayName = "SDName",
+                    simOperatorName = "simOperName",
+                    simOperatorMccMnc = "233-02",
+                    simCountryIso = "US",
+                    operatorName = "operName",
+                    mcc = 233,
+                    mnc = 2,
+                    isRoaming = false,
+                    isPrimaryDataSubscription = PrimaryDataSubscription.TRUE,
+                    simCount = 1,
+                    obtainedTimestampMillis = 194656515616
+                )
             ),
             onAction = {},
             onEvent = {}
