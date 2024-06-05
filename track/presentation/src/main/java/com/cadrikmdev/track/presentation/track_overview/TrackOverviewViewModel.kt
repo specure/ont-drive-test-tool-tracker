@@ -1,9 +1,13 @@
 package com.cadrikmdev.track.presentation.track_overview
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver
 import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
@@ -14,13 +18,20 @@ import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.permissions.domain.PermissionHandler
+import com.cadrikmdev.permissions.presentation.BuildConfig
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.presentation.track_overview.mapper.toTrackUi
+import com.synaptictools.iperf.IPerf
+import com.synaptictools.iperf.IPerfConfig
+import com.synaptictools.iperf.IPerfResult
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 import kotlin.time.Duration.Companion.minutes
 
 class TrackOverviewViewModel(
@@ -33,12 +44,36 @@ class TrackOverviewViewModel(
     private val gpsLocationService: ServiceChecker,
     private val locationServiceObserver: LocationServiceObserver,
     private val mobileNetworkObserver: NetworkTracker,
+    private val applicationContext: Context,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
         private set
 
+    private val resultBuilder: StringBuilder = StringBuilder()
+
+    private val _iPerfRequestResult: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+    val iPerfRequestResult: LiveData<String>
+        get() = _iPerfRequestResult
+
+    private val _iPerfTestRunning: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>(false)
+    }
+    val iPerfTestRunning: LiveData<Boolean>
+        get() = _iPerfTestRunning
+
     init {
+
+        viewModelScope.launch {
+            iPerfRequestResult.asFlow().collect {
+                state = state.copy(
+                    currentIperfInfo = it
+                )
+            }
+        }
+
         viewModelScope.launch {
             syncTrackScheduler.scheduleSync(
                 type = SyncTrackScheduler.SyncType.FetchTracks(30.minutes)
@@ -77,6 +112,28 @@ class TrackOverviewViewModel(
                 } else {
                     state = state.copy(mobileNetworkInfo = it.first() as MobileNetworkInfo)
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            val hostname: String = BuildConfig.BASE_URL.toString()
+//            val port = etPort.text.toString()
+            if (hostname.isNotEmpty()) {
+                val stream = File(applicationContext.filesDir, "iperf3.XXXXXX")
+
+                startRequest(
+                    IPerfConfig(
+                        hostname = hostname,
+                        stream = stream.path,
+                        duration = 20,
+                        interval = 1,
+                        download = true,
+                        useUDP = false,
+                        json = false,
+                        debug = false
+                    ),
+                    isAsync = true
+                )
             }
         }
     }
@@ -141,5 +198,58 @@ class TrackOverviewViewModel(
             sessionStorage.set(null)
         }
 
+    }
+
+    fun startRequest(config: IPerfConfig, isAsync: Boolean = true) {
+        Timber.d("isAsync request $isAsync")
+        Timber.d("start request with $config")
+        _iPerfTestRunning.postValue(true)
+        resultBuilder.clear()
+        viewModelScope.launch {
+            doStartRequest(config, isAsync)
+        }
+    }
+
+    private suspend fun doStartRequest(config: IPerfConfig, isAsync: Boolean) {
+        withContext(Dispatchers.IO) {
+            try {
+                if (isAsync) {
+                    IPerf.seCallBack {
+                        success {
+                            Timber.d("iPerf request done")
+                            _iPerfTestRunning.postValue(false)
+                        }
+                        update { text ->
+                            resultBuilder.append(text)
+                            _iPerfRequestResult.postValue(resultBuilder.toString())
+                        }
+                        error { e ->
+                            resultBuilder.append("\niPerf request failed:\n error: $e")
+                            Timber.d("$resultBuilder")
+                            _iPerfTestRunning.postValue(false)
+                        }
+                    }
+                }
+                val result = IPerf.request(config)
+                if (!isAsync) {
+                    when (result) {
+                        is IPerfResult.Success -> {
+                            Timber.d("iPerf request done")
+                            resultBuilder.append(result.data)
+                            _iPerfRequestResult.postValue(resultBuilder.toString())
+                            _iPerfTestRunning.postValue(false)
+                        }
+
+                        is IPerfResult.Error -> {
+                            Timber.d("iPerf request failed-> ${result.error}")
+                            resultBuilder.append("\niPerf request failed:\n error: $result.error")
+                            _iPerfTestRunning.postValue(false)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.d("error on doStartRequest() -> ${e.message}")
+            }
+        }
     }
 }

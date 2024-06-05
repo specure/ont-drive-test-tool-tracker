@@ -10,6 +10,5 @@ data class TrackOverviewState(
     val isLocationServiceEnabled: Boolean = false,
     val isLocationServiceResolvable: Boolean = false,
     val mobileNetworkInfo: MobileNetworkInfo? = null,
-) {
-
-}
+    val currentIperfInfo: String? = null,
+)

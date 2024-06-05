@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,6 +35,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkType
@@ -121,6 +124,7 @@ private fun TrackOverviewScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -230,6 +234,13 @@ private fun TrackOverviewScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
+
+            state.currentIperfInfo?.let {
+                Text(
+                    text = it,
+                    fontSize = 8.sp
+                )
+            }
         }
 
 
@@ -284,7 +295,8 @@ private fun TrackOverviewScreenPreview() {
                     isPrimaryDataSubscription = PrimaryDataSubscription.TRUE,
                     simCount = 1,
                     obtainedTimestampMillis = 194656515616
-                )
+                ),
+                currentIperfInfo = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih "
             ),
             onAction = {},
             onEvent = {}
