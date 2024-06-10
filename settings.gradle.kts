@@ -38,6 +38,7 @@ include(":track:domain")
 include(":track:location")
 include(":track:network")
 include(":track:presentation")
+include(":iperf-jni:iperf")
 
 
 

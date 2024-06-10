@@ -13,7 +13,6 @@ dependencies {
     implementation(libs.google.maps.android.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.timber)
-    implementation(libs.iperf)
 
     implementation(projects.core.domain)
     implementation(projects.track.domain)
@@ -21,4 +20,5 @@ dependencies {
     implementation(projects.permissions.presentation)
     implementation(projects.core.presentation.service)
     implementation(projects.core.connectivity)
+    implementation(project(":iperf-jni:iperf"))
 }
