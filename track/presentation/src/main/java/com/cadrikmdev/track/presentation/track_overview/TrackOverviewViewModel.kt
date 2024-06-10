@@ -130,7 +130,8 @@ class TrackOverviewViewModel(
                         download = true,
                         useUDP = false,
                         json = false,
-                        debug = false
+                        debug = false,
+                        maxBandwidthBitPerSecond = 20000000,
                     ),
                     isAsync = true
                 )
