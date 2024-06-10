@@ -5,13 +5,16 @@ package com.cadrikmdev.track.presentation.track_overview
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -41,6 +44,7 @@ import androidx.lifecycle.compose.currentStateAsState
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkType
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.PrimaryDataSubscription
+import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.TrackIcon
@@ -62,7 +66,7 @@ fun TrackOverviewScreenRoot(
         state = viewModel.state,
         onAction = { action ->
             when (action) {
-                TrackOverviewAction.OnStartClick -> onStartTrackClick()
+//                TrackOverviewAction.OnStartClick -> onStartTrackClick()
                 TrackOverviewAction.OnResolvePermissionClick -> onResolvePermissionClick()
                 else -> Unit
             }
@@ -192,6 +196,62 @@ private fun TrackOverviewScreen(
                 }
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                state.currentTemperatureCelsius?.let {
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Box(
+                            modifier = Modifier.alignByBaseline()
+                        ) {
+                            Text(
+                                text = it.temperatureCelsius.toString(),
+                                style = MaterialTheme.typography.headlineLarge
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier.alignByBaseline()
+                        ) {
+                            Text(
+                                text = "°C",
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
+                }
+
+                state.currentIperfSpeed?.let {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Box(
+                            modifier = Modifier.alignByBaseline()
+                        ) {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.headlineLarge
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier.alignByBaseline()
+                        ) {
+                            Text(
+                                text = "MBit/s",
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -236,7 +296,7 @@ private fun TrackOverviewScreen(
                 )
             }
 
-            state.currentIperfInfo?.let {
+            state.currentIperfInfoRaw?.let {
                 Text(
                     text = it,
                     fontSize = 8.sp
@@ -297,7 +357,13 @@ private fun TrackOverviewScreenPreview() {
                     simCount = 1,
                     obtainedTimestampMillis = 194656515616
                 ),
-                currentIperfInfo = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih "
+                currentIperfInfoRaw = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih ",
+                currentIperfSpeed = "20",
+                currentTemperatureCelsius = Temperature(
+                    22.3f,
+                    System.currentTimeMillis(),
+                )
+
             ),
             onAction = {},
             onEvent = {}

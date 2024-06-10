@@ -13,10 +13,12 @@ import com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver
 import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.SessionStorage
+import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.presentation.service.ServiceChecker
+import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.BuildConfig
 import com.cadrikmdev.permissions.presentation.appPermissions
@@ -26,6 +28,7 @@ import com.synaptictools.iperf.IPerfConfig
 import com.synaptictools.iperf.IPerfResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -44,6 +47,7 @@ class TrackOverviewViewModel(
     private val gpsLocationService: ServiceChecker,
     private val locationServiceObserver: LocationServiceObserver,
     private val mobileNetworkObserver: NetworkTracker,
+    private val temperatureInfoReceiver: TemperatureInfoReceiver,
     private val applicationContext: Context,
 ) : ViewModel() {
 
@@ -58,6 +62,13 @@ class TrackOverviewViewModel(
     val iPerfRequestResult: LiveData<String>
         get() = _iPerfRequestResult
 
+    private val _iPerfSpeed: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val iPerfSpeed: LiveData<String>
+        get() = _iPerfSpeed
+
     private val _iPerfTestRunning: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>(false)
     }
@@ -65,11 +76,28 @@ class TrackOverviewViewModel(
         get() = _iPerfTestRunning
 
     init {
+        viewModelScope.launch {
+            temperatureInfoReceiver.temperatureFlow.collect { temperature ->
+                updateTemperature(temperature)
+            }
+        }
+
+        viewModelScope.launch {
+            temperatureInfoReceiver.register()
+        }
 
         viewModelScope.launch {
             iPerfRequestResult.asFlow().collect {
                 state = state.copy(
-                    currentIperfInfo = it
+                    currentIperfInfoRaw = it
+                )
+            }
+        }
+
+        viewModelScope.launch {
+            _iPerfSpeed.asFlow().collect {
+                state = state.copy(
+                    currentIperfSpeed = it
                 )
             }
         }
@@ -116,33 +144,22 @@ class TrackOverviewViewModel(
         }
 
         viewModelScope.launch {
-            val hostname: String = BuildConfig.BASE_URL.toString()
-//            val port = etPort.text.toString()
-            if (hostname.isNotEmpty()) {
-                val stream = File(applicationContext.filesDir, "iperf3.XXXXXX")
-
-                startRequest(
-                    IPerfConfig(
-                        hostname = hostname,
-                        stream = stream.path,
-                        duration = 20,
-                        interval = 1,
-                        download = true,
-                        useUDP = false,
-                        json = false,
-                        debug = false,
-                        maxBandwidthBitPerSecond = 20000000,
-                    ),
-                    isAsync = true
-                )
-            }
+            startIperf()
         }
+    }
+
+    private fun updateTemperature(temperatureCelsius: Temperature?) {
+        state = state.copy(
+            currentTemperatureCelsius = temperatureCelsius
+        )
     }
 
     fun onAction(action: TrackOverviewAction) {
         when (action) {
             TrackOverviewAction.OnLogoutClick -> logout()
-            TrackOverviewAction.OnStartClick -> Unit
+            TrackOverviewAction.OnStartClick -> {
+                startIperf()
+            }
             is TrackOverviewAction.DeleteTrack -> {
                 viewModelScope.launch {
                     trackRepository.deleteTrack(action.trackUi.id)
@@ -155,6 +172,11 @@ class TrackOverviewViewModel(
 
             else -> Unit
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        temperatureInfoReceiver.unregister()
     }
 
     fun onEvent(event: TrackOverviewEvent) {
@@ -201,6 +223,29 @@ class TrackOverviewViewModel(
 
     }
 
+    fun startIperf() {
+        val hostname: String = BuildConfig.BASE_URL.toString()
+//            val port = etPort.text.toString()
+        if (hostname.isNotEmpty()) {
+            val stream = File(applicationContext.filesDir, "iperf3.XXXXXX")
+
+            startRequest(
+                IPerfConfig(
+                    hostname = hostname,
+                    stream = stream.path,
+                    duration = 10,
+                    interval = 1,
+                    download = true,
+                    useUDP = false,
+                    json = false,
+                    debug = false,
+                    maxBandwidthBitPerSecond = 20000000,
+                ),
+                isAsync = true
+            )
+        }
+    }
+
     fun startRequest(config: IPerfConfig, isAsync: Boolean = true) {
         Timber.d("isAsync request $isAsync")
         Timber.d("start request with $config")
@@ -221,8 +266,29 @@ class TrackOverviewViewModel(
                             _iPerfTestRunning.postValue(false)
                         }
                         update { text ->
-                            resultBuilder.append(text)
+                            val pattern = """\[(\d+)]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+\.\d+)\s+(MBytes|KBytes|GBytes)\s+(\d+\.\d+)\s+(Mbits/sec|Kbits/sec|Gbits/sec)""".toRegex()
+
+                            // Match the input string with the pattern
+                            val matchResult = pattern.find(text.toString())
+
+                            if (matchResult != null) {
+                                // Extract the matched groups
+                                val (index, startTime, endTime, dataSize, dataUnit, transferRate, transferUnit) = matchResult.destructured
+
+                                // Print the extracted values
+                                println("Index: $index")
+                                println("Start Time: $startTime sec")
+                                println("End Time: $endTime sec")
+                                println("Data Size: $dataSize $dataUnit")
+                                println("Transfer Rate: $transferRate $transferUnit")
+                                _iPerfSpeed.postValue(transferRate)
+                            } else {
+                                _iPerfSpeed.postValue("-")
+                            }
                             _iPerfRequestResult.postValue(resultBuilder.toString())
+                            resultBuilder.append(text)
+
+
                         }
                         error { e ->
                             resultBuilder.append("\niPerf request failed:\n error: $e")
