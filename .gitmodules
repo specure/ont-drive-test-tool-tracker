@@ -1,0 +1,3 @@
+[submodule "iperf-jni"]
+	path = iperf-jni
+	url = https://github.com/cadrikmdev/iperf-jni.git
