@@ -49,53 +49,61 @@ class NetmonsterNetworkTracker(
                             )
                 ) {
                     emit(emptyList())
+                } else {
+
+
+                    val defaultDataSubscriptionId =
+                        SubscriptionManager.getDefaultDataSubscriptionId()
+                    val isDefaultDataSubscriptionIdDetected =
+                        defaultDataSubscriptionId != SubscriptionManager.INVALID_SUBSCRIPTION_ID
+                    val simCount = subscriptionManager.activeSubscriptionInfoCount
+
+                    val mobileNetworkList =
+                        subscriptionManager.activeSubscriptionInfoList.map { subscriptionInfo ->
+                            val netmonsterNetworkType =
+                                netmonster.getNetworkType(subscriptionInfo.subscriptionId)
+                            val mobileNetworkType = netmonsterNetworkType.mapToMobileNetworkType()
+
+                            val validSubscriptionId =
+                                subscriptionInfo.subscriptionId != SubscriptionManager.INVALID_SUBSCRIPTION_ID
+
+                            val isDefaultDataSubscription = when {
+                                defaultDataSubscriptionId == subscriptionInfo.subscriptionId && validSubscriptionId && isDefaultDataSubscriptionIdDetected -> PrimaryDataSubscription.TRUE
+                                defaultDataSubscriptionId != subscriptionInfo.subscriptionId && validSubscriptionId && isDefaultDataSubscriptionIdDetected -> PrimaryDataSubscription.FALSE
+                                else -> PrimaryDataSubscription.UNKNOWN
+                            }
+
+                            val operatorName = subscriptionInfo.carrierName.toString()
+                            val simOperatorMccMnc = when {
+                                subscriptionInfo.mccCompat() == null -> null
+                                subscriptionInfo.mncCompat() == null -> null
+                                else -> "${subscriptionInfo.mccCompat()}-${
+                                    DecimalFormat("00").format(
+                                        subscriptionInfo.mncCompat()
+                                    )
+                                }"
+                            }
+                            val simCountryIso = subscriptionInfo.countryIso
+                            val simDisplayName = subscriptionInfo.displayName?.toString()
+
+                            MobileNetworkInfo(
+                                name = operatorName,
+                                simOperatorName = telephonyManager.getCorrectDataTelephonyManagerOrNull()?.simOperatorName.fixOperatorName(),
+                                simDisplayName = simDisplayName,
+                                simOperatorMccMnc = simOperatorMccMnc,
+                                simCountryIso = simCountryIso,
+                                networkType = mobileNetworkType,
+                                operatorName = operatorName,
+                                mcc = subscriptionInfo.mccCompat(),
+                                mnc = subscriptionInfo.mncCompat(),
+                                isRoaming = telephonyManager.getCorrectDataTelephonyManagerOrNull()?.isNetworkRoaming,
+                                isPrimaryDataSubscription = isDefaultDataSubscription,
+                                simCount = simCount,
+                                obtainedTimestampMillis = System.currentTimeMillis()
+                            )
+                        }
+                    emit(mobileNetworkList)
                 }
-
-
-                val defaultDataSubscriptionId = SubscriptionManager.getDefaultDataSubscriptionId()
-                val isDefaultDataSubscriptionIdDetected =
-                    defaultDataSubscriptionId != SubscriptionManager.INVALID_SUBSCRIPTION_ID
-                val simCount = subscriptionManager.activeSubscriptionInfoCount
-
-                val mobileNetworkList = subscriptionManager.activeSubscriptionInfoList.map { subscriptionInfo ->
-                    val netmonsterNetworkType = netmonster.getNetworkType(subscriptionInfo.subscriptionId)
-                    val mobileNetworkType = netmonsterNetworkType.mapToMobileNetworkType()
-
-                    val validSubscriptionId =
-                        subscriptionInfo.subscriptionId != SubscriptionManager.INVALID_SUBSCRIPTION_ID
-
-                    val isDefaultDataSubscription = when {
-                        defaultDataSubscriptionId == subscriptionInfo.subscriptionId && validSubscriptionId && isDefaultDataSubscriptionIdDetected -> PrimaryDataSubscription.TRUE
-                        defaultDataSubscriptionId != subscriptionInfo.subscriptionId && validSubscriptionId && isDefaultDataSubscriptionIdDetected -> PrimaryDataSubscription.FALSE
-                        else -> PrimaryDataSubscription.UNKNOWN
-                    }
-
-                    val operatorName = subscriptionInfo.carrierName.toString()
-                    val simOperatorMccMnc = when {
-                        subscriptionInfo.mccCompat() == null -> null
-                        subscriptionInfo.mncCompat() == null -> null
-                        else -> "${subscriptionInfo.mccCompat()}-${DecimalFormat("00").format(subscriptionInfo.mncCompat())}"
-                    }
-                    val simCountryIso = subscriptionInfo.countryIso
-                    val simDisplayName = subscriptionInfo.displayName?.toString()
-
-                    MobileNetworkInfo(
-                        name = operatorName,
-                        simOperatorName = telephonyManager.getCorrectDataTelephonyManagerOrNull()?.simOperatorName.fixOperatorName(),
-                        simDisplayName = simDisplayName,
-                        simOperatorMccMnc = simOperatorMccMnc,
-                        simCountryIso = simCountryIso,
-                        networkType = mobileNetworkType,
-                        operatorName = operatorName,
-                        mcc = subscriptionInfo.mccCompat(),
-                        mnc = subscriptionInfo.mncCompat(),
-                        isRoaming = telephonyManager.getCorrectDataTelephonyManagerOrNull()?.isNetworkRoaming,
-                        isPrimaryDataSubscription = isDefaultDataSubscription,
-                        simCount = simCount,
-                        obtainedTimestampMillis = System.currentTimeMillis()
-                    )
-                }
-                emit(mobileNetworkList)
                 delay(700)
             }
         }
