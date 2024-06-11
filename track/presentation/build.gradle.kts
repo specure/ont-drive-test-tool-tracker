@@ -20,5 +20,6 @@ dependencies {
     implementation(projects.permissions.presentation)
     implementation(projects.core.presentation.service)
     implementation(projects.core.connectivity)
-    implementation(project(":iperf-jni:iperf"))
+    implementation(project(":iperf-jni-upload:iperf"))
+    implementation(project(":iperf-jni-download:iperf"))
 }

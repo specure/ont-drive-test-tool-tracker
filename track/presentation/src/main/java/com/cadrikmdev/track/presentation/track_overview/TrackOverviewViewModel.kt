@@ -28,7 +28,6 @@ import com.synaptictools.iperf.IPerfConfig
 import com.synaptictools.iperf.IPerfResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -54,26 +53,50 @@ class TrackOverviewViewModel(
     var state by mutableStateOf(TrackOverviewState())
         private set
 
-    private val resultBuilder: StringBuilder = StringBuilder()
+    private val downloadResultBuilder: StringBuilder = StringBuilder()
+    private val uploadResultBuilder: StringBuilder = StringBuilder()
 
-    private val _iPerfRequestResult: MutableLiveData<String> by lazy {
+    private val iperfUpload = IPerf
+    private val iperfDownload = com.cadrikmdev.iperf.IPerf
+
+    private val _iPerfDownloadRequestResult: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
-    val iPerfRequestResult: LiveData<String>
-        get() = _iPerfRequestResult
+    val iPerfDownloadRequestResult: LiveData<String>
+        get() = _iPerfDownloadRequestResult
 
-    private val _iPerfSpeed: MutableLiveData<String> by lazy {
+    private val _iPerfUploadRequestResult: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+    val iPerfUploadRequestResult: LiveData<String>
+        get() = _iPerfUploadRequestResult
+
+    private val _iPerfDownloadSpeed: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
-    val iPerfSpeed: LiveData<String>
-        get() = _iPerfSpeed
+    val iPerfDownloadSpeed: LiveData<String>
+        get() = _iPerfDownloadSpeed
 
-    private val _iPerfTestRunning: MutableLiveData<Boolean> by lazy {
+    private val _iPerfUploadSpeed: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val iPerfUploadSpeed: LiveData<String>
+        get() = _iPerfUploadSpeed
+
+
+    private val _iPerfDownloadTestRunning: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>(false)
     }
-    val iPerfTestRunning: LiveData<Boolean>
-        get() = _iPerfTestRunning
+    val iPerfDownloadTestRunning: LiveData<Boolean>
+        get() = _iPerfDownloadTestRunning
+
+    private val _iPerfUploadTestRunning: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>(false)
+    }
+    val iPerfUploadTestRunning: LiveData<Boolean>
+        get() = _iPerfUploadTestRunning
 
     init {
         viewModelScope.launch {
@@ -87,17 +110,33 @@ class TrackOverviewViewModel(
         }
 
         viewModelScope.launch {
-            iPerfRequestResult.asFlow().collect {
+            iPerfDownloadRequestResult.asFlow().collect {
                 state = state.copy(
-                    currentIperfInfoRaw = it
+                    currentIperfDownloadInfoRaw = it
                 )
             }
         }
 
         viewModelScope.launch {
-            _iPerfSpeed.asFlow().collect {
+            iPerfUploadRequestResult.asFlow().collect {
                 state = state.copy(
-                    currentIperfSpeed = it
+                    currentIperfUploadInfoRaw = it
+                )
+            }
+        }
+
+        viewModelScope.launch {
+            _iPerfDownloadSpeed.asFlow().collect {
+                state = state.copy(
+                    currentIperfDownloadSpeed = it
+                )
+            }
+        }
+
+        viewModelScope.launch {
+            _iPerfUploadSpeed.asFlow().collect {
+                state = state.copy(
+                    currentIperfUploadSpeed = it
                 )
             }
         }
@@ -143,9 +182,10 @@ class TrackOverviewViewModel(
             }
         }
 
-        viewModelScope.launch {
-            startIperf()
-        }
+//        viewModelScope.launch {
+//            startIperfDownload()
+//            startIperfUpload()
+//        }
     }
 
     private fun updateTemperature(temperatureCelsius: Temperature?) {
@@ -158,7 +198,10 @@ class TrackOverviewViewModel(
         when (action) {
             TrackOverviewAction.OnLogoutClick -> logout()
             TrackOverviewAction.OnStartClick -> {
-                startIperf()
+                viewModelScope.launch {
+                    startIperfDownload()
+                    startIperfUpload()
+                }
             }
             is TrackOverviewAction.DeleteTrack -> {
                 viewModelScope.launch {
@@ -223,16 +266,17 @@ class TrackOverviewViewModel(
 
     }
 
-    fun startIperf() {
-        val hostname: String = BuildConfig.BASE_URL.toString()
+    fun startIperfDownload() {
+        val hostname: String = BuildConfig.BASE_URL
 //            val port = etPort.text.toString()
         if (hostname.isNotEmpty()) {
-            val stream = File(applicationContext.filesDir, "iperf3.XXXXXX")
+            val stream = File(applicationContext.filesDir, "iperf3.DXXXXXX")
 
-            startRequest(
-                IPerfConfig(
+            startDownloadRequest(
+                com.cadrikmdev.iperf.IPerfConfig(
                     hostname = hostname,
                     stream = stream.path,
+                    port = 5201,
                     duration = 10,
                     interval = 1,
                     download = true,
@@ -246,24 +290,58 @@ class TrackOverviewViewModel(
         }
     }
 
-    fun startRequest(config: IPerfConfig, isAsync: Boolean = true) {
-        Timber.d("isAsync request $isAsync")
-        Timber.d("start request with $config")
-        _iPerfTestRunning.postValue(true)
-        resultBuilder.clear()
-        viewModelScope.launch {
-            doStartRequest(config, isAsync)
+    fun startIperfUpload() {
+        val hostname: String = BuildConfig.BASE_URL
+//            val port = etPort.text.toString()
+        if (hostname.isNotEmpty()) {
+            val stream = File(applicationContext.filesDir, "iperf3.UXXXXXX")
+
+            startUploadRequest(
+                IPerfConfig(
+                    hostname = hostname,
+                    stream = stream.path,
+                    duration = 10,
+                    interval = 1,
+                    port = 5202,
+                    download = false,
+                    useUDP = false,
+                    json = false,
+                    debug = false,
+                    maxBandwidthBitPerSecond = 2000000,
+                ),
+                isAsync = true
+            )
         }
     }
 
-    private suspend fun doStartRequest(config: IPerfConfig, isAsync: Boolean) {
+    fun startDownloadRequest(config: com.cadrikmdev.iperf.IPerfConfig, isAsync: Boolean = true) {
+        Timber.d("isAsync request $isAsync")
+        Timber.d("start request with $config")
+        _iPerfDownloadTestRunning.postValue(true)
+        downloadResultBuilder.clear()
+        viewModelScope.launch {
+            doStartDownloadRequest(config, isAsync)
+        }
+    }
+
+    fun startUploadRequest(config: IPerfConfig, isAsync: Boolean = true) {
+        Timber.d("isAsync request $isAsync")
+        Timber.d("start request with $config")
+        _iPerfUploadTestRunning.postValue(true)
+        uploadResultBuilder.clear()
+        viewModelScope.launch {
+            doStartUploadRequest(config, isAsync)
+        }
+    }
+
+    private suspend fun doStartDownloadRequest(config: com.cadrikmdev.iperf.IPerfConfig, isAsync: Boolean) {
         withContext(Dispatchers.IO) {
             try {
                 if (isAsync) {
-                    IPerf.seCallBack {
+                    iperfDownload.seCallBack {
                         success {
-                            Timber.d("iPerf request done")
-                            _iPerfTestRunning.postValue(false)
+                            Timber.d("iPerf download request done")
+                            _iPerfDownloadTestRunning.postValue(false)
                         }
                         update { text ->
                             val pattern = """\[(\d+)]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+\.\d+)\s+(MBytes|KBytes|GBytes)\s+(\d+\.\d+)\s+(Mbits/sec|Kbits/sec|Gbits/sec)""".toRegex()
@@ -275,42 +353,96 @@ class TrackOverviewViewModel(
                                 // Extract the matched groups
                                 val (index, startTime, endTime, dataSize, dataUnit, transferRate, transferUnit) = matchResult.destructured
 
-                                // Print the extracted values
-                                println("Index: $index")
-                                println("Start Time: $startTime sec")
-                                println("End Time: $endTime sec")
-                                println("Data Size: $dataSize $dataUnit")
-                                println("Transfer Rate: $transferRate $transferUnit")
-                                _iPerfSpeed.postValue(transferRate)
+                                _iPerfDownloadSpeed.postValue(transferRate)
                             } else {
-                                _iPerfSpeed.postValue("-")
+                                _iPerfDownloadSpeed.postValue("-")
                             }
-                            _iPerfRequestResult.postValue(resultBuilder.toString())
-                            resultBuilder.append(text)
+                            _iPerfDownloadRequestResult.postValue("D ${downloadResultBuilder.toString()}")
+                            downloadResultBuilder.append(text)
 
 
                         }
                         error { e ->
-                            resultBuilder.append("\niPerf request failed:\n error: $e")
-                            Timber.d("$resultBuilder")
-                            _iPerfTestRunning.postValue(false)
+                            downloadResultBuilder.append("\niPerf download request failed:\n error: $e")
+                            Timber.d("D $downloadResultBuilder")
+                            _iPerfDownloadTestRunning.postValue(false)
                         }
                     }
                 }
-                val result = IPerf.request(config)
+                Timber.d("IPERF DOWNLOAD: $iperfDownload")
+                val result = iperfDownload.request(config)
+                if (!isAsync) {
+                    when (result) {
+                        is com.cadrikmdev.iperf.IPerfResult.Success -> {
+                            Timber.d("iPerf download request done")
+                            downloadResultBuilder.append(result.data)
+                            _iPerfDownloadRequestResult.postValue(downloadResultBuilder.toString())
+                            _iPerfDownloadTestRunning.postValue(false)
+                        }
+
+                        is com.cadrikmdev.iperf.IPerfResult.Error -> {
+                            Timber.d("iPerf download request failed-> ${result.error}")
+                            downloadResultBuilder.append("\niPerf download request failed:\n error: $result.error")
+                            _iPerfDownloadTestRunning.postValue(false)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.d("error on download doStartRequest() -> ${e.message}")
+            }
+        }
+    }
+
+    private suspend fun doStartUploadRequest(config: IPerfConfig, isAsync: Boolean) {
+        withContext(Dispatchers.IO) {
+            try {
+                if (isAsync) {
+                    iperfUpload.seCallBack {
+                        success {
+                            Timber.d("iPerf upload request done")
+                            _iPerfUploadTestRunning.postValue(false)
+                        }
+                        update { text ->
+                            val pattern = """\[(\d+)]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+\.\d+)\s+(MBytes|KBytes|GBytes)\s+(\d+\.\d+)\s+(Mbits/sec|Kbits/sec|Gbits/sec)""".toRegex()
+
+                            // Match the input string with the pattern
+                            val matchResult = pattern.find(text.toString())
+
+                            if (matchResult != null) {
+                                // Extract the matched groups
+                                val (index, startTime, endTime, dataSize, dataUnit, transferRate, transferUnit) = matchResult.destructured
+
+                                _iPerfUploadSpeed.postValue(transferRate)
+                            } else {
+                                _iPerfUploadSpeed.postValue("-")
+                            }
+                            _iPerfUploadRequestResult.postValue("U ${uploadResultBuilder.toString()}")
+                            uploadResultBuilder.append("U $text")
+
+
+                        }
+                        error { e ->
+                            uploadResultBuilder.append("\niPerf upload request failed:\n error: $e")
+                            Timber.d("U $uploadResultBuilder")
+                            _iPerfUploadTestRunning.postValue(false)
+                        }
+                    }
+                }
+                Timber.d("IPERF UPLOAD: $iperfUpload")
+                val result = iperfUpload.request(config)
                 if (!isAsync) {
                     when (result) {
                         is IPerfResult.Success -> {
-                            Timber.d("iPerf request done")
-                            resultBuilder.append(result.data)
-                            _iPerfRequestResult.postValue(resultBuilder.toString())
-                            _iPerfTestRunning.postValue(false)
+                            Timber.d("iPerf upload request done")
+                            uploadResultBuilder.append(result.data)
+                            _iPerfUploadRequestResult.postValue("U ${uploadResultBuilder.toString()}")
+                            _iPerfUploadTestRunning.postValue(false)
                         }
 
                         is IPerfResult.Error -> {
-                            Timber.d("iPerf request failed-> ${result.error}")
-                            resultBuilder.append("\niPerf request failed:\n error: $result.error")
-                            _iPerfTestRunning.postValue(false)
+                            Timber.d("iPerf upload request failed-> ${result.error}")
+                            uploadResultBuilder.append("\niPerf upload request failed:\n error: $result.error")
+                            _iPerfUploadTestRunning.postValue(false)
                         }
                     }
                 }

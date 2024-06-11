@@ -1,3 +1,6 @@
-[submodule "iperf-jni"]
-	path = iperf-jni
+[submodule "iperf-jni-download"]
+	path = iperf-jni-download
+	url = https://github.com/cadrikmdev/iperf-jni.git
+[submodule "iperf-jni-upload"]
+	path = iperf-jni-upload
 	url = https://github.com/cadrikmdev/iperf-jni.git

@@ -11,8 +11,10 @@ data class TrackOverviewState(
     val isLocationServiceEnabled: Boolean = false,
     val isLocationServiceResolvable: Boolean = false,
     val mobileNetworkInfo: MobileNetworkInfo? = null,
-    val currentIperfSpeed: String? = null,
+    val currentIperfDownloadSpeed: String? = null,
+    val currentIperfUploadSpeed: String? = null,
     val currentTemperatureCelsius: Temperature? = null,
     val currentIperfDirection: String? = null,
-    val currentIperfInfoRaw: String? = null,
+    val currentIperfDownloadInfoRaw: String? = null,
+    val currentIperfUploadInfoRaw: String? = null,
 )

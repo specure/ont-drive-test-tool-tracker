@@ -8,6 +8,10 @@ val AnalyticsIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.analytics)
 
+val ArrowDownIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.arrow_down)
+
 val ArrowLeftIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.arrow_left)
@@ -15,6 +19,10 @@ val ArrowLeftIcon: ImageVector
 val ArrowRightIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.arrow_right)
+
+val ArrowUpIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.arrow_up)
 
 val CalendarIcon: ImageVector
     @Composable
