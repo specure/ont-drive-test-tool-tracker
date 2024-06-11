@@ -213,7 +213,7 @@ private fun TrackOverviewScreen(
                         ) {
                             Text(
                                 text = it.temperatureCelsius.toString(),
-                                style = MaterialTheme.typography.headlineLarge
+                                style = MaterialTheme.typography.headlineSmall
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
@@ -222,7 +222,7 @@ private fun TrackOverviewScreen(
                         ) {
                             Text(
                                 text = "°C",
-                                fontSize = 20.sp
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize
                             )
                         }
                     }
@@ -244,7 +244,7 @@ private fun TrackOverviewScreen(
                         ) {
                             Text(
                                 text = it,
-                                style = MaterialTheme.typography.headlineLarge
+                                style = MaterialTheme.typography.headlineSmall
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
@@ -253,7 +253,7 @@ private fun TrackOverviewScreen(
                         ) {
                             Text(
                                 text = "MBit/s",
-                                fontSize = 20.sp
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize
                             )
                         }
                     }
@@ -276,7 +276,7 @@ private fun TrackOverviewScreen(
                         ) {
                             Text(
                                 text = it,
-                                style = MaterialTheme.typography.headlineLarge
+                                style = MaterialTheme.typography.headlineSmall
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
@@ -285,7 +285,7 @@ private fun TrackOverviewScreen(
                         ) {
                             Text(
                                 text = "MBit/s",
-                                fontSize = 20.sp
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize
                             )
                         }
                     }

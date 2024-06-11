@@ -403,20 +403,19 @@ class TrackOverviewViewModel(
                             _iPerfUploadTestRunning.postValue(false)
                         }
                         update { text ->
-                            val pattern = """\[(\d+)]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+\.\d+)\s+(MBytes|KBytes|GBytes)\s+(\d+\.\d+)\s+(Mbits/sec|Kbits/sec|Gbits/sec)""".toRegex()
-
+                            val pattern = """\[(\d+)\]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+)\s+(MBytes|KBytes|GBytes)\s+(\d+\.\d+)\s+(Mbits/sec|Kbits/sec|Gbits/sec)\s+(\d+)\s+(\d+)\s+(MBytes|KBytes|GBytes)""".toRegex()
                             // Match the input string with the pattern
                             val matchResult = pattern.find(text.toString())
 
                             if (matchResult != null) {
                                 // Extract the matched groups
-                                val (index, startTime, endTime, dataSize, dataUnit, transferRate, transferUnit) = matchResult.destructured
+                                val (id, startTime, endTime, data, dataUnit, speed, speedUnit, errors, retrans, retransUnit) = matchResult.destructured
 
-                                _iPerfUploadSpeed.postValue(transferRate)
+                                _iPerfUploadSpeed.postValue(speed)
                             } else {
                                 _iPerfUploadSpeed.postValue("-")
                             }
-                            _iPerfUploadRequestResult.postValue("U ${uploadResultBuilder.toString()}")
+                            _iPerfUploadRequestResult.postValue("${uploadResultBuilder.toString()}")
                             uploadResultBuilder.append("U $text")
 
 
