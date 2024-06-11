@@ -27,7 +27,7 @@ class TemperatureInfoReceiver(
         return temp
     }
 
-    // On samsung A526B it updates it values at static 30s intervals
+    // On samsung A526B (Android 14 - UpsideDownCake) it updates it values at static 30s intervals
     override fun onReceive(arg0: Context?, intent: Intent) {
         temp = Temperature(
             temperatureCelsius = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0).toFloat() / 10f,
@@ -51,7 +51,7 @@ class TemperatureInfoReceiver(
             context.unregisterReceiver(
                 this
             )
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             Timber.e("Error during unregistering battery info receiver: ${e.localizedMessage}")
         }
     }
