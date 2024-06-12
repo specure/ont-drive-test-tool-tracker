@@ -56,7 +56,6 @@ import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerFlo
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
-import com.cadrikmdev.core.presentation.ui.toLocalDateTime
 import com.cadrikmdev.core.presentation.ui.toLocalTime
 import com.cadrikmdev.track.presentation.R
 import com.cadrikmdev.track.presentation.track_overview.components.TrackListItem
@@ -100,7 +99,7 @@ private fun TrackOverviewScreen(
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
                 onEvent(TrackOverviewEvent.OnUpdatePermissionStatus)
-                onEvent(TrackOverviewEvent.OnUpdateLocationServiceStatus)
+                onEvent(TrackOverviewEvent.OnUpdateServiceStatus)
             }
 
             Lifecycle.State.DESTROYED,
@@ -154,6 +153,21 @@ private fun TrackOverviewScreen(
                         color = MaterialTheme.colorScheme.error
                     )
 
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = stringResource(id = R.string.wifi_service_enabled))
+                if (state.isWifiServiceEnabled)
+                    Text(
+                        text = stringResource(id = R.string.available),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                else
+                    Text(
+                        text = stringResource(id = R.string.unavailable),
+                    )
             }
             if (state.isPermissionRequired) {
                 Row(

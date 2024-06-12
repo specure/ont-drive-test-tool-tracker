@@ -10,6 +10,7 @@ data class TrackOverviewState(
     val isOnline: Boolean = false,
     val isLocationTrackable: Boolean = false,
     val isPermissionRequired: Boolean = false,
+    val isWifiServiceEnabled: Boolean = false,
     val isLocationServiceEnabled: Boolean = false,
     val isLocationServiceResolvable: Boolean = false,
     val mobileNetworkInfo: MobileNetworkInfo? = null,

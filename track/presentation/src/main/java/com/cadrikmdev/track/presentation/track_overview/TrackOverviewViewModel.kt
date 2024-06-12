@@ -19,6 +19,7 @@ import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
+import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.cadrikmdev.permissions.domain.PermissionHandler
@@ -57,6 +58,7 @@ class TrackOverviewViewModel(
     private val permissionHandler: PermissionHandler,
     private val gpsLocationService: ServiceChecker,
     private val locationServiceObserver: LocationServiceObserver,
+    private val wifiServiceObserver: WifiServiceObserver,
     private val locationObserver: LocationObserver,
     private val mobileNetworkObserver: NetworkTracker,
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
@@ -201,6 +203,10 @@ class TrackOverviewViewModel(
             updateGpsLocationServiceStatus(serviceStatus.isGpsEnabled, isAvailable)
         }.launchIn(viewModelScope)
 
+        wifiServiceObserver.observeWifiServiceEnabledStatus().onEach { serviceStatus ->
+            updateWifiServiceStatusEnabled(serviceStatus)
+        }.launchIn(viewModelScope)
+
         viewModelScope.launch {
             mobileNetworkObserver.observeNetwork().collect {
                 if (it.isEmpty()) {
@@ -271,13 +277,21 @@ class TrackOverviewViewModel(
                 updatePermissionsState()
             }
 
-            TrackOverviewEvent.OnUpdateLocationServiceStatus -> {
+            TrackOverviewEvent.OnUpdateServiceStatus -> {
                 val isGpsEnabled = gpsLocationService.isServiceEnabled()
                 val isAvailable = gpsLocationService.isServiceAvailable()
 
                 updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
+                // todo: update wifi state
             }
         }
+    }
+
+    private fun updateWifiServiceStatusEnabled(isWifiEnabled: Boolean) {
+        this.state = state.copy(
+            isWifiServiceEnabled = isWifiEnabled,
+        )
+        startObservingData(state.isLocationTrackable)
     }
 
     private fun updateGpsLocationServiceStatus(isGpsEnabled: Boolean, isAvailable: Boolean) {
