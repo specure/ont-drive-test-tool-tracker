@@ -7,7 +7,7 @@ import android.location.LocationManager
 import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
-import com.cadrikmdev.core.domain.location.LocationWithAltitude
+import com.cadrikmdev.core.domain.location.LocationWithDetails
 import com.cadrikmdev.track.domain.LocationObserver
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -24,7 +24,7 @@ class AndroidLocationObserver(
 ) : LocationObserver {
 
     private val client = LocationServices.getFusedLocationProviderClient(context)
-    override fun observeLocation(interval: Long): Flow<LocationWithAltitude> {
+    override fun observeLocation(interval: Long): Flow<LocationWithDetails> {
         return callbackFlow {
             val locationManager = context.getSystemService<LocationManager>()!!
             var isGpsEnabled = false
@@ -50,7 +50,7 @@ class AndroidLocationObserver(
             } else {
                 client.lastLocation.addOnSuccessListener {
                     it?.let { location ->
-                        trySend(location.toLocationWithAltitude())
+                        trySend(location.toLocationWithDetails())
                     }
                 }
 
@@ -59,7 +59,7 @@ class AndroidLocationObserver(
                     override fun onLocationResult(result: LocationResult) {
                         super.onLocationResult(result)
                         result.locations.lastOrNull()?.let { location ->
-                            trySend(location.toLocationWithAltitude())
+                            trySend(location.toLocationWithDetails())
                         }
                     }
                 }

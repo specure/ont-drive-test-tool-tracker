@@ -1,5 +1,9 @@
 package com.cadrikmdev.core.presentation.ui
 
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.roundToInt
@@ -39,4 +43,25 @@ fun Duration.toFormattedPace(distanceKm: Double): String {
 fun Double.roundToDecimals(decimalCount: Int): Double {
     val factor = 10f.pow(decimalCount)
     return round(this * factor) / factor
+}
+
+fun Duration.toLocalDateTime(): LocalDateTime {
+    val instant = Instant.ofEpochMilli(this.inWholeMilliseconds)
+    val zoneId = ZoneId.systemDefault()
+    val localDateTime = LocalDateTime.ofInstant(instant, zoneId)
+    return localDateTime
+}
+
+fun Duration.toUTCDateTime(): LocalDateTime {
+    val instant = Instant.ofEpochMilli(this.inWholeMilliseconds)
+    val zoneId = ZoneId.of("UTC")
+    val localDateTime = LocalDateTime.ofInstant(instant, zoneId)
+    return localDateTime
+}
+
+fun Duration.toLocalTime(): LocalTime {
+    val instant = Instant.ofEpochMilli(this.inWholeMilliseconds)
+    val zoneId = ZoneId.systemDefault()
+    val localDateTime = LocalTime.ofInstant(instant, zoneId)
+    return localDateTime
 }

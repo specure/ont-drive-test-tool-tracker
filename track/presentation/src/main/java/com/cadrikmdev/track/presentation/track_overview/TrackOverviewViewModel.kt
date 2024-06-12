@@ -1,5 +1,6 @@
 package com.cadrikmdev.track.presentation.track_overview
 
+import android.Manifest
 import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +15,7 @@ import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.Temperature
+import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
@@ -22,19 +24,29 @@ import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoRecei
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.BuildConfig
 import com.cadrikmdev.permissions.presentation.appPermissions
+import com.cadrikmdev.track.domain.LocationObserver
+import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.track_overview.mapper.toTrackUi
 import com.synaptictools.iperf.IPerf
 import com.synaptictools.iperf.IPerfConfig
 import com.synaptictools.iperf.IPerfResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class TrackOverviewViewModel(
     private val trackRepository: TrackRepository,
@@ -45,9 +57,11 @@ class TrackOverviewViewModel(
     private val permissionHandler: PermissionHandler,
     private val gpsLocationService: ServiceChecker,
     private val locationServiceObserver: LocationServiceObserver,
+    private val locationObserver: LocationObserver,
     private val mobileNetworkObserver: NetworkTracker,
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
     private val applicationContext: Context,
+    private val measurementTracker: MeasurementTracker,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -98,7 +112,22 @@ class TrackOverviewViewModel(
     val iPerfUploadTestRunning: LiveData<Boolean>
         get() = _iPerfUploadTestRunning
 
+    private val isObservingLocation = MutableStateFlow(false)
+
+    private val currentLocation = isObservingLocation
+        .flatMapLatest { isObservingLocation ->
+            if (isObservingLocation) {
+                locationObserver.observeLocation(1000L)
+            } else flowOf(null)
+        }
+        .stateIn(
+            applicationScope,
+            SharingStarted.Lazily,
+            null
+        )
+
     init {
+
         viewModelScope.launch {
             temperatureInfoReceiver.temperatureFlow.collect { temperature ->
                 updateTemperature(temperature)
@@ -182,10 +211,23 @@ class TrackOverviewViewModel(
             }
         }
 
-//        viewModelScope.launch {
-//            startIperfDownload()
-//            startIperfUpload()
-//        }
+        currentLocation.onEach { location ->
+
+            if (location == null) {
+                state = state.copy(
+                    location = null,
+                )
+            }
+
+            location?.let {
+                state = state.copy(
+                    location = LocationTimestamp(
+                        location,
+                        System.currentTimeMillis().toDuration(DurationUnit.MILLISECONDS)
+                    )
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun updateTemperature(temperatureCelsius: Temperature?) {
@@ -241,14 +283,23 @@ class TrackOverviewViewModel(
     private fun updateGpsLocationServiceStatus(isGpsEnabled: Boolean, isAvailable: Boolean) {
         this.state = state.copy(
             isLocationServiceEnabled = isGpsEnabled && isAvailable,
-            isLocationServiceResolvable = isAvailable
+            isLocationServiceResolvable = isAvailable,
+            isLocationTrackable = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && isAvailable && isGpsEnabled
         )
+        startObservingData(state.isLocationTrackable)
     }
 
     private fun updatePermissionsState() {
         state = state.copy(
-            isPermissionRequired = permissionHandler.getNotGrantedPermissionList().isNotEmpty()
+            isPermissionRequired = permissionHandler.getNotGrantedPermissionList().isNotEmpty(),
+            isLocationTrackable = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && state.isLocationServiceEnabled
         )
+        startObservingData(state.isLocationTrackable)
+    }
+
+    fun startObservingData(isLocationTrackable: Boolean) {
+        isObservingLocation.value = isLocationTrackable
+        // TODO: if all necessary prerequisities are fullfilled then we can run measurement tracker to track values and save it to DB
     }
 
     fun onOnlineStatusChange(isOnline: Boolean) {

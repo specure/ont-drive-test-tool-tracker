@@ -27,4 +27,9 @@
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
     <string name="location_service">Location service</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="age">Age</string>
+    <string name="timestamp">Timestamp</string>
+    <string name="provider">Provider</string>
 </resources>

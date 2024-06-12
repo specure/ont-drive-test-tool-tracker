@@ -44,8 +44,10 @@ import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkI
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkType
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.PrimaryDataSubscription
 import com.cadrikmdev.core.domain.Temperature
+import com.cadrikmdev.core.domain.location.Location
+import com.cadrikmdev.core.domain.location.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationWithDetails
 import com.cadrikmdev.core.presentation.designsystem.ArrowDownIcon
-import com.cadrikmdev.core.presentation.designsystem.ArrowLeftIcon
 import com.cadrikmdev.core.presentation.designsystem.ArrowUpIcon
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
@@ -54,9 +56,13 @@ import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerFlo
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
+import com.cadrikmdev.core.presentation.ui.toLocalDateTime
+import com.cadrikmdev.core.presentation.ui.toLocalTime
 import com.cadrikmdev.track.presentation.R
 import com.cadrikmdev.track.presentation.track_overview.components.TrackListItem
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Composable
 fun TrackOverviewScreenRoot(
@@ -337,6 +343,75 @@ private fun TrackOverviewScreen(
                 )
             }
 
+            state.location?.let { location ->
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(id = R.string.latitude),
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = location.location.location.lat.toString(),
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(id = R.string.longitude),
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = location.location.location.long.toString(),
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(id = R.string.timestamp),
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = location.location.timestamp.toLocalTime().toString(),
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(id = R.string.provider),
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = location.location.source,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                        )
+                    }
+
+                }
+            }
+
+
             Row {
                 state.currentIperfDownloadInfoRaw?.let {
                     Text(
@@ -421,8 +496,17 @@ private fun TrackOverviewScreenPreview() {
                 currentTemperatureCelsius = Temperature(
                     22.3f,
                     System.currentTimeMillis(),
+                ),
+                location = LocationTimestamp(
+                    location = LocationWithDetails(
+                        location = Location(4.94135, 4.8965),
+                        source = "GPS",
+                        altitude = 256.5,
+                        age = 10.toDuration(DurationUnit.SECONDS),
+                        timestamp = 1520.toDuration(DurationUnit.SECONDS)
+                    ),
+                    durationTimestamp = 123.toDuration(DurationUnit.SECONDS)
                 )
-
             ),
             onAction = {},
             onEvent = {}
