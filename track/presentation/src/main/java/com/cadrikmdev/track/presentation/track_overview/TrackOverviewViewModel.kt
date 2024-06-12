@@ -342,7 +342,7 @@ class TrackOverviewViewModel(
                     hostname = hostname,
                     stream = stream.path,
                     port = 5201,
-                    duration = 10,
+                    duration = 120,
                     interval = 1,
                     download = true,
                     useUDP = false,
@@ -365,7 +365,7 @@ class TrackOverviewViewModel(
                 IPerfConfig(
                     hostname = hostname,
                     stream = stream.path,
-                    duration = 10,
+                    duration = 120,
                     interval = 1,
                     port = 5202,
                     download = false,
@@ -409,7 +409,7 @@ class TrackOverviewViewModel(
                             _iPerfDownloadTestRunning.postValue(false)
                         }
                         update { text ->
-                            val pattern = """\[(\d+)]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+\.\d+)\s+(MBytes|KBytes|GBytes)\s+(\d+\.\d+)\s+(Mbits/sec|Kbits/sec|Gbits/sec)""".toRegex()
+                            val pattern = """\[\s*(\d+)]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+|\d+\.\d+)\s+(Bytes|MBytes|KBytes|GBytes)\s+(\d+|\d+\.\d+)\s+(bits/sec|Mbits/sec|Kbits/sec|Gbits/sec)""".toRegex()
 
                             // Match the input string with the pattern
                             val matchResult = pattern.find(text.toString())
@@ -468,7 +468,7 @@ class TrackOverviewViewModel(
                             _iPerfUploadTestRunning.postValue(false)
                         }
                         update { text ->
-                            val pattern = """\[(\d+)\]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+)\s+(MBytes|KBytes|GBytes)\s+(\d+\.\d+)\s+(Mbits/sec|Kbits/sec|Gbits/sec)\s+(\d+)\s+(\d+)\s+(MBytes|KBytes|GBytes)""".toRegex()
+                            val pattern = """\[\s*(\d+)\]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+|\d+\.\d+)\s+(Bytes|MBytes|KBytes|GBytes)\s+(\d+|\d+\.\d+)\s+(bits/sec|Mbits/sec|Kbits/sec|Gbits/sec)\s+(\d+)\s+(\d+|\d+\.\d+)\s+(Bytes|MBytes|KBytes|GBytes)""".toRegex()
                             // Match the input string with the pattern
                             val matchResult = pattern.find(text.toString())
 
@@ -476,6 +476,13 @@ class TrackOverviewViewModel(
                                 // Extract the matched groups
                                 val (id, startTime, endTime, data, dataUnit, speed, speedUnit, errors, retrans, retransUnit) = matchResult.destructured
 
+                                    Timber.d("ID: $id")
+                                    Timber.d("Start Time: $startTime")
+                                    Timber.d("End Time: $endTime")
+                                    Timber.d("Data Transferred: $data $dataUnit")
+                                    Timber.d("Speed: $speed $speedUnit/sec")
+                                    Timber.d("Errors: $errors")
+                                    Timber.d("Retransmission Size: $retrans $retransUnit")
                                 _iPerfUploadSpeed.postValue(speed)
                             } else {
                                 _iPerfUploadSpeed.postValue("-")
