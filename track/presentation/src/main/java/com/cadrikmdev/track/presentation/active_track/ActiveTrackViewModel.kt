@@ -1,23 +1,36 @@
 package com.cadrikmdev.track.presentation.active_track
 
+import android.Manifest
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver
+import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
 import com.cadrikmdev.core.domain.location.Location
+import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.Track
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.domain.util.Result
+import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
+import com.cadrikmdev.core.presentation.service.ServiceChecker
+import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.cadrikmdev.core.presentation.ui.asUiText
-import com.cadrikmdev.track.domain.LocationDataCalculator
+import com.cadrikmdev.iperf.domain.IperfOutputParser
+import com.cadrikmdev.permissions.domain.PermissionHandler
+import com.cadrikmdev.track.domain.LocationObserver
 import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
+import com.cadrikmdev.track.presentation.track_overview.TrackOverviewEvent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -29,6 +42,16 @@ import java.time.ZonedDateTime
 class ActiveTrackViewModel(
     private val measurementTracker: MeasurementTracker,
     private val trackRepository: TrackRepository,
+    private val connectivityObserver: ConnectivityObserver,
+    private val permissionHandler: PermissionHandler,
+    private val gpsLocationService: ServiceChecker,
+    private val locationServiceObserver: LocationServiceObserver,
+    private val wifiServiceObserver: WifiServiceObserver,
+    private val locationObserver: LocationObserver,
+    private val mobileNetworkObserver: NetworkTracker,
+    private val temperatureInfoReceiver: TemperatureInfoReceiver,
+    private val applicationContext: Context,
+    private val iperfParser: IperfOutputParser,
 ) : ViewModel() {
 
     var state by mutableStateOf(
@@ -47,17 +70,21 @@ class ActiveTrackViewModel(
     }
         .stateIn(viewModelScope, SharingStarted.Lazily, state.shouldTrack)
 
-    private val hasLocationPermission = MutableStateFlow(false)
+    private val hasAllPermission = MutableStateFlow(false)
+
+    private val isLocationTrackable = MutableStateFlow(false)
+    private val isLocationServiceEnabled = MutableStateFlow(false)
 
     private val isTracking = combine(
         shouldTrack,
-        hasLocationPermission
-    ) { shouldTrack, hasPermission ->
-        shouldTrack && hasPermission
+        hasAllPermission,
+        isLocationTrackable
+    ) { shouldTrack, hasPermission, isLocationObserved ->
+        shouldTrack && hasPermission && isLocationObserved
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     init {
-        hasLocationPermission
+        hasAllPermission
             .onEach { hasPermission ->
                 if (hasPermission) {
                     measurementTracker.startObservingLocation()
@@ -66,6 +93,11 @@ class ActiveTrackViewModel(
                 }
             }
             .launchIn(viewModelScope)
+
+        locationServiceObserver.observeLocationServiceStatus().onEach { serviceStatus ->
+            val isAvailable = gpsLocationService.isServiceAvailable()
+            updateGpsLocationServiceStatus(serviceStatus.isGpsEnabled, isAvailable)
+        }.launchIn(viewModelScope)
 
         isTracking
             .onEach { isTracking ->
@@ -123,26 +155,6 @@ class ActiveTrackViewModel(
                 )
             }
 
-            is ActiveTrackAction.SubmitLocationPermissionInfo -> {
-                hasLocationPermission.value = action.acceptedLocationPermission
-                state = state.copy(
-                    showLocationRationale = action.showLocationRationale,
-                )
-            }
-
-            is ActiveTrackAction.SubmitNotificationPermissionInfo -> {
-                state = state.copy(
-                    showNotificationRationale = action.showNotificationRationale,
-                )
-            }
-
-            is ActiveTrackAction.DismissRationaleDialog -> {
-                state = state.copy(
-                    showLocationRationale = false,
-                    showNotificationRationale = false,
-                )
-            }
-
             is ActiveTrackAction.OnTrackProcessed -> {
                 finishTrack()
             }
@@ -153,7 +165,7 @@ class ActiveTrackViewModel(
 
     private fun finishTrack() {
         val locations = state.trackData.locations
-        if (locations.isEmpty() || locations.first().size <= 1) {
+        if (locations.isEmpty() || locations.size <= 1) {
             state = state.copy(
                 isSavingTrack = false
             )
@@ -165,10 +177,7 @@ class ActiveTrackViewModel(
                 duration = state.elapsedTime,
                 dateTimeUtc = ZonedDateTime.now()
                     .withZoneSameInstant(ZoneId.of("UTC")),
-                distanceMeters = state.trackData.distanceMeters,
                 location = state.currentLocation ?: Location(0.0, 0.0),
-                maxSpeedKmh = LocationDataCalculator.getMaxSpeedKmh(locations),
-                totalElevationMeters = LocationDataCalculator.getTotalElevationMeters(locations),
             )
 
             measurementTracker.finishTrack()
@@ -194,5 +203,29 @@ class ActiveTrackViewModel(
         if (!ActiveTrackService.isServiceActive) {
             measurementTracker.stopObservingLocation()
         }
+    }
+
+    fun onEvent(event: ActiveTrackEvent) {
+        when (event) {
+            ActiveTrackEvent.OnUpdatePermissionStatus -> {
+                permissionHandler.checkPermissionsState()
+                val isGpsEnabled = gpsLocationService.isServiceEnabled()
+                val isAvailable = gpsLocationService.isServiceAvailable()
+
+                updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
+                updatePermissionsState()
+            }
+            else -> Unit
+        }
+    }
+
+    private fun updateGpsLocationServiceStatus(isGpsEnabled: Boolean, isAvailable: Boolean) {
+        isLocationServiceEnabled.value = isGpsEnabled && isAvailable
+        isLocationTrackable.value = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && isAvailable && isGpsEnabled
+    }
+
+    private fun updatePermissionsState() {
+        hasAllPermission.value = permissionHandler.getNotGrantedPermissionList().isEmpty()
+        isLocationTrackable.value = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && isLocationServiceEnabled.value
     }
 }

@@ -20,11 +20,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.currentStateAsState
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.StartIcon
 import com.cadrikmdev.core.presentation.designsystem.StopIcon
@@ -65,6 +69,7 @@ fun ActiveTrackScreenRoot(
             }
 
             ActiveTrackEvent.TrackSaved -> onFinish()
+            else -> viewModel::onEvent
         }
     }
 
@@ -82,7 +87,8 @@ fun ActiveTrackScreenRoot(
                 else -> Unit
             }
             viewModel.onAction(action)
-        }
+        },
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -90,9 +96,27 @@ fun ActiveTrackScreenRoot(
 private fun ActiveTrackScreen(
     state: ActiveTrackState,
     onServiceToggle: (isServiceRunning: Boolean) -> Unit,
-    onAction: (ActiveTrackAction) -> Unit
+    onAction: (ActiveTrackAction) -> Unit,
+    onEvent: (ActiveTrackEvent) -> Unit
 ) {
     val context = LocalContext.current
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.RESUMED -> {
+                onEvent(ActiveTrackEvent.OnUpdatePermissionStatus)
+            }
+            Lifecycle.State.DESTROYED,
+            Lifecycle.State.INITIALIZED,
+            Lifecycle.State.CREATED,
+            Lifecycle.State.STARTED -> { // nothing to do }
+            }
+        }
+    }
+
+
     val permissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -101,7 +125,7 @@ private fun ActiveTrackScreen(
                 perms[Manifest.permission.ACCESS_COARSE_LOCATION] == true
             val hasFineLocationPermission = perms[Manifest.permission.ACCESS_FINE_LOCATION] == true
             val hasNotificationPermission = if (Build.VERSION.SDK_INT >= 33) {
-                perms[Manifest.permission.ACCESS_FINE_LOCATION] == true
+                perms[Manifest.permission.POST_NOTIFICATIONS] == true
             } else true
             val activity = context as ComponentActivity
             val showLocationRationale = activity.shouldShowLocationPermissionRationale()
@@ -253,38 +277,6 @@ private fun ActiveTrackScreen(
             }
         )
     }
-
-    if (state.showLocationRationale || state.showNotificationRationale) {
-        SignalTrackerDialog(
-            title = stringResource(id = R.string.permission_required),
-            onDismiss = { /* Normal dismissing not allowed for permission. */ },
-            description = when {
-                state.showLocationRationale && state.showNotificationRationale -> {
-                    stringResource(id = R.string.location_notification_rationale)
-                }
-
-                state.showLocationRationale -> {
-                    stringResource(id = R.string.location_rationale)
-                }
-
-                else -> {
-                    stringResource(id = R.string.location_rationale)
-                }
-            },
-            primaryButton = {
-                SignalTrackerOutlinedActionButton(
-                    text = stringResource(id = R.string.ok),
-                    isLoading = false,
-                    onClick = {
-                        onAction(ActiveTrackAction.DismissRationaleDialog)
-                        permissionLauncher.requestSignalTrackerPermissions(context)
-                    }
-                )
-            }) {
-
-        }
-    }
-
 }
 
 private fun ActivityResultLauncher<Array<String>>.requestSignalTrackerPermissions(
@@ -319,7 +311,8 @@ private fun ActiveTrackScreenPreview() {
         ActiveTrackScreen(
             state = ActiveTrackState(),
             onServiceToggle = {},
-            onAction = {}
+            onAction = {},
+            onEvent = {},
         )
     }
 }

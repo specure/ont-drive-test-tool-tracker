@@ -33,4 +33,6 @@
     <string name="timestamp">Timestamp</string>
     <string name="provider">Provider</string>
     <string name="wifi_service_enabled">Wifi service enabled</string>
+    <string name="download">Download</string>
+    <string name="upload">Upload</string>
 </resources>

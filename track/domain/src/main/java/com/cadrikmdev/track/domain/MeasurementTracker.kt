@@ -2,6 +2,7 @@ package com.cadrikmdev.track.domain
 
 import com.cadrikmdev.core.domain.Timer
 import com.cadrikmdev.core.domain.location.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationWithDetails
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -53,7 +54,6 @@ class MeasurementTracker(
                 if (!isTracking) {
                     val newList = buildList {
                         addAll(trackData.value.locations)
-                        add(emptyList<LocationTimestamp>())
                     }.toList()
                     _trackData.update {
                         it.copy(
@@ -87,29 +87,14 @@ class MeasurementTracker(
                     durationTimestamp = elapsedTime
                 )
             }
-            .onEach { locationWithTimestamp ->
-                val currentLocations = trackData.value.locations
-                val lastLocationsList = if (currentLocations.isNotEmpty()) {
-                    currentLocations.last() + locationWithTimestamp
-                } else listOf(locationWithTimestamp)
-                val newLocationsList = currentLocations.replaceLast(lastLocationsList)
+            .onEach { locationWithDetails ->
+                val newLocationsList = trackData.value.locations
 
-                val distanceMeters = LocationDataCalculator.getTotalDistanceInMeters(
-                    locations = newLocationsList
-                )
-                val distanceKm = distanceMeters / 1000.0
-                val currentDuration = locationWithTimestamp.durationTimestamp
+                val currentDuration = locationWithDetails.durationTimestamp
 
-                val avgSecondsPerKm = if (distanceKm == 0.0) {
-                    0
-                } else {
-                    (currentDuration.inWholeSeconds / distanceKm).roundToInt()
-                }
 
                 _trackData.update {
                     TrackData(
-                        distanceMeters = distanceMeters,
-                        pace = avgSecondsPerKm.seconds,
                         locations = newLocationsList
                     )
                 }

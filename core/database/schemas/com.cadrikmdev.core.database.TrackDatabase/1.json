@@ -2,21 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "aecbbed53f01fae12c87b7060facbbf7",
+    "identityHash": "22bf2c9eb46d30b34ded308742f3c3f0",
     "entities": [
       {
         "tableName": "track_entity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`durationMillis` INTEGER NOT NULL, `distanceMeters` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `avgSpeedKmh` REAL NOT NULL, `maxSpeedKmh` REAL NOT NULL, `totalElevationMeters` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`durationMillis` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "durationMillis",
             "columnName": "durationMillis",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "distanceMeters",
-            "columnName": "distanceMeters",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -39,24 +33,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "avgSpeedKmh",
-            "columnName": "avgSpeedKmh",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "maxSpeedKmh",
-            "columnName": "maxSpeedKmh",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "totalElevationMeters",
-            "columnName": "totalElevationMeters",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "TEXT",
@@ -74,7 +50,7 @@
       },
       {
         "tableName": "track_pending_sync_entity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackId` TEXT NOT NULL, `userId` TEXT NOT NULL, `durationMillis` INTEGER NOT NULL, `distanceMeters` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `avgSpeedKmh` REAL NOT NULL, `maxSpeedKmh` REAL NOT NULL, `totalElevationMeters` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`trackId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackId` TEXT NOT NULL, `userId` TEXT NOT NULL, `durationMillis` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`trackId`))",
         "fields": [
           {
             "fieldPath": "trackId",
@@ -95,12 +71,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "track.distanceMeters",
-            "columnName": "distanceMeters",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "track.dateTimeUtc",
             "columnName": "dateTimeUtc",
             "affinity": "TEXT",
@@ -116,24 +86,6 @@
             "fieldPath": "track.longitude",
             "columnName": "longitude",
             "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "track.avgSpeedKmh",
-            "columnName": "avgSpeedKmh",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "track.maxSpeedKmh",
-            "columnName": "maxSpeedKmh",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "track.totalElevationMeters",
-            "columnName": "totalElevationMeters",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -182,7 +134,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aecbbed53f01fae12c87b7060facbbf7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '22bf2c9eb46d30b34ded308742f3c3f0')"
     ]
   }
 }

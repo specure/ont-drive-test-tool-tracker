@@ -14,13 +14,10 @@ fun TrackEntity.toTrack(): Track {
         duration = durationMillis.milliseconds,
         dateTimeUtc = Instant.parse(dateTimeUtc)
             .atZone(ZoneId.of("UTC")),
-        distanceMeters = distanceMeters,
         location = Location(
             lat = latitude,
             long = longitude
         ),
-        maxSpeedKmh = maxSpeedKmh,
-        totalElevationMeters = totalElevationMeters,
     )
 }
 
@@ -29,11 +26,7 @@ fun Track.toTrackEntity(): TrackEntity {
         id = id ?: ObjectId().toHexString(),
         durationMillis = duration.inWholeMilliseconds,
         dateTimeUtc = dateTimeUtc.toInstant().toString(),
-        distanceMeters = distanceMeters,
         latitude = location.lat,
         longitude = location.long,
-        maxSpeedKmh = maxSpeedKmh,
-        avgSpeedKmh = avgSpeedKmh,
-        totalElevationMeters = totalElevationMeters,
     )
 }

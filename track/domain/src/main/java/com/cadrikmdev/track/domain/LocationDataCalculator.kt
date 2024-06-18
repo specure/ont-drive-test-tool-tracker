@@ -1,16 +1,17 @@
 package com.cadrikmdev.track.domain
 
 import com.cadrikmdev.core.domain.location.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationWithDetails
 import kotlin.math.roundToInt
 import kotlin.time.DurationUnit
 
 object LocationDataCalculator {
 
-    fun getTotalDistanceInMeters(locations: List<List<LocationTimestamp>>): Int {
+    fun getTotalDistanceInMeters(locations: List<List<LocationWithDetails>>): Int {
         return locations
             .sumOf { timestampsPerLine ->
                 timestampsPerLine.zipWithNext { location1, location2 ->
-                    location1.location.location.distanceTo(location2.location.location)
+                    location1.location.distanceTo(location2.location)
                 }.sum().roundToInt()
             }
     }

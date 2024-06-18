@@ -27,32 +27,26 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.cadrikmdev.core.domain.location.Location
-import com.cadrikmdev.core.domain.location.LocationTimestamp
+import com.cadrikmdev.core.domain.location.LocationWithDetails
 import com.cadrikmdev.core.presentation.designsystem.TrackIcon
 import com.cadrikmdev.track.presentation.R
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import com.google.maps.android.ktx.awaitSnapshot
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun TrackerMap(
     isTrackFinished: Boolean,
     currentLocation: Location?,
-    locations: List<List<LocationTimestamp>>,
+    locations: List<LocationWithDetails>,
     onSnapshot: (Bitmap) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -124,38 +118,7 @@ fun TrackerMap(
         SignalTrackerPolylines(
             locations = locations
         )
-
-        MapEffect(locations, isTrackFinished, triggerCapture, createSnapshotJob) { map ->
-            if (isTrackFinished && triggerCapture && createSnapshotJob == null) {
-                triggerCapture = false
-                val boundsBuilder = LatLngBounds.builder()
-                locations.flatten().forEach { location ->
-                    boundsBuilder.include(
-                        LatLng(
-                            location.location.location.lat,
-                            location.location.location.long,
-                        )
-                    )
-                }
-                map.moveCamera(
-                    CameraUpdateFactory.newLatLngBounds(
-                        boundsBuilder.build(),
-                        100
-                    )
-                )
-                map.setOnCameraIdleListener {
-                    createSnapshotJob?.cancel()
-                    createSnapshotJob = GlobalScope.launch {
-                        // make sure map is ready and sharp before taking a screenshot
-                        delay(500L)
-                        map.awaitSnapshot()?.let(onSnapshot)
-                    }
-                }
-                val bmp = map.awaitSnapshot()
-            }
-
-        }
-
+        
         if (!isTrackFinished && currentLocation != null) {
             MarkerComposable(
                 currentLocation,

@@ -12,6 +12,4 @@ data class ActiveTrackState(
     val currentLocation: Location? = null,
     val isTrackFinished: Boolean = false,
     val isSavingTrack: Boolean = false,
-    val showLocationRationale: Boolean = false,
-    val showNotificationRationale: Boolean = false,
 )

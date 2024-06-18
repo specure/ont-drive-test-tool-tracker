@@ -12,10 +12,7 @@ fun TrackDto.toTrack(): Track {
         duration = durationMillis.milliseconds,
         dateTimeUtc = Instant.parse(dateTimeUtc)
             .atZone(ZoneId.of("UTC")),
-        distanceMeters = distanceMeters,
         location = Location(lat, long),
-        maxSpeedKmh = maxSpeedKmh,
-        totalElevationMeters = totalElevationMeters,
     )
 }
 
@@ -24,11 +21,7 @@ fun Track.toCreateTrackRequest(): CreateTrackRequest {
         id = id!!,
         epochMillis = dateTimeUtc.toEpochSecond() * 1000L,
         durationMillis = duration.inWholeMilliseconds,
-        distanceMeters = distanceMeters,
         lat = location.lat,
         long = location.long,
-        avgSpeedKmh = avgSpeedKmh,
-        maxSpeedKmh = maxSpeedKmh,
-        totalElevationMeters = totalElevationMeters
     )
 }

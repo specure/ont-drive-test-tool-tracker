@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.ui.formatted
-import com.cadrikmdev.core.presentation.ui.toFormattedKm
-import com.cadrikmdev.core.presentation.ui.toFormattedPace
+import com.cadrikmdev.iperf.domain.IperfTestProgressDownload
+import com.cadrikmdev.iperf.domain.IperfTestProgressUpload
 import com.cadrikmdev.track.domain.TrackData
 import com.cadrikmdev.track.presentation.R
 import kotlin.time.Duration
@@ -56,16 +56,14 @@ fun TrackDataCard(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             TrackDataItem(
-                title = stringResource(id = R.string.distance),
-                value = (trackData.distanceMeters / 1000.0).toFormattedKm(),
+                title = stringResource(id = R.string.download),
+                value = "${trackData.downloadProgress?.bandwidth ?: "-"} ${trackData.downloadProgress?.bandwidthUnit ?: ""}",
                 modifier = Modifier
                     .defaultMinSize(minWidth = 75.dp)
             )
             TrackDataItem(
-                title = stringResource(id = R.string.pace),
-                value = elapsedTime.toFormattedPace(
-                    distanceKm = (trackData.distanceMeters / 1000.0)
-                ),
+                title = stringResource(id = R.string.upload),
+                value = "${trackData.uploadProgress?.bandwidth ?: "-"} ${trackData.uploadProgress?.bandwidthUnit ?: ""}",
                 modifier = Modifier
                     .defaultMinSize(minWidth = 75.dp)
             )
@@ -107,8 +105,29 @@ private fun TrackDataCardPreview() {
         TrackDataCard(
             elapsedTime = 35818.seconds,
             trackData = TrackData(
-                distanceMeters = 3548,
-                pace = 1568.seconds
+                downloadProgress = IperfTestProgressDownload(
+                    1718713960422,
+                    relativeTestStartIntervalStart = 0.00,
+                    relativeTestStartIntervalEnd = 1.00,
+                    relativeTestStartIntervalUnit = "sec",
+                    transferred = 230.0,
+                    transferredUnit = "KBytes",
+                    bandwidth = 20.0,
+                    bandwidthUnit = "Mbits",
+                ),
+                uploadProgress = IperfTestProgressUpload(
+                    retransmissions = 3,
+                    congestionWindow = 20,
+                    congestionWindowUnit = "KBytes",
+                    timestampMillis = 1718713960422,
+                    relativeTestStartIntervalStart = 0.00,
+                    relativeTestStartIntervalEnd = 1.00,
+                    relativeTestStartIntervalUnit = "sec",
+                    transferred = 234.0,
+                    transferredUnit = "KBytes",
+                    bandwidth = 1.9,
+                    bandwidthUnit = "Mbits",
+                ),
             )
         )
     }
