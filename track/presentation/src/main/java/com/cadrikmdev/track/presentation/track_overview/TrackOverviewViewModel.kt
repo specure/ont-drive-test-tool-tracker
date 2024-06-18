@@ -271,7 +271,7 @@ class TrackOverviewViewModel(
     fun onAction(action: TrackOverviewAction) {
         when (action) {
             TrackOverviewAction.OnLogoutClick -> logout()
-            TrackOverviewAction.OnStartClick -> {
+            TrackOverviewAction.OnDemoStartClick -> {
                 viewModelScope.launch {
                     startIperfDownload()
                     startIperfUpload()

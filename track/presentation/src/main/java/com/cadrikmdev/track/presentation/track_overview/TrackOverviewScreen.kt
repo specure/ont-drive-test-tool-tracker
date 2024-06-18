@@ -73,7 +73,7 @@ fun TrackOverviewScreenRoot(
         state = viewModel.state,
         onAction = { action ->
             when (action) {
-//                TrackOverviewAction.OnStartClick -> onStartTrackClick()
+                TrackOverviewAction.OnStartClick -> onStartTrackClick()
                 TrackOverviewAction.OnResolvePermissionClick -> onResolvePermissionClick()
                 else -> Unit
             }

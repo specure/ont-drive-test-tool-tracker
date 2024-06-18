@@ -5,6 +5,7 @@ import com.cadrikmdev.track.presentation.track_overview.model.TrackUi
 sealed interface TrackOverviewAction {
     data object OnStartClick : TrackOverviewAction
     data object OnLogoutClick : TrackOverviewAction
+    data object OnDemoStartClick : TrackOverviewAction
     data object OnResolvePermissionClick : TrackOverviewAction
     data object OnResolveLocationService : TrackOverviewAction
 
