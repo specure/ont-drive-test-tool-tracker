@@ -11,10 +11,12 @@ import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkInfo
 import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.PrimaryDataSubscription
+import com.cadrikmdev.core.connectivty.presentation.mobile_network.util.filterOnlyPrimaryActiveDataCell
 import com.cadrikmdev.core.connectivty.presentation.mobile_network.util.getCorrectDataTelephonyManagerOrNull
 import com.cadrikmdev.core.connectivty.presentation.mobile_network.util.mapToMobileNetworkType
 import com.cadrikmdev.core.connectivty.presentation.mobile_network.util.mccCompat
 import com.cadrikmdev.core.connectivty.presentation.mobile_network.util.mncCompat
+import com.cadrikmdev.core.connectivty.presentation.mobile_network.util.toSignalStrengthInfo
 import cz.mroczis.netmonster.core.INetMonster
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -86,6 +88,8 @@ class NetmonsterNetworkTracker(
                             val simCountryIso = subscriptionInfo.countryIso
                             val simDisplayName = subscriptionInfo.displayName?.toString()
 
+                            val primaryCellSignalDbm = netmonster.getCells().filterOnlyPrimaryActiveDataCell(dataSubscriptionId = subscriptionInfo.subscriptionId).firstOrNull()?.signal?.toSignalStrengthInfo(System.currentTimeMillis())?.value
+
                             MobileNetworkInfo(
                                 name = operatorName,
                                 simOperatorName = telephonyManager.getCorrectDataTelephonyManagerOrNull()?.simOperatorName.fixOperatorName(),
@@ -99,7 +103,8 @@ class NetmonsterNetworkTracker(
                                 isRoaming = telephonyManager.getCorrectDataTelephonyManagerOrNull()?.isNetworkRoaming,
                                 isPrimaryDataSubscription = isDefaultDataSubscription,
                                 simCount = simCount,
-                                obtainedTimestampMillis = System.currentTimeMillis()
+                                obtainedTimestampMillis = System.currentTimeMillis(),
+                                primarySignalDbm = primaryCellSignalDbm
                             )
                         }
                     emit(mobileNetworkList)

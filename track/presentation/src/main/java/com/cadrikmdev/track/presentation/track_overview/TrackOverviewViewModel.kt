@@ -441,7 +441,7 @@ class TrackOverviewViewModel(
                                 _iPerfDownloadSpeedUnit.postValue(progress.bandwidthUnit.toString())
                             } else {
                                 _iPerfDownloadSpeed.postValue("-")
-                                _iPerfDownloadSpeedUnit.postValue("-")
+                                _iPerfDownloadSpeedUnit.postValue("")
                             }
                             _iPerfDownloadRequestResult.postValue("D ${downloadResultBuilder.toString()}")
                             downloadResultBuilder.append(text)
@@ -493,7 +493,7 @@ class TrackOverviewViewModel(
                                 _iPerfUploadSpeedUnit.postValue(progress.bandwidthUnit.toString())
                             } else {
                                 _iPerfUploadSpeed.postValue("-")
-                                _iPerfUploadSpeedUnit.postValue("-")
+                                _iPerfUploadSpeedUnit.postValue("")
                             }
                             _iPerfUploadRequestResult.postValue("${uploadResultBuilder.toString()}")
                             uploadResultBuilder.append("U $text")

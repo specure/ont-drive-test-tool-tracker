@@ -316,7 +316,7 @@ private fun TrackOverviewScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp)
+                    .height(280.dp)
                     .padding(16.dp)
                     .background(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -353,6 +353,10 @@ private fun TrackOverviewScreen(
                 )
                 Text(
                     text = state.mobileNetworkInfo?.simCount.toString() ?: "-",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "${state.mobileNetworkInfo?.primarySignalDbm.toString()} dBm"  ?: "-",
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -502,7 +506,8 @@ private fun TrackOverviewScreenPreview() {
                     isRoaming = false,
                     isPrimaryDataSubscription = PrimaryDataSubscription.TRUE,
                     simCount = 1,
-                    obtainedTimestampMillis = 194656515616
+                    obtainedTimestampMillis = 194656515616,
+                    primarySignalDbm = -120,
                 ),
                 currentIperfDownloadInfoRaw = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih ",
                 currentIperfDownloadSpeed = "20",

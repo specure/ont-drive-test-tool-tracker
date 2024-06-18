@@ -32,6 +32,7 @@ data class MobileNetworkInfo(
     val simCount: Int,
     val obtainedTimestampMillis: Long,
 
+    val primarySignalDbm: Int?
 
     ) : NetworkInfo(TransportType.CELLULAR, UUID.randomUUID().toString())
 
