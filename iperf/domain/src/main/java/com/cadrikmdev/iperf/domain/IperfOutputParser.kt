@@ -4,7 +4,7 @@ abstract class IperfOutputParser {
 
     abstract fun parseOutput(output: String)
 
-    abstract fun parseIperfVersion(version: String)
+    abstract fun parseIperfVersion(version: String): String?
 
     abstract fun parseClientInformation(clientInfo: String)
 
@@ -20,13 +20,16 @@ abstract class IperfOutputParser {
 
     abstract fun parseTestProgressHeader(testProgressHeader: String)
 
-    abstract fun parseTestProgress(testProgress: String)
+    abstract fun parseTestProgress(testProgress: String): IperfTestProgress?
 
     abstract fun parseTestingPhaseEnd(testingPhaseEnd: String)
 
     abstract fun parseEndHeader(testingPhaseEnd: String)
 
-    abstract fun parseEnd(error: String)
+    abstract fun parseEnd(end: String)
+
+    abstract fun parseError(error: String)
 
     abstract fun parseEndCpuUtil(cpuUtilization: String)
+
 }

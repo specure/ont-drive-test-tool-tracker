@@ -7,6 +7,8 @@ import com.cadrikmdev.core.presentation.service.location.AndroidLocationServiceO
 import com.cadrikmdev.core.presentation.service.location.GpsLocationServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.cadrikmdev.core.presentation.service.wifi.AndroidWifiServiceObserver
+import com.cadrikmdev.iperf.domain.IperfOutputParser
+import com.cadrikmdev.iperf.presentation.IperfAndroidParser
 import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackViewModel
 import com.cadrikmdev.track.presentation.track_overview.TrackOverviewViewModel
@@ -22,5 +24,6 @@ val trackPresentationModule = module {
     singleOf(::GpsLocationServiceChecker).bind<ServiceChecker>()
     singleOf(::AndroidLocationServiceObserver).bind<LocationServiceObserver>()
     singleOf(::AndroidWifiServiceObserver).bind<WifiServiceObserver>()
+    singleOf(::IperfAndroidParser).bind<IperfOutputParser>()
     singleOf(::TemperatureInfoReceiver)
 }

@@ -22,6 +22,7 @@ import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
+import com.cadrikmdev.iperf.domain.IperfOutputParser
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.BuildConfig
 import com.cadrikmdev.permissions.presentation.appPermissions
@@ -64,6 +65,7 @@ class TrackOverviewViewModel(
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
     private val applicationContext: Context,
     private val measurementTracker: MeasurementTracker,
+    private val iperfParser: IperfOutputParser,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -95,6 +97,14 @@ class TrackOverviewViewModel(
         get() = _iPerfDownloadSpeed
 
     private val _iPerfUploadSpeed: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    private val _iPerfUploadSpeedUnit: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    private val _iPerfDownloadSpeedUnit: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
@@ -168,6 +178,22 @@ class TrackOverviewViewModel(
             _iPerfUploadSpeed.asFlow().collect {
                 state = state.copy(
                     currentIperfUploadSpeed = it
+                )
+            }
+        }
+
+        viewModelScope.launch {
+            _iPerfDownloadSpeedUnit.asFlow().collect {
+                state = state.copy(
+                    currentIperfDownloadSpeedUnit = it
+                )
+            }
+        }
+
+        viewModelScope.launch {
+            _iPerfUploadSpeedUnit.asFlow().collect {
+                state = state.copy(
+                    currentIperfUploadSpeedUnit = it
                 )
             }
         }
@@ -409,23 +435,16 @@ class TrackOverviewViewModel(
                             _iPerfDownloadTestRunning.postValue(false)
                         }
                         update { text ->
-                            val pattern = """\[\s*(\d+)]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+|\d+\.\d+)\s+(Bytes|MBytes|KBytes|GBytes)\s+(\d+|\d+\.\d+)\s+(bits/sec|Mbits/sec|Kbits/sec|Gbits/sec)""".toRegex()
-
-                            // Match the input string with the pattern
-                            val matchResult = pattern.find(text.toString())
-
-                            if (matchResult != null) {
-                                // Extract the matched groups
-                                val (index, startTime, endTime, dataSize, dataUnit, transferRate, transferUnit) = matchResult.destructured
-
-                                _iPerfDownloadSpeed.postValue(transferRate)
+                            val progress = iperfParser.parseTestProgress(text.toString())
+                            if (progress != null) {
+                                _iPerfDownloadSpeed.postValue(progress.bandwidth.toString())
+                                _iPerfDownloadSpeedUnit.postValue(progress.bandwidthUnit.toString())
                             } else {
                                 _iPerfDownloadSpeed.postValue("-")
+                                _iPerfDownloadSpeedUnit.postValue("-")
                             }
                             _iPerfDownloadRequestResult.postValue("D ${downloadResultBuilder.toString()}")
                             downloadResultBuilder.append(text)
-
-
                         }
                         error { e ->
                             downloadResultBuilder.append("\niPerf download request failed:\n error: $e")
@@ -468,24 +487,13 @@ class TrackOverviewViewModel(
                             _iPerfUploadTestRunning.postValue(false)
                         }
                         update { text ->
-                            val pattern = """\[\s*(\d+)\]\s+(\d+\.\d+)-(\d+\.\d+)\s+sec\s+(\d+|\d+\.\d+)\s+(Bytes|MBytes|KBytes|GBytes)\s+(\d+|\d+\.\d+)\s+(bits/sec|Mbits/sec|Kbits/sec|Gbits/sec)\s+(\d+)\s+(\d+|\d+\.\d+)\s+(Bytes|MBytes|KBytes|GBytes)""".toRegex()
-                            // Match the input string with the pattern
-                            val matchResult = pattern.find(text.toString())
-
-                            if (matchResult != null) {
-                                // Extract the matched groups
-                                val (id, startTime, endTime, data, dataUnit, speed, speedUnit, errors, retrans, retransUnit) = matchResult.destructured
-
-                                    Timber.d("ID: $id")
-                                    Timber.d("Start Time: $startTime")
-                                    Timber.d("End Time: $endTime")
-                                    Timber.d("Data Transferred: $data $dataUnit")
-                                    Timber.d("Speed: $speed $speedUnit/sec")
-                                    Timber.d("Errors: $errors")
-                                    Timber.d("Retransmission Size: $retrans $retransUnit")
-                                _iPerfUploadSpeed.postValue(speed)
+                            val progress = iperfParser.parseTestProgress(text.toString())
+                            if (progress != null) {
+                                _iPerfUploadSpeed.postValue(progress.bandwidth.toString())
+                                _iPerfUploadSpeedUnit.postValue(progress.bandwidthUnit.toString())
                             } else {
                                 _iPerfUploadSpeed.postValue("-")
+                                _iPerfUploadSpeedUnit.postValue("-")
                             }
                             _iPerfUploadRequestResult.postValue("${uploadResultBuilder.toString()}")
                             uploadResultBuilder.append("U $text")

@@ -242,7 +242,7 @@ private fun TrackOverviewScreen(
                         ) {
                             Text(
                                 text = "°C",
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize
                             )
                         }
                     }
@@ -272,8 +272,8 @@ private fun TrackOverviewScreen(
                             modifier = Modifier.alignByBaseline()
                         ) {
                             Text(
-                                text = "MBit/s",
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                                text = state.currentIperfDownloadSpeedUnit.toString(),
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize
                             )
                         }
                     }
@@ -304,8 +304,8 @@ private fun TrackOverviewScreen(
                             modifier = Modifier.alignByBaseline()
                         ) {
                             Text(
-                                text = "MBit/s",
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                                text = state.currentIperfUploadSpeedUnit.toString(),
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize
                             )
                         }
                     }

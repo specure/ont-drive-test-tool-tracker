@@ -1,11 +1,12 @@
 package com.cadrikmdev.iperf.domain
 
 data class IperfTest(
-    val version: String?,
-    val startTimestampRaw: String?,
-    val startTimestamp: Long?,
-    val iperfServerInfo: IperfServerInfo?,
-    val connectionInfo: IperfConnectionInfo?,
-    val testProgress: List<IperfTestProgress>?,
-    val error: String?
+    val version: String? = null,
+    val startTimestampRaw: String? = null,
+    val startTimestamp: Long? = null,
+    val iperfServerInfo: IperfServerInfo? = null,
+    val connectionInfo: IperfConnectionInfo? = null,
+    val testProgress: List<IperfTestProgress>? = null,
+    val error: List<IperfError?>? = null,
+    val rawUnparsedLog: String? = null
 )
