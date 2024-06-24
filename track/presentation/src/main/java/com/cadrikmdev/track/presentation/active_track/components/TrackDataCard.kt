@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.ui.formatted
@@ -60,7 +61,7 @@ fun TrackDataCard(
                 TrackDataItem(
                     title = stringResource(id = R.string.temperature),
                     value = "- °C" ,
-                    valueFontSize = 32.sp
+                    valueFontSize = 10.sp
                 )
             }
             TrackDataItem(
@@ -68,6 +69,20 @@ fun TrackDataCard(
                 value = elapsedTime.formatted(),
                 valueFontSize = 32.sp
             )
+            if (trackData.networkInfo != null && trackData.networkInfo is MobileNetworkInfo) {
+                val mobileNetworkInfo = (trackData.networkInfo as MobileNetworkInfo)
+                TrackDataItem(
+                    title = stringResource(id = R.string.network),
+                    value = "${mobileNetworkInfo.networkType} / ${trackData.networkInfo?.name.toString()} \n ${mobileNetworkInfo.primarySignalDbm}" ,
+                    valueFontSize = 10.sp
+                )
+            } else {
+                TrackDataItem(
+                    title = stringResource(id = R.string.network),
+                    value = "-" ,
+                    valueFontSize = 10.sp
+                )
+            }
         }
         Spacer(modifier = Modifier.height(24.dp))
         Row(

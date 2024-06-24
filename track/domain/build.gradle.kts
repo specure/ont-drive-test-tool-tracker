@@ -7,4 +7,5 @@ dependencies {
 
     implementation(projects.core.domain)
     implementation(projects.iperf.domain)
+    implementation(projects.connectivity.domain)
 }

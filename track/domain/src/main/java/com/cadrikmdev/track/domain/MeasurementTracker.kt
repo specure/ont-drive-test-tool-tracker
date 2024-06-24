@@ -1,8 +1,10 @@
 package com.cadrikmdev.track.domain
 
+import com.cadrikmdev.connectivity.domain.NetworkTracker
 import com.cadrikmdev.core.domain.Timer
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
+import com.cadrikmdev.iperf.domain.IperfOutputParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,8 +25,9 @@ class MeasurementTracker(
     private val locationObserver: LocationObserver,
     private val applicationScope: CoroutineScope,
     private val temperatureInfoReceiver: TemperatureInfoObserver,
+    private val mobileNetworkTracker: NetworkTracker,
+    private val iperfParser: IperfOutputParser,
 ) {
-
     private val _trackData = MutableStateFlow(TrackData())
     val trackData = _trackData.asStateFlow()
 
@@ -63,6 +66,19 @@ class MeasurementTracker(
         applicationScope.launch {
             temperatureInfoReceiver.register()
         }
+
+        applicationScope.launch {
+            mobileNetworkTracker.observeNetwork().collect { networkInfo ->
+
+                _trackData.update {
+                    it.copy(
+                        networkInfo = networkInfo.firstOrNull()
+                    )
+                }
+            }
+        }
+
+
         _isTracking
             .onEach { isTracking ->
                 if (!isTracking) {

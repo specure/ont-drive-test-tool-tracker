@@ -19,7 +19,8 @@ dependencies {
     implementation(projects.permissions.domain)
     implementation(projects.permissions.presentation)
     implementation(projects.core.presentation.service)
-    implementation(projects.core.connectivity)
+    implementation(projects.connectivity.domain)
+    implementation(projects.connectivity.presentation)
     implementation(projects.iperf.domain)
     implementation(projects.iperf.presentation)
 }

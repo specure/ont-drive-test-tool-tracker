@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.currentStateAsState
-import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
-import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkType
-import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.PrimaryDataSubscription
+import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
+import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkType
+import com.cadrikmdev.connectivity.domain.mobile.PrimaryDataSubscription
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.location.LocationTimestamp

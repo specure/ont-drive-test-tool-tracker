@@ -1,5 +1,6 @@
 package com.cadrikmdev.track.domain
 
+import com.cadrikmdev.connectivity.domain.NetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationWithDetails
 import com.cadrikmdev.iperf.domain.IperfTestProgressDownload
@@ -13,5 +14,6 @@ data class TrackData(
     val downloadProgress: IperfTestProgressDownload? = null,
     val uploadProgress: IperfTestProgressUpload? = null,
     val temperature: Temperature? = null,
+    val networkInfo: NetworkInfo? = null,
     val connected: Boolean = false,
 )

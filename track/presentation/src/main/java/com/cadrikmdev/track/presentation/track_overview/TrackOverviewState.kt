@@ -1,6 +1,6 @@
 package com.cadrikmdev.track.presentation.track_overview
 
-import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
+import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.track.presentation.track_overview.model.TrackUi

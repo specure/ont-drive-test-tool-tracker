@@ -10,9 +10,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver
-import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
-import com.cadrikmdev.core.connectivty.domain.connectivity.mobile.MobileNetworkInfo
+import com.cadrikmdev.connectivity.domain.ConnectivityObserver
+import com.cadrikmdev.connectivity.domain.NetworkTracker
+import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationTimestamp

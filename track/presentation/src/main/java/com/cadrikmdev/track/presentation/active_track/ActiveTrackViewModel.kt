@@ -10,18 +10,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver
-import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
+import com.cadrikmdev.connectivity.domain.ConnectivityObserver
+import com.cadrikmdev.connectivity.domain.NetworkTracker
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.cadrikmdev.iperf.domain.IperfOutputParser
+import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
+import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.track.domain.LocationObserver
 import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,6 +46,7 @@ class ActiveTrackViewModel(
     private val locationObserver: LocationObserver,
     private val mobileNetworkObserver: NetworkTracker,
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
+    private val applicationScope: CoroutineScope,
     private val applicationContext: Context,
     private val iperfParser: IperfOutputParser,
 ) : ViewModel() {
@@ -63,6 +67,8 @@ class ActiveTrackViewModel(
     }
         .stateIn(viewModelScope, SharingStarted.Lazily, state.shouldTrack)
 
+    private val iperfUpload = IperfUploadRunner(applicationContext, applicationScope, iperfParser)
+    private val iperfDownload = IperfDownloadRunner(applicationContext, applicationScope, iperfParser)
 
 
     private val _iPerfDownloadRequestResult: MutableLiveData<String> by lazy {
@@ -155,7 +161,7 @@ class ActiveTrackViewModel(
             ActiveTrackAction.OnFinishTrackClick -> {
                 state = state.copy(
                     isTrackFinished = true,
-                    isSavingTrack = true,
+                    isSavingTrack = false,
                 )
             }
 
