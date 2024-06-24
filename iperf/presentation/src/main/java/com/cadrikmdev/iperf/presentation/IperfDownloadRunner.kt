@@ -43,24 +43,29 @@ class IperfDownloadRunner(
                 maxBandwidthBitPerSecond = 20000000,
             )
         }
-    private lateinit var testProgressDetails: IperfTest
+    private var testProgressDetails: IperfTest = IperfTest(
+        status = IperfTestStatus.NOT_STARTED,
+        direction = IperfTestDirection.DOWNLOAD,
+    )
 
     private val _testProgressDetailsFlow = MutableStateFlow<IperfTest>(IperfTest())
     override val testProgressDetailsFlow: StateFlow<IperfTest> get() = _testProgressDetailsFlow
 
 
     override fun startTest() {
-        applicationScope.launch {
-            testProgressDetails = IperfTest()
-            testProgressDetails = testProgressDetails.copy(
-                startTimestamp = System.currentTimeMillis(),
-                status = IperfTestStatus.INITIALIZING,
-                direction = IperfTestDirection.DOWNLOAD,
-            )
-            _testProgressDetailsFlow.emit(testProgressDetails)
-            val isAsync = true
-            doStartDownloadRequest(config, isAsync)
-        }
+        if (testProgressDetails.status in listOf(IperfTestStatus.NOT_STARTED, IperfTestStatus.STOPPED, IperfTestStatus.ERROR)) {
+                applicationScope.launch {
+                    testProgressDetails = IperfTest()
+                    testProgressDetails = testProgressDetails.copy(
+                        startTimestamp = System.currentTimeMillis(),
+                        status = IperfTestStatus.INITIALIZING,
+                        direction = IperfTestDirection.DOWNLOAD,
+                    )
+                    _testProgressDetailsFlow.emit(testProgressDetails)
+                    val isAsync = true
+                    doStartDownloadRequest(config, isAsync)
+                }
+            }
     }
 //        downloadResultBuilder.clear()
 

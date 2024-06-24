@@ -46,13 +46,15 @@ class IperfUploadRunner(
                 maxBandwidthBitPerSecond = 2000000,
             )
         }
-        private lateinit var testProgressDetails: IperfTest
+    private var testProgressDetails: IperfTest = IperfTest(
+        status = IperfTestStatus.NOT_STARTED,
+        direction = IperfTestDirection.UPLOAD,
+    )
 
         private val _testProgressDetailsFlow = MutableStateFlow<IperfTest>(IperfTest())
         override val testProgressDetailsFlow: StateFlow<IperfTest> get() = _testProgressDetailsFlow
 
         override fun startTest() {
-            iperf = IPerf
             iperf.init(
                 config.hostname,
                 config.port,
@@ -65,16 +67,18 @@ class IperfUploadRunner(
                 config.maxBandwidthBitPerSecond
             )
             Timber.d("IPERF Trying port ${config.port}")
-            applicationScope.launch {
-                testProgressDetails = IperfTest()
-                testProgressDetails = testProgressDetails.copy(
-                    startTimestamp = System.currentTimeMillis(),
-                    status = IperfTestStatus.INITIALIZING,
-                    direction = IperfTestDirection.UPLOAD,
-                )
-                _testProgressDetailsFlow.emit(testProgressDetails)
-                val isAsync = true
-                doStartUploadRequest(config, isAsync)
+            if (testProgressDetails.status in listOf(IperfTestStatus.NOT_STARTED, IperfTestStatus.STOPPED, IperfTestStatus.ERROR)) {
+                applicationScope.launch {
+                    testProgressDetails = IperfTest()
+                    testProgressDetails = testProgressDetails.copy(
+                        startTimestamp = System.currentTimeMillis(),
+                        status = IperfTestStatus.INITIALIZING,
+                        direction = IperfTestDirection.UPLOAD,
+                    )
+                    _testProgressDetailsFlow.emit(testProgressDetails)
+                    val isAsync = true
+                    doStartUploadRequest(config, isAsync)
+                }
             }
         }
 //        downloadResultBuilder.clear()
