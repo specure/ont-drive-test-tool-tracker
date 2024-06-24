@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
-import kotlin.concurrent.thread
 
 
 class IperfUploadRunner(
@@ -88,6 +87,9 @@ class IperfUploadRunner(
                 testProgressDetails = testProgressDetails.copy(
                     status = IperfTestStatus.STOPPED,
                     direction = IperfTestDirection.UPLOAD,
+                    testProgress = testProgressDetails.testProgress.plus(
+                        zeroUploadSpeedProgress
+                    ),
                 )
                 _testProgressDetailsFlow.emit(testProgressDetails)
             }
@@ -102,7 +104,10 @@ class IperfUploadRunner(
                             Timber.d("iPerf upload request done")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
-                                    status = IperfTestStatus.ENDED
+                                    status = IperfTestStatus.ENDED,
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroUploadSpeedProgress
+                                    ),
                                 )
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
@@ -127,27 +132,23 @@ class IperfUploadRunner(
                                     status = IperfTestStatus.RUNNING
                                 )
                             } else {
-//                                _iPerfDownloadSpeed.postValue("-")
-//                                _iPerfDownloadSpeedUnit.postValue("")
+                                // TODO: parse other states
                             }
-//                            _iPerfDownloadRequestResult.postValue("D ${downloadResultBuilder.toString()}")
-//                            downloadResultBuilder.append(text)
                             applicationScope.launch {
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
-
                         }
                         error { e ->
                             Timber.e("IPERF Upload: $e")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
-                                    status = IperfTestStatus.ERROR
+                                    status = IperfTestStatus.ERROR,
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroUploadSpeedProgress
+                                    ),
                                 )
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
-//                            downloadResultBuilder.append("\niPerf download request failed:\n error: $e")
-//                            Timber.d("D $downloadResultBuilder")
-//                            _iPerfDownloadTestRunning.postValue(false)
                         }
                     }
                 }
@@ -159,7 +160,10 @@ class IperfUploadRunner(
                             Timber.d("iPerf upload request done")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
-                                    status = IperfTestStatus.ENDED
+                                    status = IperfTestStatus.ENDED,
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroUploadSpeedProgress
+                                    ),
                                 )
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
@@ -170,6 +174,9 @@ class IperfUploadRunner(
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
                                     status = IperfTestStatus.ERROR,
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroUploadSpeedProgress
+                                    ),
                                     error = testProgressDetails.error + IperfError(
                                         timestamp = System.currentTimeMillis(),
                                         error = result.error.toString()
@@ -187,6 +194,9 @@ class IperfUploadRunner(
                 applicationScope.launch {
                     testProgressDetails = testProgressDetails.copy(
                         status = IperfTestStatus.ERROR,
+                        testProgress = testProgressDetails.testProgress.plus(
+                            zeroUploadSpeedProgress
+                        ),
                         error = testProgressDetails.error + IperfError(
                             timestamp = System.currentTimeMillis(),
                             error = "Error - unable to start iperf request"

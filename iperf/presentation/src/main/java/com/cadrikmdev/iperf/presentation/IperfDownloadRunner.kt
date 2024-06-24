@@ -67,7 +67,6 @@ class IperfDownloadRunner(
                 }
             }
     }
-//        downloadResultBuilder.clear()
 
     override fun stopTest() {
         applicationScope.launch {
@@ -75,6 +74,9 @@ class IperfDownloadRunner(
             testProgressDetails = testProgressDetails.copy(
                 status = IperfTestStatus.STOPPED,
                 direction = IperfTestDirection.DOWNLOAD,
+                testProgress = testProgressDetails.testProgress.plus(
+                    zeroDownloadSpeedProgress
+                ),
             )
             _testProgressDetailsFlow.emit(testProgressDetails)
         }
@@ -89,7 +91,10 @@ class IperfDownloadRunner(
                             Timber.d("iPerf download request done")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
-                                    status = IperfTestStatus.ENDED
+                                    status = IperfTestStatus.ENDED,
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroDownloadSpeedProgress
+                                    ),
                                 )
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
@@ -114,11 +119,8 @@ class IperfDownloadRunner(
                                     status = IperfTestStatus.RUNNING
                                 )
                             } else {
-//                                _iPerfDownloadSpeed.postValue("-")
-//                                _iPerfDownloadSpeedUnit.postValue("")
+                                // TODO: parse other states
                             }
-//                            _iPerfDownloadRequestResult.postValue("D ${downloadResultBuilder.toString()}")
-//                            downloadResultBuilder.append(text)
                             applicationScope.launch {
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
@@ -128,13 +130,13 @@ class IperfDownloadRunner(
                             Timber.e("IPERF Download: $e")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroDownloadSpeedProgress
+                                    ),
                                     status = IperfTestStatus.ERROR
                                 )
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
-//                            downloadResultBuilder.append("\niPerf download request failed:\n error: $e")
-//                            Timber.d("D $downloadResultBuilder")
-//                            _iPerfDownloadTestRunning.postValue(false)
                         }
                     }
                 }
@@ -146,7 +148,10 @@ class IperfDownloadRunner(
                             Timber.d("iPerf download request done")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
-                                    status = IperfTestStatus.ENDED
+                                    status = IperfTestStatus.ENDED,
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroDownloadSpeedProgress
+                                    ),
                                 )
                                 _testProgressDetailsFlow.emit(testProgressDetails)
                             }
@@ -157,6 +162,9 @@ class IperfDownloadRunner(
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
                                     status = IperfTestStatus.ERROR,
+                                    testProgress = testProgressDetails.testProgress.plus(
+                                        zeroDownloadSpeedProgress
+                                    ),
                                     error = testProgressDetails.error + IperfError(
                                         timestamp = System.currentTimeMillis(),
                                         error = result.error.toString()
@@ -174,6 +182,9 @@ class IperfDownloadRunner(
                 applicationScope.launch {
                     testProgressDetails = testProgressDetails.copy(
                         status = IperfTestStatus.ERROR,
+                        testProgress = testProgressDetails.testProgress.plus(
+                            zeroDownloadSpeedProgress
+                        ),
                         error = testProgressDetails.error + IperfError(
                             timestamp = System.currentTimeMillis(),
                             error = "Error - unable to start iperf request"
