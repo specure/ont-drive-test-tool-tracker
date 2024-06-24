@@ -113,7 +113,7 @@ class TrackOverviewViewModel(
     init {
 
         viewModelScope.launch {
-            temperatureInfoReceiver.temperatureFlow.collect { temperature ->
+            temperatureInfoReceiver.observeTemperature().collect { temperature ->
                 updateTemperature(temperature)
             }
         }

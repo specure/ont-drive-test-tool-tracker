@@ -2,7 +2,7 @@ package com.cadrikmdev.track.domain
 
 import com.cadrikmdev.core.domain.Timer
 import com.cadrikmdev.core.domain.location.LocationTimestamp
-import com.cadrikmdev.core.domain.location.LocationWithDetails
+import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,13 +16,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.zip
-import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 class MeasurementTracker(
     private val locationObserver: LocationObserver,
     private val applicationScope: CoroutineScope,
+    private val temperatureInfoReceiver: TemperatureInfoObserver,
 ) {
 
     private val _trackData = MutableStateFlow(TrackData())
@@ -49,6 +49,20 @@ class MeasurementTracker(
         )
 
     init {
+
+        applicationScope.launch {
+            temperatureInfoReceiver.observeTemperature().collect { temperature ->
+                _trackData.update {
+                    it.copy(
+                        temperature = temperature
+                    )
+                }
+            }
+        }
+
+        applicationScope.launch {
+            temperatureInfoReceiver.register()
+        }
         _isTracking
             .onEach { isTracking ->
                 if (!isTracking) {
@@ -94,9 +108,9 @@ class MeasurementTracker(
 
 
                 _trackData.update {
-                    TrackData(
-                        locations = newLocationsList
-                    )
+                        it.copy(
+                            locations = newLocationsList
+                        )
                 }
             }
             .launchIn(applicationScope)

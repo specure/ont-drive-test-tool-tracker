@@ -6,19 +6,25 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import com.cadrikmdev.core.domain.Temperature
+import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 
 class TemperatureInfoReceiver(
     private val context: Context,
-) : BroadcastReceiver() {
+) : BroadcastReceiver(), TemperatureInfoObserver {
     // temperature in Celsius units in XXY format as XX.Y
     private var temp: Temperature? = null
 
     private val _temperatureFlow = MutableStateFlow<Temperature?>(null)
     val temperatureFlow: Flow<Temperature?> = _temperatureFlow.asStateFlow()
+
+    override fun observeTemperature(): Flow<Temperature?> {
+        return temperatureFlow
+    }
 
     /**
      * temperature in Celzius or null if not acquired yet
@@ -37,7 +43,7 @@ class TemperatureInfoReceiver(
         _temperatureFlow.tryEmit(temperatureInCelsius)
     }
 
-    fun register() {
+    override fun register() {
         Timber.d("REGISTERING TEMPERATURE")
         context.registerReceiver(
             this,
@@ -45,7 +51,7 @@ class TemperatureInfoReceiver(
         )
     }
 
-    fun unregister() {
+    override fun unregister() {
         try {
             Timber.d("UNREGISTERING TEMPERATURE")
             context.unregisterReceiver(

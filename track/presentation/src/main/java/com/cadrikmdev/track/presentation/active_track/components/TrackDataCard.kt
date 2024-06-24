@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.ui.formatted
 import com.cadrikmdev.iperf.domain.IperfTestProgressDownload
@@ -43,11 +44,31 @@ fun TrackDataCard(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TrackDataItem(
-            title = stringResource(id = R.string.duration),
-            value = elapsedTime.formatted(),
-            valueFontSize = 32.sp
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            if (trackData.temperature != null) {
+                TrackDataItem(
+                    title = stringResource(id = R.string.temperature),
+                    value = "${trackData.temperature?.temperatureCelsius.toString()} °C" ,
+                    valueFontSize = 10.sp
+                )
+            } else {
+                TrackDataItem(
+                    title = stringResource(id = R.string.temperature),
+                    value = "- °C" ,
+                    valueFontSize = 32.sp
+                )
+            }
+            TrackDataItem(
+                title = stringResource(id = R.string.duration),
+                value = elapsedTime.formatted(),
+                valueFontSize = 32.sp
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
         Row(
             modifier = Modifier
@@ -84,11 +105,12 @@ private fun TrackDataItem(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = title,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 12.sp
-        )
+        if (title.isNotBlank())
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp
+            )
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onSurface,
@@ -128,6 +150,10 @@ private fun TrackDataCardPreview() {
                     bandwidth = 1.9,
                     bandwidthUnit = "Mbits",
                 ),
+                temperature = Temperature(
+                    temperatureCelsius = 22.3f,
+                    timestampMillis = 554684684346
+                )
             )
         )
     }

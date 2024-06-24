@@ -35,4 +35,6 @@
     <string name="wifi_service_enabled">Wifi service enabled</string>
     <string name="download">Download</string>
     <string name="upload">Upload</string>
+    <string name="temperature">Temperature</string>
+    <string name="network">Network</string>
 </resources>
