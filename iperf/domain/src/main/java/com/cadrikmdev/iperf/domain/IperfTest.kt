@@ -6,7 +6,24 @@ data class IperfTest(
     val startTimestamp: Long? = null,
     val iperfServerInfo: IperfServerInfo? = null,
     val connectionInfo: IperfConnectionInfo? = null,
-    val testProgress: List<IperfTestProgress>? = null,
-    val error: List<IperfError?>? = null,
-    val rawUnparsedLog: String? = null
+    val testProgress: List<IperfTestProgress> = emptyList(),
+    val error: List<IperfError> = emptyList(),
+    val rawUnparsedLog: String? = null,
+    val status: IperfTestStatus = IperfTestStatus.NOT_STARTED,
+    val direction: IperfTestDirection = IperfTestDirection.UNDEFINED,
 )
+
+enum class IperfTestStatus {
+    NOT_STARTED,
+    INITIALIZING,
+    RUNNING,
+    ENDED,
+    ERROR,
+    STOPPED,
+}
+
+enum class IperfTestDirection {
+    UNDEFINED,
+    DOWNLOAD,
+    UPLOAD,
+}

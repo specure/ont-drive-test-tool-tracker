@@ -6,38 +6,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.core.connectivty.domain.connectivity.ConnectivityObserver
 import com.cadrikmdev.core.connectivty.domain.connectivity.NetworkTracker
-import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
-import com.cadrikmdev.core.domain.track.Track
 import com.cadrikmdev.core.domain.track.TrackRepository
-import com.cadrikmdev.core.domain.util.Result
 import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
-import com.cadrikmdev.core.presentation.ui.asUiText
 import com.cadrikmdev.iperf.domain.IperfOutputParser
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.track.domain.LocationObserver
 import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
-import com.cadrikmdev.track.presentation.track_overview.TrackOverviewEvent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 class ActiveTrackViewModel(
     private val measurementTracker: MeasurementTracker,
@@ -69,6 +62,36 @@ class ActiveTrackViewModel(
         state.shouldTrack
     }
         .stateIn(viewModelScope, SharingStarted.Lazily, state.shouldTrack)
+
+
+
+    private val _iPerfDownloadRequestResult: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+    val iPerfDownloadRequestResult: LiveData<String>
+        get() = _iPerfDownloadRequestResult
+
+    private val _iPerfUploadRequestResult: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+    val iPerfUploadRequestResult: LiveData<String>
+        get() = _iPerfUploadRequestResult
+
+    private val _iPerfDownloadSpeed: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    private val _iPerfUploadSpeed: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    private val _iPerfUploadSpeedUnit: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    private val _iPerfDownloadSpeedUnit: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 
     private val hasAllPermission = MutableStateFlow(false)
 
@@ -172,26 +195,8 @@ class ActiveTrackViewModel(
             return
         }
         viewModelScope.launch {
-            val track = Track(
-                id = null,
-                duration = state.elapsedTime,
-                dateTimeUtc = ZonedDateTime.now()
-                    .withZoneSameInstant(ZoneId.of("UTC")),
-                location = state.currentLocation ?: Location(0.0, 0.0),
-            )
-
             measurementTracker.finishTrack()
-
-            when (val result = trackRepository.upsertTrack(track)) {
-                is Result.Error -> {
-                    eventChannel.send(ActiveTrackEvent.Error(result.error.asUiText()))
-                }
-
-                is Result.Success -> {
-                    eventChannel.send(ActiveTrackEvent.TrackSaved)
-                }
-            }
-
+            eventChannel.send(ActiveTrackEvent.TrackSaved)
             state = state.copy(
                 isSavingTrack = false
             )

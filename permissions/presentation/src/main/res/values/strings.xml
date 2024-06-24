@@ -16,4 +16,6 @@
     <string name="notification_permission">Post notification</string>
     <string name="background_location">Use location on background</string>
     <string name="read_phone_state">Read phone data</string>
+    <string name="stop">Stop</string>
+    <string name="start">Start</string>
 </resources>

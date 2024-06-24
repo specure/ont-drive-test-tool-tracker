@@ -122,11 +122,3 @@ class MeasurementTracker(
         _trackData.value = TrackData()
     }
 }
-
-private fun <E> List<List<E>>.replaceLast(replacement: List<E>): List<List<E>> {
-    if (this.isEmpty()) {
-        return listOf(replacement)
-    } else {
-        return this.dropLast(1) + listOf(replacement)
-    }
-}

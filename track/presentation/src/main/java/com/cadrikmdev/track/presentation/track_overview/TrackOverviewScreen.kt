@@ -428,7 +428,28 @@ private fun TrackOverviewScreen(
 
                 }
             }
-
+            Row {
+                SignalTrackerOutlinedActionButton(
+                    modifier = Modifier.padding(start = 16.dp).weight(1f),
+                    text = if (state.isIperfDownloadRunning)
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                    else
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.start),
+                    isLoading = false
+                ) {
+                    onAction(TrackOverviewAction.OnDownloadTestClick)
+                }
+                SignalTrackerOutlinedActionButton(
+                    modifier = Modifier.padding(start = 16.dp).weight(1f),
+                    text = if (state.isIperfUploadRunning)
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                    else
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.start),
+                    isLoading = false
+                ) {
+                    onAction(TrackOverviewAction.OnUploadTestClick)
+                }
+            }
 
             Row {
                 state.currentIperfDownloadInfoRaw?.let {

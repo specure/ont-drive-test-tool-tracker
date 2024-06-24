@@ -8,7 +8,8 @@ sealed interface TrackOverviewAction {
     data object OnDemoStartClick : TrackOverviewAction
     data object OnResolvePermissionClick : TrackOverviewAction
     data object OnResolveLocationService : TrackOverviewAction
-
+    data object OnDownloadTestClick : TrackOverviewAction
+    data object OnUploadTestClick : TrackOverviewAction
 
     data class DeleteTrack(val trackUi: TrackUi) : TrackOverviewAction
 }

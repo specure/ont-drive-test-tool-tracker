@@ -22,6 +22,4 @@ dependencies {
     implementation(projects.core.connectivity)
     implementation(projects.iperf.domain)
     implementation(projects.iperf.presentation)
-    implementation(project(":iperf-jni-upload:iperf"))
-    implementation(project(":iperf-jni-download:iperf"))
 }
