@@ -46,7 +46,7 @@ class IperfDownloadRunner(
     private lateinit var testProgressDetails: IperfTest
 
     private val _testProgressDetailsFlow = MutableStateFlow<IperfTest>(IperfTest())
-    val testProgressDetailsFlow: StateFlow<IperfTest> get() = _testProgressDetailsFlow
+    override val testProgressDetailsFlow: StateFlow<IperfTest> get() = _testProgressDetailsFlow
 
 
     override fun startTest() {

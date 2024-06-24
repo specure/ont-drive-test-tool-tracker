@@ -9,22 +9,51 @@ import com.cadrikmdev.core.presentation.service.location.GpsLocationServiceCheck
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.cadrikmdev.core.presentation.service.wifi.AndroidWifiServiceObserver
 import com.cadrikmdev.iperf.domain.IperfOutputParser
+import com.cadrikmdev.iperf.domain.IperfRunner
 import com.cadrikmdev.iperf.presentation.IperfAndroidParser
+import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
+import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackViewModel
 import com.cadrikmdev.track.presentation.track_overview.TrackOverviewViewModel
+import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val trackPresentationModule = module {
     viewModelOf(::TrackOverviewViewModel)
     viewModelOf(::ActiveTrackViewModel)
-    singleOf(::MeasurementTracker)
+
     singleOf(::GpsLocationServiceChecker).bind<ServiceChecker>()
     singleOf(::AndroidLocationServiceObserver).bind<LocationServiceObserver>()
     singleOf(::TemperatureInfoReceiver).bind<TemperatureInfoObserver>()
     singleOf(::AndroidWifiServiceObserver).bind<WifiServiceObserver>()
     singleOf(::IperfAndroidParser).bind<IperfOutputParser>()
+    single<IperfRunner>(named("iperfDownloadRunner")) {
+        IperfDownloadRunner(
+            get(),
+            get(),
+            get(),
+        )
+    }
+    single<IperfRunner>(named("iperfUploadRunner")) {
+        IperfUploadRunner(
+            get(),
+            get(),
+            get(),
+        )
+    }
+    single {
+        MeasurementTracker(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(named("iperfDownloadRunner")),
+            get(named("iperfUploadRunner")),
+        )
+    }
 }

@@ -59,7 +59,6 @@ class TrackOverviewViewModel(
     private val mobileNetworkObserver: NetworkTracker,
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
     private val applicationContext: Context,
-    private val measurementTracker: MeasurementTracker,
     private val iperfParser: IperfOutputParser,
 ) : ViewModel() {
 

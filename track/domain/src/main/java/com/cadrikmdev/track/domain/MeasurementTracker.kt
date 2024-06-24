@@ -4,7 +4,7 @@ import com.cadrikmdev.connectivity.domain.NetworkTracker
 import com.cadrikmdev.core.domain.Timer
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
-import com.cadrikmdev.iperf.domain.IperfOutputParser
+import com.cadrikmdev.iperf.domain.IperfRunner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +26,8 @@ class MeasurementTracker(
     private val applicationScope: CoroutineScope,
     private val temperatureInfoReceiver: TemperatureInfoObserver,
     private val mobileNetworkTracker: NetworkTracker,
-    private val iperfParser: IperfOutputParser,
+    private val iperfDownloadRunner: IperfRunner,
+    private val iperfUploadRunner: IperfRunner,
 ) {
     private val _trackData = MutableStateFlow(TrackData())
     val trackData = _trackData.asStateFlow()
@@ -69,7 +70,6 @@ class MeasurementTracker(
 
         applicationScope.launch {
             mobileNetworkTracker.observeNetwork().collect { networkInfo ->
-
                 _trackData.update {
                     it.copy(
                         networkInfo = networkInfo.firstOrNull()
@@ -90,6 +90,9 @@ class MeasurementTracker(
                             locations = newList
                         )
                     }
+                } else {
+                    iperfUploadRunner.startTest()
+                    iperfDownloadRunner.startTest()
                 }
             }
             .flatMapLatest { isTracking ->
@@ -103,6 +106,8 @@ class MeasurementTracker(
                 _elapsedTime.value += it
             }
             .launchIn(applicationScope)
+
+
 
         currentLocation
             .filterNotNull()
@@ -130,6 +135,22 @@ class MeasurementTracker(
                 }
             }
             .launchIn(applicationScope)
+
+        iperfUploadRunner.testProgressDetailsFlow.onEach { testState ->
+            _trackData.update {
+                it.copy(
+                    iperfTestUpload = testState
+                )
+            }
+        }.launchIn(applicationScope)
+
+        iperfDownloadRunner.testProgressDetailsFlow.onEach { testState ->
+            _trackData.update {
+                it.copy(
+                    iperfTestDownload = testState
+                )
+            }
+        }.launchIn(applicationScope)
     }
 
 
