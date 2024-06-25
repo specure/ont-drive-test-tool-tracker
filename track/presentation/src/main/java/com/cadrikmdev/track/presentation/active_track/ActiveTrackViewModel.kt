@@ -162,12 +162,15 @@ class ActiveTrackViewModel(
                 state = state.copy(
                     isTrackFinished = true,
                     isSavingTrack = false,
+                    shouldTrack = false,
                 )
+                finishTrack()
             }
 
             ActiveTrackAction.OnResumeTrackClick -> {
                 state = state.copy(
-                    shouldTrack = true
+                    shouldTrack = true,
+                    isShowingPauseDialog = false,
                 )
             }
 
@@ -180,7 +183,8 @@ class ActiveTrackViewModel(
             ActiveTrackAction.OnToggleTrackClick -> {
                 state = state.copy(
                     hasStartedTracking = true,
-                    shouldTrack = !state.shouldTrack
+                    isShowingPauseDialog = shouldTrack.value,
+                    shouldTrack = true,
                 )
             }
 
@@ -193,18 +197,13 @@ class ActiveTrackViewModel(
     }
 
     private fun finishTrack() {
-        val locations = state.trackData.locations
-        if (locations.isEmpty() || locations.size <= 1) {
-            state = state.copy(
-                isSavingTrack = false
-            )
-            return
-        }
         viewModelScope.launch {
             measurementTracker.finishTrack()
             eventChannel.send(ActiveTrackEvent.TrackSaved)
             state = state.copy(
-                isSavingTrack = false
+                shouldTrack = false,
+                isSavingTrack = false,
+                isShowingPauseDialog = false
             )
         }
     }

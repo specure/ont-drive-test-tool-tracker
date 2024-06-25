@@ -218,20 +218,10 @@ private fun ActiveTrackScreen(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             TrackerMap(
-                isTrackFinished = state.isTrackFinished,
+                isTrackFinished = false,
                 currentLocation = state.currentLocation,
                 locations = state.trackData.locations,
-                onSnapshot = { bitmap ->
-                    val stream = ByteArrayOutputStream()
-                    stream.use { outputStream ->
-                        bitmap.compress(
-                            Bitmap.CompressFormat.JPEG,
-                            80,
-                            outputStream
-                        )
-                    }
-                    onAction(ActiveTrackAction.OnTrackProcessed(stream.toByteArray()))
-                },
+                onSnapshot = { },
                 modifier = Modifier
                     .fillMaxSize()
             )
@@ -246,7 +236,7 @@ private fun ActiveTrackScreen(
         }
     }
 
-    if (!state.shouldTrack && state.hasStartedTracking) {
+    if (state.isShowingPauseDialog && state.hasStartedTracking) {
         SignalTrackerDialog(
             title = stringResource(
                 id = R.string.tracking_is_paused
