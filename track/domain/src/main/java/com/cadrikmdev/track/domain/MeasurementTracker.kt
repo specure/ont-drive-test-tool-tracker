@@ -65,10 +65,6 @@ class MeasurementTracker(
         }
 
         applicationScope.launch {
-            temperatureInfoReceiver.register()
-        }
-
-        applicationScope.launch {
             mobileNetworkTracker.observeNetwork().collect { networkInfo ->
                 _trackData.update {
                     it.copy(
@@ -90,7 +86,13 @@ class MeasurementTracker(
                             locations = newList
                         )
                     }
+                    applicationScope.launch {
+//                        temperatureInfoReceiver.unregister()
+                    }
                 } else {
+                    applicationScope.launch {
+                        temperatureInfoReceiver.register()
+                    }
                     iperfUploadRunner.startTest()
                     iperfDownloadRunner.startTest()
                 }
@@ -153,17 +155,38 @@ class MeasurementTracker(
         }.launchIn(applicationScope)
     }
 
-
     fun setIsTracking(isTracking: Boolean) {
         this._isTracking.value = isTracking
     }
 
-    fun startObservingLocation() {
+    private fun startObservingLocation() {
         isObservingLocation.value = true
     }
 
-    fun stopObservingLocation() {
+    private fun stopObservingLocation() {
         isObservingLocation.value = false
+    }
+
+    fun startObserving() {
+        startObservingTemperature()
+        startObservingLocation()
+    }
+
+    fun stopObserving() {
+        stopObservingLocation()
+        stopObservingTemperature()
+    }
+
+    private fun stopObservingTemperature() {
+        applicationScope.launch {
+            temperatureInfoReceiver.unregister()
+        }
+    }
+
+    private fun startObservingTemperature() {
+        applicationScope.launch {
+            temperatureInfoReceiver.register()
+        }
     }
 
     fun finishTrack() {

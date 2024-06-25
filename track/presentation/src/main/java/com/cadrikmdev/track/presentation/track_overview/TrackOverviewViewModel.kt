@@ -291,7 +291,7 @@ class TrackOverviewViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        temperatureInfoReceiver.unregister()
+//        temperatureInfoReceiver.unregister()
     }
 
     fun onEvent(event: TrackOverviewEvent) {

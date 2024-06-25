@@ -67,10 +67,6 @@ class ActiveTrackViewModel(
     }
         .stateIn(viewModelScope, SharingStarted.Lazily, state.shouldTrack)
 
-    private val iperfUpload = IperfUploadRunner(applicationContext, applicationScope, iperfParser)
-    private val iperfDownload = IperfDownloadRunner(applicationContext, applicationScope, iperfParser)
-
-
     private val _iPerfDownloadRequestResult: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
@@ -116,9 +112,9 @@ class ActiveTrackViewModel(
         hasAllPermission
             .onEach { hasPermission ->
                 if (hasPermission) {
-                    measurementTracker.startObservingLocation()
+                    measurementTracker.startObserving()
                 } else {
-                    measurementTracker.stopObservingLocation()
+                    measurementTracker.stopObserving()
                 }
             }
             .launchIn(viewModelScope)
@@ -211,7 +207,7 @@ class ActiveTrackViewModel(
     override fun onCleared() {
         super.onCleared()
         if (!ActiveTrackService.isServiceActive) {
-            measurementTracker.stopObservingLocation()
+            measurementTracker.stopObserving()
         }
     }
 
