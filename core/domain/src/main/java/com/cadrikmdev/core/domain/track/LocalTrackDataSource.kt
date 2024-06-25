@@ -4,7 +4,7 @@ import com.cadrikmdev.core.domain.util.DataError
 import com.cadrikmdev.core.domain.util.Result
 import kotlinx.coroutines.flow.Flow
 
-typealias TrackId = String
+typealias TrackId = Long
 
 interface LocalTrackDataSource {
     fun getTracks(): Flow<List<Track>>
@@ -13,7 +13,13 @@ interface LocalTrackDataSource {
 
     suspend fun upsertTracks(tracks: List<Track>): Result<List<TrackId>, DataError.Local>
 
-    suspend fun deleteTrack(id: String)
+    suspend fun getTracksForExport(): Flow<List<Track>>
+
+    suspend fun getLatestNTracksForExport(limit: Int): Flow<List<Track>>
+
+    suspend fun deleteExportedTracks()
+
+    suspend fun deleteTrack(id: TrackId)
 
     suspend fun deleteAllTracks()
 }

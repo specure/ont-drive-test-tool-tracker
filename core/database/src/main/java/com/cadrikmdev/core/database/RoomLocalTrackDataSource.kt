@@ -46,7 +46,19 @@ class RoomLocalTrackDataSource(
         }
     }
 
-    override suspend fun deleteTrack(id: String) {
+    override suspend fun getTracksForExport(): Flow<List<Track>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getLatestNTracksForExport(limit: Int): Flow<List<Track>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteExportedTracks() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteTrack(id: TrackId) {
         trackDao.deleteTrack(id)
     }
 

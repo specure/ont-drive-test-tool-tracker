@@ -81,6 +81,5 @@ dependencies {
     implementation(projects.track.domain)
     implementation(projects.track.data)
     implementation(projects.track.location)
-    implementation(projects.track.network)
 
 }

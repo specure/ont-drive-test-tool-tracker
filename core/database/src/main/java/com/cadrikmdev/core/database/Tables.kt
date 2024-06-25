@@ -25,7 +25,6 @@ object Tables {
     const val SIGNAL_MEASUREMENT_INFO = "signal_measurement_info"
     const val SIGNAL_MEASUREMENT_CHUNK = "signal_measurement_chunk"
     const val TRACK_ENTITY = "track_entity"
-    const val TRACK_PENDING_SYNC_ENTITY = "track_pending_sync_entity"
     const val CONNECTIVITY_STATE = "connectivity_state"
 
 }

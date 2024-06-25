@@ -65,12 +65,15 @@ fun TrackListItem(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        TrackingTimeSection(duration = trackUi.duration, modifier = Modifier.fillMaxWidth())
+        TrackingTimeSection(
+            duration = trackUi.durationMillis.toString(),
+            modifier = Modifier.fillMaxWidth()
+        )
         HorizontalDivider(
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
         )
         TrackingDateSection(
-            dateTime = trackUi.dateTime
+            dateTime = trackUi.timestamp
         )
     }
     DropdownMenu(
@@ -189,9 +192,37 @@ private fun TrackListItemPreview() {
     SignalTrackerTheme {
         TrackListItem(
             trackUi = TrackUi(
-                id = "1",
-                duration = "00:10:35",
-                dateTime = "May 13th, 2024 - 10:25AM",
+                id = 1,
+                durationMillis = 8504646086,
+                timestamp = "May 13th, 2024 - 10:25AM",
+                timestampRaw = 8504646086,
+                temperatureCelsius = 12.3,
+                temperatureTimestamp = "May 13th, 2024 - 10:27AM",
+                temperatureTimestampRaw = 18716461181681,
+                downloadSpeed = 12.2,
+                downloadSpeedUnit = "Mbit/sec",
+                downloadSpeedTestState = "RUNNING",
+                downloadSpeedTestError = null,
+                downloadSpeedTestTimestamp = "May 13th, 2024 - 10:27AM",
+                downloadSpeedTestTimestampRaw = 18716461181681,
+                uploadSpeed = 2.2,
+                uploadSpeedUnit = "Mbit/sec",
+                uploadSpeedTestState = "RUNNING",
+                uploadSpeedTestError = null,
+                uploadSpeedTestTimestamp = "May 13th, 2024 - 10:27AM",
+                uploadSpeedTestTimestampRaw = 18716461181681,
+                latitude = 48.3,
+                longitude = 42.4,
+                locationTimestamp = "May 13th, 2024 - 10:27AM",
+                locationTimestampRaw = 18716461181681,
+                networkType = "CELLULAR",
+                mobileNetworkOperator = "O2 - SK",
+                mobileNetworkType = "LTE",
+                signalStrength = -110,
+                networkInfoTimestamp = "May 13th, 2024 - 10:27AM",
+                networkInfoTimestampRaw = 18716461181681,
+                connectionStatus = "CONNECTED",
+                exported = false,
             ),
             onDeleteClick = { }
         )

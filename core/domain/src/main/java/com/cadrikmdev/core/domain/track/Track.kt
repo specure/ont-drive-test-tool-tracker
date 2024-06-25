@@ -1,13 +1,35 @@
 package com.cadrikmdev.core.domain.track
 
-import com.cadrikmdev.core.domain.location.Location
-import java.time.ZonedDateTime
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
-
 data class Track(
-    val id: String?, // null if new track
-    val duration: Duration,
-    val dateTimeUtc: ZonedDateTime,
-    val location: Location,
+    val id: Long, // null if new track
+    val durationMillis: Long,
+    val timestamp: String,
+    val timestampRaw: Long,
+    val downloadSpeed: Double?,
+    val downloadSpeedUnit: String?,
+    val downloadSpeedTestState: String?,
+    val downloadSpeedTestError: String?,
+    val downloadSpeedTestTimestamp: String?,
+    val downloadSpeedTestTimestampRaw: Long?,
+    val uploadSpeed: Double?,
+    val uploadSpeedUnit: String?,
+    val uploadSpeedTestState: String?,
+    val uploadSpeedTestError: String?,
+    val uploadSpeedTestTimestamp: String?,
+    val uploadSpeedTestTimestampRaw: Long?,
+    val latitude: Double?,
+    val longitude: Double?,
+    val locationTimestamp: String?,
+    val locationTimestampRaw: Long?,
+    val networkType: String?,
+    val mobileNetworkOperator: String?,
+    val mobileNetworkType: String?,
+    val signalStrength: Int?,
+    val networkInfoTimestamp: String?,
+    val networkInfoTimestampRaw: Long?,
+    val connectionStatus: String?,
+    val temperatureCelsius: Double?,
+    val temperatureTimestamp: String?,
+    val temperatureTimestampRaw: Long?,
+    val exported: Boolean = false,
 )

@@ -3,10 +3,8 @@ package com.cadrikmdev.track.presentation.track_overview
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationTimestamp
-import com.cadrikmdev.track.presentation.track_overview.model.TrackUi
 
 data class TrackOverviewState(
-    val tracks: List<TrackUi> = emptyList(),
     val isOnline: Boolean = false,
     val isLocationTrackable: Boolean = false,
     val isPermissionRequired: Boolean = false,

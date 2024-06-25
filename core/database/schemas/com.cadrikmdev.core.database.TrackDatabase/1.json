@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "22bf2c9eb46d30b34ded308742f3c3f0",
+    "identityHash": "ad15b637588ee9ac8e8b4d7cb838342e",
     "entities": [
       {
         "tableName": "track_entity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`durationMillis` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`durationMillis` INTEGER NOT NULL, `timestamp` TEXT NOT NULL, `timestampRaw` INTEGER NOT NULL, `downloadSpeed` REAL, `downloadSpeedUnit` TEXT, `downloadSpeedTestState` TEXT, `downloadSpeedTestError` TEXT, `downloadSpeedTestTimestamp` TEXT, `downloadSpeedTestTimestampRaw` INTEGER, `uploadSpeed` REAL, `uploadSpeedUnit` TEXT, `uploadSpeedTestState` TEXT, `uploadSpeedTestError` TEXT, `uploadSpeedTestTimestamp` TEXT, `uploadSpeedTestTimestampRaw` INTEGER, `latitude` REAL, `longitude` REAL, `locationTimestamp` TEXT, `locationTimestampRaw` INTEGER, `networkType` TEXT, `mobileNetworkOperator` TEXT, `mobileNetworkType` TEXT, `signalStrength` INTEGER, `networkInfoTimestamp` TEXT, `networkInfoTimestampRaw` INTEGER, `connectionStatus` TEXT, `temperatureCelsius` REAL, `temperatureTimestamp` TEXT, `temperatureTimestampRaw` INTEGER, `exported` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
           {
             "fieldPath": "durationMillis",
@@ -15,116 +15,190 @@
             "notNull": true
           },
           {
-            "fieldPath": "dateTimeUtc",
-            "columnName": "dateTimeUtc",
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "timestampRaw",
+            "columnName": "timestampRaw",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadSpeed",
+            "columnName": "downloadSpeed",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadSpeedUnit",
+            "columnName": "downloadSpeedUnit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadSpeedTestState",
+            "columnName": "downloadSpeedTestState",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadSpeedTestError",
+            "columnName": "downloadSpeedTestError",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadSpeedTestTimestamp",
+            "columnName": "downloadSpeedTestTimestamp",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadSpeedTestTimestampRaw",
+            "columnName": "downloadSpeedTestTimestampRaw",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadSpeed",
+            "columnName": "uploadSpeed",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadSpeedUnit",
+            "columnName": "uploadSpeedUnit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadSpeedTestState",
+            "columnName": "uploadSpeedTestState",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadSpeedTestError",
+            "columnName": "uploadSpeedTestError",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadSpeedTestTimestamp",
+            "columnName": "uploadSpeedTestTimestamp",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadSpeedTestTimestampRaw",
+            "columnName": "uploadSpeedTestTimestampRaw",
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "latitude",
             "columnName": "latitude",
             "affinity": "REAL",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "longitude",
             "columnName": "longitude",
             "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locationTimestamp",
+            "columnName": "locationTimestamp",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locationTimestampRaw",
+            "columnName": "locationTimestampRaw",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "networkType",
+            "columnName": "networkType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mobileNetworkOperator",
+            "columnName": "mobileNetworkOperator",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mobileNetworkType",
+            "columnName": "mobileNetworkType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "signalStrength",
+            "columnName": "signalStrength",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "networkInfoTimestamp",
+            "columnName": "networkInfoTimestamp",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "networkInfoTimestampRaw",
+            "columnName": "networkInfoTimestampRaw",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "connectionStatus",
+            "columnName": "connectionStatus",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "temperatureCelsius",
+            "columnName": "temperatureCelsius",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "temperatureTimestamp",
+            "columnName": "temperatureTimestamp",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "temperatureTimestampRaw",
+            "columnName": "temperatureTimestampRaw",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "exported",
+            "columnName": "exported",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "track_pending_sync_entity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackId` TEXT NOT NULL, `userId` TEXT NOT NULL, `durationMillis` INTEGER NOT NULL, `dateTimeUtc` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`trackId`))",
-        "fields": [
-          {
-            "fieldPath": "trackId",
-            "columnName": "trackId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "userId",
-            "columnName": "userId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "track.durationMillis",
-            "columnName": "durationMillis",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "track.dateTimeUtc",
-            "columnName": "dateTimeUtc",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "track.latitude",
-            "columnName": "latitude",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "track.longitude",
-            "columnName": "longitude",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "track.id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
-          "autoGenerate": false,
+          "autoGenerate": true,
           "columnNames": [
-            "trackId"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "delete_track_sync_entity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackId` TEXT NOT NULL, `userId` TEXT NOT NULL, PRIMARY KEY(`trackId`))",
-        "fields": [
-          {
-            "fieldPath": "trackId",
-            "columnName": "trackId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "userId",
-            "columnName": "userId",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "trackId"
+            "id"
           ]
         },
         "indices": [],
@@ -134,7 +208,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '22bf2c9eb46d30b34ded308742f3c3f0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ad15b637588ee9ac8e8b4d7cb838342e')"
     ]
   }
 }

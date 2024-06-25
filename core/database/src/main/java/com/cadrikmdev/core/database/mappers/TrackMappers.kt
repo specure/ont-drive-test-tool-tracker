@@ -1,32 +1,76 @@
 package com.cadrikmdev.core.database.mappers
 
 import com.cadrikmdev.core.database.entity.TrackEntity
-import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.track.Track
-import org.bson.types.ObjectId
-import java.time.Instant
-import java.time.ZoneId
-import kotlin.time.Duration.Companion.milliseconds
 
 fun TrackEntity.toTrack(): Track {
     return Track(
         id = id,
-        duration = durationMillis.milliseconds,
-        dateTimeUtc = Instant.parse(dateTimeUtc)
-            .atZone(ZoneId.of("UTC")),
-        location = Location(
-            lat = latitude,
-            long = longitude
-        ),
+        durationMillis = durationMillis,
+        timestamp = timestamp,
+        timestampRaw = timestampRaw,
+        downloadSpeed = downloadSpeed,
+        downloadSpeedUnit = downloadSpeedUnit,
+        downloadSpeedTestState = downloadSpeedTestState,
+        downloadSpeedTestError = downloadSpeedTestError,
+        downloadSpeedTestTimestamp = downloadSpeedTestTimestamp,
+        downloadSpeedTestTimestampRaw = downloadSpeedTestTimestampRaw,
+        uploadSpeed = uploadSpeed,
+        uploadSpeedUnit = uploadSpeedUnit,
+        uploadSpeedTestState = uploadSpeedTestState,
+        uploadSpeedTestError = uploadSpeedTestError,
+        uploadSpeedTestTimestamp = uploadSpeedTestTimestamp,
+        uploadSpeedTestTimestampRaw = uploadSpeedTestTimestampRaw,
+        latitude = latitude,
+        longitude = longitude,
+        locationTimestamp = locationTimestamp,
+        locationTimestampRaw = locationTimestampRaw,
+        networkType = networkType,
+        mobileNetworkOperator = mobileNetworkOperator,
+        mobileNetworkType = mobileNetworkType,
+        signalStrength = signalStrength,
+        networkInfoTimestamp = networkInfoTimestamp,
+        networkInfoTimestampRaw = networkInfoTimestampRaw,
+        connectionStatus = connectionStatus,
+        temperatureCelsius = temperatureCelsius,
+        temperatureTimestamp = temperatureTimestamp,
+        temperatureTimestampRaw = temperatureTimestampRaw,
+        exported = exported,
     )
 }
 
 fun Track.toTrackEntity(): TrackEntity {
     return TrackEntity(
-        id = id ?: ObjectId().toHexString(),
-        durationMillis = duration.inWholeMilliseconds,
-        dateTimeUtc = dateTimeUtc.toInstant().toString(),
-        latitude = location.lat,
-        longitude = location.long,
+        id = id,
+        durationMillis = durationMillis,
+        timestamp = timestamp,
+        timestampRaw = timestampRaw,
+        downloadSpeed = downloadSpeed,
+        downloadSpeedUnit = downloadSpeedUnit,
+        downloadSpeedTestState = downloadSpeedTestState,
+        downloadSpeedTestError = downloadSpeedTestError,
+        downloadSpeedTestTimestamp = downloadSpeedTestTimestamp,
+        downloadSpeedTestTimestampRaw = downloadSpeedTestTimestampRaw,
+        uploadSpeed = uploadSpeed,
+        uploadSpeedUnit = uploadSpeedUnit,
+        uploadSpeedTestState = uploadSpeedTestState,
+        uploadSpeedTestError = uploadSpeedTestError,
+        uploadSpeedTestTimestamp = uploadSpeedTestTimestamp,
+        uploadSpeedTestTimestampRaw = uploadSpeedTestTimestampRaw,
+        latitude = latitude,
+        longitude = longitude,
+        locationTimestamp = locationTimestamp,
+        locationTimestampRaw = locationTimestampRaw,
+        networkType = networkType,
+        mobileNetworkOperator = mobileNetworkOperator,
+        mobileNetworkType = mobileNetworkType,
+        signalStrength = signalStrength,
+        networkInfoTimestamp = networkInfoTimestamp,
+        networkInfoTimestampRaw = networkInfoTimestampRaw,
+        connectionStatus = connectionStatus,
+        temperatureCelsius = temperatureCelsius,
+        temperatureTimestamp = temperatureTimestamp,
+        temperatureTimestampRaw = temperatureTimestampRaw,
+        exported = exported,
     )
 }

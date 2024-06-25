@@ -8,13 +8,13 @@ interface TrackRepository {
 
     fun getTracks(): Flow<List<Track>>
 
-    suspend fun fetchTracks(): EmptyResult<DataError>
-
     suspend fun upsertTrack(track: Track): EmptyResult<DataError>
 
     suspend fun deleteTrack(id: TrackId)
 
-    suspend fun syncPendingTracks()
+    suspend fun exportPendingTracks()
+
+    suspend fun deleteExportedTracks()
 
     suspend fun deleteAllTracks()
 

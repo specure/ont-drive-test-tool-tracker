@@ -17,7 +17,6 @@ import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
-import com.cadrikmdev.core.domain.track.SyncTrackScheduler
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
@@ -29,8 +28,6 @@ import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.domain.LocationObserver
-import com.cadrikmdev.track.domain.MeasurementTracker
-import com.cadrikmdev.track.presentation.track_overview.mapper.toTrackUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,13 +38,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class TrackOverviewViewModel(
     private val trackRepository: TrackRepository,
-    private val syncTrackScheduler: SyncTrackScheduler,
     private val applicationScope: CoroutineScope,
     private val sessionStorage: SessionStorage,
     private val connectivityObserver: ConnectivityObserver,
@@ -137,12 +132,6 @@ class TrackOverviewViewModel(
             }
         }
 
-        viewModelScope.launch {
-            syncTrackScheduler.scheduleSync(
-                type = SyncTrackScheduler.SyncType.FetchTracks(30.minutes)
-            )
-        }
-
         permissionHandler.setPermissionsNeeded(
             appPermissions
         )
@@ -152,16 +141,6 @@ class TrackOverviewViewModel(
             onOnlineStatusChange(it)
 
         }.launchIn(viewModelScope)
-
-        trackRepository.getTracks().onEach { tracks ->
-            val trackUis = tracks.map { it.toTrackUi() }
-            state = state.copy(tracks = trackUis)
-        }.launchIn(viewModelScope)
-
-        viewModelScope.launch {
-            trackRepository.syncPendingTracks()
-            trackRepository.fetchTracks()
-        }
 
         locationServiceObserver.observeLocationServiceStatus().onEach { serviceStatus ->
             val isAvailable = gpsLocationService.isServiceAvailable()
@@ -250,11 +229,6 @@ class TrackOverviewViewModel(
             TrackOverviewAction.OnDemoStartClick -> {
                 viewModelScope.launch {
                     startIperf()
-                }
-            }
-            is TrackOverviewAction.DeleteTrack -> {
-                viewModelScope.launch {
-                    trackRepository.deleteTrack(action.trackUi.id)
                 }
             }
 
@@ -348,10 +322,7 @@ class TrackOverviewViewModel(
 
     private fun logout() {
         applicationScope.launch {
-            syncTrackScheduler.cancelAllSyncs()
-            trackRepository.deleteAllTracks()
             sessionStorage.set(null)
         }
-
     }
 }

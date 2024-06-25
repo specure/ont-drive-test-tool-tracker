@@ -10,7 +10,6 @@ import com.cadrikmdev.permissions.presentation.di.permissionsModule
 import com.cadrikmdev.signaltracker.di.appModule
 import com.cadrikmdev.track.data.di.trackDataModule
 import com.cadrikmdev.track.location.di.locationModule
-import com.cadrikmdev.track.network.di.trackNetworkModule
 import com.cadrikmdev.track.presentation.di.trackPresentationModule
 import com.google.android.play.core.splitcompat.SplitCompat
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +43,6 @@ class SignalTrackerApp : Application() {
                 mobileNetworkModule,
                 permissionsModule,
                 trackDataModule,
-                trackNetworkModule,
                 trackPresentationModule,
                 locationModule,
             )

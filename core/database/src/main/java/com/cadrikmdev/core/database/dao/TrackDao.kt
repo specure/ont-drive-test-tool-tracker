@@ -15,11 +15,17 @@ interface TrackDao {
     @Upsert
     suspend fun upsertTracks(runs: List<TrackEntity>)
 
-    @Query("SELECT * FROM track_entity ORDER BY dateTimeUtc DESC")
+    @Query("SELECT * FROM track_entity ORDER BY timestamp DESC")
     fun getTracks(): Flow<List<TrackEntity>>
 
+    @Query("SELECT * FROM track_entity WHERE exported=0  ORDER BY timestamp DESC")
+    fun getTracksForExport(): Flow<List<TrackEntity>>
+
+    @Query("SELECT * FROM track_entity WHERE exported=0 ORDER BY timestamp DESC LIMIT :limit")
+    fun getLastNTracksForExport(limit: Int): Flow<List<TrackEntity>>
+
     @Query("DELETE FROM track_entity WHERE id=:id")
-    suspend fun deleteTrack(id: String)
+    suspend fun deleteTrack(id: Long)
 
     @Query("DELETE FROM track_entity")
     suspend fun deleteAllTracks()

@@ -19,7 +19,6 @@ val databaseModule = module {
     }
 
     single { get<TrackDatabase>().trackDao }
-    single { get<TrackDatabase>().trackPendingSyncDao }
 
     singleOf(::RoomLocalTrackDataSource).bind<LocalTrackDataSource>()
 }

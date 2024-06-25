@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +30,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,7 +55,6 @@ import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerSca
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
 import com.cadrikmdev.core.presentation.ui.toLocalTime
 import com.cadrikmdev.track.presentation.R
-import com.cadrikmdev.track.presentation.track_overview.components.TrackListItem
 import org.koin.androidx.compose.koinViewModel
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -473,33 +469,6 @@ private fun TrackOverviewScreen(
                         fontSize = 8.sp
                     )
                 }
-            }
-        }
-
-
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(horizontal = 16.dp),
-            contentPadding = padding,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            items(
-                items = state.tracks,
-                key = {
-                    it.id
-                }
-            ) {
-                TrackListItem(
-                    trackUi = it,
-                    onDeleteClick = {
-                        onAction(TrackOverviewAction.DeleteTrack(it))
-                    },
-                    modifier = Modifier
-                        .animateItemPlacement()
-                )
             }
         }
     }
