@@ -54,6 +54,7 @@ class IperfUploadRunner(
         override val testProgressDetailsFlow: StateFlow<IperfTest> get() = _testProgressDetailsFlow
 
         override fun startTest() {
+            iperf = IPerf
             iperf.init(
                 config.hostname,
                 config.port,
@@ -65,8 +66,14 @@ class IperfUploadRunner(
                 config.json,
                 config.maxBandwidthBitPerSecond
             )
-            Timber.d("IPERF Trying port ${config.port}")
-            if (testProgressDetails.status in listOf(IperfTestStatus.NOT_STARTED, IperfTestStatus.STOPPED, IperfTestStatus.ERROR)) {
+            Timber.d("IPERF Trying port ${config.port} status: ${testProgressDetails.status}")
+            if (testProgressDetails.status in listOf(
+                    IperfTestStatus.ENDED,
+                    IperfTestStatus.NOT_STARTED,
+                    IperfTestStatus.STOPPED,
+                    IperfTestStatus.ERROR
+                )
+            ) {
                 applicationScope.launch {
                     testProgressDetails = IperfTest()
                     testProgressDetails = testProgressDetails.copy(
@@ -80,10 +87,10 @@ class IperfUploadRunner(
                 }
             }
         }
-//        downloadResultBuilder.clear()
 
         override fun stopTest() {
             applicationScope.launch {
+                iperf.stopTest()
                 testProgressDetails = testProgressDetails.copy(
                     status = IperfTestStatus.STOPPED,
                     direction = IperfTestDirection.UPLOAD,

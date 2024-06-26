@@ -25,7 +25,7 @@ class IperfDownloadRunner(
     private val iperfParser: IperfOutputParser,
 ): IperfRunner {
 
-    private val iperf = IPerf
+    private var iperf = IPerf
     private val config: IPerfConfig
         get() {
             val hostname: String = BuildConfig.BASE_URL
@@ -53,7 +53,26 @@ class IperfDownloadRunner(
 
 
     override fun startTest() {
-        if (testProgressDetails.status in listOf(IperfTestStatus.NOT_STARTED, IperfTestStatus.STOPPED, IperfTestStatus.ERROR)) {
+        4
+        iperf = IPerf
+        iperf.init(
+            config.hostname,
+            config.port,
+            config.stream,
+            config.duration,
+            config.interval,
+            config.download,
+            config.useUDP,
+            config.json,
+            config.maxBandwidthBitPerSecond
+        )
+        if (testProgressDetails.status in listOf(
+                IperfTestStatus.ENDED,
+                IperfTestStatus.NOT_STARTED,
+                IperfTestStatus.STOPPED,
+                IperfTestStatus.ERROR
+            )
+        ) {
                 applicationScope.launch {
                     testProgressDetails = IperfTest()
                     testProgressDetails = testProgressDetails.copy(
@@ -70,7 +89,7 @@ class IperfDownloadRunner(
 
     override fun stopTest() {
         applicationScope.launch {
-            iperf.deInit()
+            iperf.stopTest()
             testProgressDetails = testProgressDetails.copy(
                 status = IperfTestStatus.STOPPED,
                 direction = IperfTestDirection.DOWNLOAD,

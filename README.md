@@ -61,8 +61,9 @@ simultaneously with one package of this library.
 - solved by 2 different package names for the same library and include 2 times 
 - TODO: We need to find better solution for this with only one copy of library.
 
-Currently we are not able to stop test in execution 
-- TODO: adjust C lib to be able to stop in the middle of the test
+Currently we are not able to stop test in execution
+
+- SOLVED
 
 Currently ending and starting phase are not parsed in detail, so we are missing some states of the test
 - like starting, connecting, 
