@@ -13,7 +13,7 @@
     <string name="location_rationale">In order to track your location, this app needs your permission for that. Please click on \"Okay\" to grant it.</string>
     <string name="notification_rationale">In order to display the current signal as a notification, this app needs your permission for that. Please click on \"Okay\" to grant it.</string>
     <string name="ok">Ok</string>
-    <string name="tracking_is_paused">Tracking is paused</string>
+    <string name="want_finish_tracking">Do you want to finish tracking?</string>
     <string name="resume_or_finish_track">Do you want to resume or finish your tracking?</string>
     <string name="resume">Resume</string>
     <string name="finish">Finish</string>

@@ -1,11 +1,18 @@
 package com.cadrikmdev.track.domain
 
+import com.cadrikmdev.connectivity.domain.ConnectivityObserver
 import com.cadrikmdev.connectivity.domain.NetworkTracker
+import com.cadrikmdev.connectivity.domain.TransportType
+import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.Timer
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
+import com.cadrikmdev.core.domain.track.Track
+import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.iperf.domain.IperfRunner
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +26,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
+
 
 class MeasurementTracker(
     private val locationObserver: LocationObserver,
@@ -28,6 +41,8 @@ class MeasurementTracker(
     private val mobileNetworkTracker: NetworkTracker,
     private val iperfDownloadRunner: IperfRunner,
     private val iperfUploadRunner: IperfRunner,
+    private val trackRepository: TrackRepository,
+    private val connectivityObserver: ConnectivityObserver,
 ) {
     private val _trackData = MutableStateFlow(TrackData())
     val trackData = _trackData.asStateFlow()
@@ -39,6 +54,8 @@ class MeasurementTracker(
 
     private val _elapsedTime = MutableStateFlow(Duration.ZERO)
     val elapsedTime = _elapsedTime.asStateFlow()
+
+    private var internetConnectivityJob: Job? = null
 
     val currentLocation = isObservingLocation
         .flatMapLatest { isObservingLocation ->
@@ -108,6 +125,13 @@ class MeasurementTracker(
             }
             .onEach {
                 _elapsedTime.value += it
+                _trackData.update { data ->
+                    data.copy(
+                        duration = _elapsedTime.value
+                    )
+                }
+                saveCurrentTrackData(_trackData.value)
+                // TODO: log all values to DB
             }
             .launchIn(applicationScope)
 
@@ -127,10 +151,7 @@ class MeasurementTracker(
                 )
             }
             .onEach { locationWithDetails ->
-                val newLocationsList = trackData.value.locations
-
-                val currentDuration = locationWithDetails.durationTimestamp
-
+                val newLocationsList = listOf(locationWithDetails.location)
 
                 _trackData.update {
                         it.copy(
@@ -172,11 +193,13 @@ class MeasurementTracker(
     fun startObserving() {
         startObservingTemperature()
         startObservingLocation()
+        startObservingConnectivity()
     }
 
     fun stopObserving() {
         stopObservingLocation()
         stopObservingTemperature()
+        stopObservingConnectivity()
     }
 
     private fun stopObservingTemperature() {
@@ -191,10 +214,81 @@ class MeasurementTracker(
         }
     }
 
+    private fun startObservingConnectivity() {
+        if (internetConnectivityJob?.isActive != true) {
+            internetConnectivityJob = applicationScope.launch {
+                connectivityObserver.observeBasicConnectivity().onEach { connected ->
+                    println("Internet connectivity changed to $connected")
+                    _trackData.update {
+                        it.copy(
+                            internetConnectionConnected = connected
+                        )
+                    }
+                }.launchIn(this)
+            }
+        }
+    }
+
+    private fun stopObservingConnectivity() {
+        internetConnectivityJob?.cancel()
+        internetConnectivityJob = null
+    }
+
     fun finishTrack() {
-        stopObservingLocation()
+        stopObserving()
         setIsTracking(false)
         _elapsedTime.value = Duration.ZERO
         _trackData.value = TrackData()
+    }
+
+    private suspend fun saveCurrentTrackData(trackData: TrackData) {
+        withContext(Dispatchers.IO) {
+            val currentMillis = System.currentTimeMillis()
+            val isMobileNetworkActive = trackData.networkInfo?.type == TransportType.CELLULAR
+            val mobileNetworkInfo =
+                if (isMobileNetworkActive) trackData.networkInfo as MobileNetworkInfo else null
+            print("InternetConnection: ${trackData.internetConnectionConnected}")
+            val track = Track(
+                durationMillis = trackData.duration.inWholeMilliseconds,
+                timestamp = currentMillis.formatMillisToDateString(),
+                timestampRaw = currentMillis,
+                downloadSpeed = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth,
+                downloadSpeedUnit = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit,
+                downloadSpeedTestState = trackData.iperfTestDownload?.status?.toString(),
+                downloadSpeedTestError = if (trackData.iperfTestDownload?.error?.lastOrNull() != null) "${trackData.iperfTestDownload.error.lastOrNull()?.timestamp?.formatMillisToDateString()} ${trackData.iperfTestDownload.error.lastOrNull()?.error}" else null,
+                downloadSpeedTestTimestamp = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.timestampMillis?.formatMillisToDateString(),
+                downloadSpeedTestTimestampRaw = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.timestampMillis,
+                uploadSpeed = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth,
+                uploadSpeedUnit = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit,
+                uploadSpeedTestState = trackData.iperfTestUpload?.status?.toString(),
+                uploadSpeedTestError = if (trackData.iperfTestUpload?.error?.lastOrNull() != null) "${trackData.iperfTestUpload.error.lastOrNull()?.timestamp?.formatMillisToDateString()} ${trackData.iperfTestUpload.error.lastOrNull()?.error}" else null,
+                uploadSpeedTestTimestamp = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis?.formatMillisToDateString(),
+                uploadSpeedTestTimestampRaw = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis,
+                latitude = trackData.locations.lastOrNull()?.location?.lat,
+                longitude = trackData.locations.lastOrNull()?.location?.long,
+                locationTimestamp = trackData.locations.lastOrNull()?.timestamp?.inWholeMilliseconds?.formatMillisToDateString(),
+                locationTimestampRaw = trackData.locations.lastOrNull()?.timestamp?.inWholeMilliseconds,
+                temperatureCelsius = trackData.temperature?.temperatureCelsius,
+                temperatureTimestamp = trackData.temperature?.timestampMillis?.formatMillisToDateString(),
+                temperatureTimestampRaw = trackData.temperature?.timestampMillis,
+                exported = false,
+                networkType = trackData.networkInfo?.type.toString(),
+                networkInfoTimestamp = trackData.networkInfo?.timestampMillis?.formatMillisToDateString(),
+                networkInfoTimestampRaw = trackData.networkInfo?.timestampMillis,
+                mobileNetworkOperator = mobileNetworkInfo?.operatorName,
+                mobileNetworkType = mobileNetworkInfo?.networkType.toString(),
+                signalStrength = mobileNetworkInfo?.primarySignalDbm,
+                connectionStatus = if (trackData.internetConnectionConnected) "CONNECTED" else "DISCONNECTED",
+                id = null,
+            )
+            trackRepository.upsertTrack(track)
+        }
+    }
+
+    fun Long.formatMillisToDateString(): String {
+        val instant = Instant.ofEpochMilli(this)
+        val dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        return dateTime.format(formatter)
     }
 }

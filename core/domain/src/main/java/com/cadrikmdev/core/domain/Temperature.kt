@@ -1,6 +1,6 @@
 package com.cadrikmdev.core.domain
 
 data class Temperature(
-    val temperatureCelsius: Float,
+    val temperatureCelsius: Double,
     val timestampMillis: Long,
 )

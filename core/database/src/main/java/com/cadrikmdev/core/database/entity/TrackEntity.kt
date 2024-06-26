@@ -39,5 +39,5 @@ data class TrackEntity(
     val temperatureTimestampRaw: Long?,
     val exported: Boolean = false,
     @PrimaryKey(autoGenerate = true)
-    val id: Long
+    val id: Long?
 )

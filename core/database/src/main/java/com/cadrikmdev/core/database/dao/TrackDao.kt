@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.cadrikmdev.core.database.entity.TrackEntity
+import com.cadrikmdev.core.domain.track.TrackId
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -25,7 +26,7 @@ interface TrackDao {
     fun getLastNTracksForExport(limit: Int): Flow<List<TrackEntity>>
 
     @Query("DELETE FROM track_entity WHERE id=:id")
-    suspend fun deleteTrack(id: Long)
+    suspend fun deleteTrack(id: TrackId)
 
     @Query("DELETE FROM track_entity")
     suspend fun deleteAllTracks()

@@ -30,9 +30,8 @@ data class MobileNetworkInfo(
     val isRoaming: Boolean?,
     val isPrimaryDataSubscription: PrimaryDataSubscription?,
     val simCount: Int,
-    val obtainedTimestampMillis: Long,
 
     val primarySignalDbm: Int?
 
-    ) : NetworkInfo(TransportType.CELLULAR, UUID.randomUUID().toString())
+) : NetworkInfo(TransportType.CELLULAR, System.currentTimeMillis(), UUID.randomUUID().toString())
 

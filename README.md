@@ -93,3 +93,5 @@ period (even few seconds), mostly seen with upload test
 - starting test can take at least 1s with great conditions, during the testing I experienced 
 15s from test start to first bandwidth value acquired from the test
 - unable to force user to not turn on wifi adapter
+- There is no check during the running test if mobile data are the one used for network traffic (
+  possible to add)

@@ -9,6 +9,7 @@ import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
 import com.cadrikmdev.connectivity.domain.NetworkInfo
 import com.cadrikmdev.connectivity.domain.NetworkTracker
+import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.connectivity.domain.mobile.PrimaryDataSubscription
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.filterOnlyPrimaryActiveDataCell
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.getCorrectDataTelephonyManagerOrNull
@@ -16,7 +17,6 @@ import com.cadrikmdev.connectivity.presentation.mobile_network.util.mapToMobileN
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.mccCompat
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.mncCompat
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.toSignalStrengthInfo
-import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import cz.mroczis.netmonster.core.INetMonster
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -103,7 +103,6 @@ class NetmonsterNetworkTracker(
                                 isRoaming = telephonyManager.getCorrectDataTelephonyManagerOrNull()?.isNetworkRoaming,
                                 isPrimaryDataSubscription = isDefaultDataSubscription,
                                 simCount = simCount,
-                                obtainedTimestampMillis = System.currentTimeMillis(),
                                 primarySignalDbm = primaryCellSignalDbm
                             )
                         }

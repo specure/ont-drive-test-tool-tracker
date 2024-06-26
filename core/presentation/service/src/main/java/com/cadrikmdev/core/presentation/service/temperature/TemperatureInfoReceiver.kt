@@ -9,7 +9,6 @@ import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 
@@ -36,7 +35,8 @@ class TemperatureInfoReceiver(
     // On samsung A526B (Android 14 - UpsideDownCake) it updates it values at static 30s intervals
     override fun onReceive(arg0: Context?, intent: Intent) {
         temp = Temperature(
-            temperatureCelsius = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0).toFloat() / 10f,
+            temperatureCelsius = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0)
+                .toDouble() / 10f,
             timestampMillis = System.currentTimeMillis()
         )
         val temperatureInCelsius = temp

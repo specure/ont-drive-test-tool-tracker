@@ -340,7 +340,7 @@ private fun TrackOverviewScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = state.mobileNetworkInfo?.obtainedTimestampMillis.toString() ?: "-",
+                    text = state.mobileNetworkInfo?.timestampMillis.toString() ?: "-",
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
@@ -426,7 +426,9 @@ private fun TrackOverviewScreen(
             }
             Row {
                 SignalTrackerOutlinedActionButton(
-                    modifier = Modifier.padding(start = 16.dp).weight(1f),
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .weight(1f),
                     text = if (state.isIperfDownloadRunning)
                         stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
                     else
@@ -436,7 +438,9 @@ private fun TrackOverviewScreen(
                     onAction(TrackOverviewAction.OnDownloadTestClick)
                 }
                 SignalTrackerOutlinedActionButton(
-                    modifier = Modifier.padding(start = 16.dp).weight(1f),
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .weight(1f),
                     text = if (state.isIperfUploadRunning)
                         stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
                     else
@@ -496,14 +500,13 @@ private fun TrackOverviewScreenPreview() {
                     isRoaming = false,
                     isPrimaryDataSubscription = PrimaryDataSubscription.TRUE,
                     simCount = 1,
-                    obtainedTimestampMillis = 194656515616,
                     primarySignalDbm = -120,
                 ),
                 currentIperfDownloadInfoRaw = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih ",
                 currentIperfDownloadSpeed = "20",
                 currentIperfUploadSpeed = "2",
                 currentTemperatureCelsius = Temperature(
-                    22.3f,
+                    22.3,
                     System.currentTimeMillis(),
                 ),
                 location = LocationTimestamp(

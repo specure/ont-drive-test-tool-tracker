@@ -4,7 +4,7 @@ import com.cadrikmdev.core.domain.util.DataError
 import com.cadrikmdev.core.domain.util.Result
 import kotlinx.coroutines.flow.Flow
 
-typealias TrackId = Long
+typealias TrackId = Long?
 
 interface LocalTrackDataSource {
     fun getTracks(): Flow<List<Track>>

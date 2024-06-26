@@ -1,7 +1,9 @@
 package com.cadrikmdev.track.presentation.track_overview.model
 
+import com.cadrikmdev.core.domain.track.TrackId
+
 data class TrackUi(
-    val id: Long, // null if new track
+    val id: TrackId, // null if new track
     val durationMillis: Long,
     val timestamp: String,
     val timestampRaw: Long,

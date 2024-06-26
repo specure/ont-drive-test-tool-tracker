@@ -1,7 +1,7 @@
 package com.cadrikmdev.core.domain.track
 
 data class Track(
-    val id: Long, // null if new track
+    val id: Long?, // null if new track
     val durationMillis: Long,
     val timestamp: String,
     val timestampRaw: Long,

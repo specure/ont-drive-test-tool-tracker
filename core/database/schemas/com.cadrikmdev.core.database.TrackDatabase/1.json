@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ad15b637588ee9ac8e8b4d7cb838342e",
+    "identityHash": "c6c98c9a6e343b303d0e9c2a4c7a8e2a",
     "entities": [
       {
         "tableName": "track_entity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`durationMillis` INTEGER NOT NULL, `timestamp` TEXT NOT NULL, `timestampRaw` INTEGER NOT NULL, `downloadSpeed` REAL, `downloadSpeedUnit` TEXT, `downloadSpeedTestState` TEXT, `downloadSpeedTestError` TEXT, `downloadSpeedTestTimestamp` TEXT, `downloadSpeedTestTimestampRaw` INTEGER, `uploadSpeed` REAL, `uploadSpeedUnit` TEXT, `uploadSpeedTestState` TEXT, `uploadSpeedTestError` TEXT, `uploadSpeedTestTimestamp` TEXT, `uploadSpeedTestTimestampRaw` INTEGER, `latitude` REAL, `longitude` REAL, `locationTimestamp` TEXT, `locationTimestampRaw` INTEGER, `networkType` TEXT, `mobileNetworkOperator` TEXT, `mobileNetworkType` TEXT, `signalStrength` INTEGER, `networkInfoTimestamp` TEXT, `networkInfoTimestampRaw` INTEGER, `connectionStatus` TEXT, `temperatureCelsius` REAL, `temperatureTimestamp` TEXT, `temperatureTimestampRaw` INTEGER, `exported` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`durationMillis` INTEGER NOT NULL, `timestamp` TEXT NOT NULL, `timestampRaw` INTEGER NOT NULL, `downloadSpeed` REAL, `downloadSpeedUnit` TEXT, `downloadSpeedTestState` TEXT, `downloadSpeedTestError` TEXT, `downloadSpeedTestTimestamp` TEXT, `downloadSpeedTestTimestampRaw` INTEGER, `uploadSpeed` REAL, `uploadSpeedUnit` TEXT, `uploadSpeedTestState` TEXT, `uploadSpeedTestError` TEXT, `uploadSpeedTestTimestamp` TEXT, `uploadSpeedTestTimestampRaw` INTEGER, `latitude` REAL, `longitude` REAL, `locationTimestamp` TEXT, `locationTimestampRaw` INTEGER, `networkType` TEXT, `mobileNetworkOperator` TEXT, `mobileNetworkType` TEXT, `signalStrength` INTEGER, `networkInfoTimestamp` TEXT, `networkInfoTimestampRaw` INTEGER, `connectionStatus` TEXT, `temperatureCelsius` REAL, `temperatureTimestamp` TEXT, `temperatureTimestampRaw` INTEGER, `exported` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT)",
         "fields": [
           {
             "fieldPath": "durationMillis",
@@ -192,7 +192,7 @@
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -208,7 +208,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ad15b637588ee9ac8e8b4d7cb838342e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c6c98c9a6e343b303d0e9c2a4c7a8e2a')"
     ]
   }
 }

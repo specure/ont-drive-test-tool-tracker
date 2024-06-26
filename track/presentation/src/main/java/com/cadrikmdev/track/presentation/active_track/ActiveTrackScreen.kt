@@ -4,7 +4,6 @@ package com.cadrikmdev.track.presentation.active_track
 
 import android.Manifest
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -48,7 +47,6 @@ import com.cadrikmdev.track.presentation.util.hasNotificationPermission
 import com.cadrikmdev.track.presentation.util.shouldShowLocationPermissionRationale
 import com.cadrikmdev.track.presentation.util.shouldShowNotificationPermissionRationale
 import org.koin.androidx.compose.koinViewModel
-import java.io.ByteArrayOutputStream
 
 @Composable
 fun ActiveTrackScreenRoot(
@@ -239,7 +237,7 @@ private fun ActiveTrackScreen(
     if (state.isShowingPauseDialog && state.hasStartedTracking) {
         SignalTrackerDialog(
             title = stringResource(
-                id = R.string.tracking_is_paused
+                id = R.string.want_finish_tracking
         ),
             onDismiss = {
                 onAction(ActiveTrackAction.OnResumeTrackClick)

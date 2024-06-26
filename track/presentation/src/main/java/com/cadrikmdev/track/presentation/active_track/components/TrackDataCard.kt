@@ -175,7 +175,7 @@ private fun TrackDataCardPreview() {
                     )
                 ),
                 temperature = Temperature(
-                    temperatureCelsius = 22.3f,
+                    temperatureCelsius = 22.3,
                     timestampMillis = 554684684346
                 )
             )

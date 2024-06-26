@@ -53,6 +53,8 @@ val trackPresentationModule = module {
             get(),
             get(named("iperfDownloadRunner")),
             get(named("iperfUploadRunner")),
+            get(),
+            get(),
         )
     }
 }
