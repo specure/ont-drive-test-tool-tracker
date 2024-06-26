@@ -86,8 +86,10 @@ class MeasurementTracker(
                             locations = newList
                         )
                     }
+                    iperfUploadRunner.stopTest()
+                    iperfDownloadRunner.stopTest()
                     applicationScope.launch {
-//                        temperatureInfoReceiver.unregister()
+                        temperatureInfoReceiver.unregister()
                     }
                 } else {
                     applicationScope.launch {
