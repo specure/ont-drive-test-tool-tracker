@@ -61,21 +61,35 @@ simultaneously with one package of this library.
 - solved by 2 different package names for the same library and include 2 times 
 - TODO: We need to find better solution for this with only one copy of library.
 
+Make autorestart of Iperf test on error
+
+Currently ending and starting phase are not parsed in detail, so we are missing some states of the
+test
+
+- like starting, connecting,
+
+When there is a network type switch even between mobile network types (e.g. LTE to HSPDA or EDGE
+or...)
+and the test survives, the bandwidth is no more limited - maybe if there was technology with lower
+speeds,
+and max bandwidth is not reached then it has like more data buffered and therefore it put more data
+while
+it does not empty that buffer to a bandwidth value set originally (observable thru emulator network
+switching)
+
 Currently we are not able to stop test in execution
-
 - SOLVED
-
-Currently ending and starting phase are not parsed in detail, so we are missing some states of the test
-- like starting, connecting, 
 
 Do not stop time on pause
 
-Make autorestart of Iperf test on error
+- SOLVED
+
 
 ## Potential limitation:
 - during the test it seems like android OS make batches and it results in 0.0 bandwidth for some 
 period (even few seconds), mostly seen with upload test
-- when network switches from one type to another (e.g. LTE to Edge) test is interrupted with error
+- when network switches from one type to another (e.g. LTE to Edge) test can be interrupted with
+  error
 - starting test can take at least 1s with great conditions, during the testing I experienced 
 15s from test start to first bandwidth value acquired from the test
 - unable to force user to not turn on wifi adapter
