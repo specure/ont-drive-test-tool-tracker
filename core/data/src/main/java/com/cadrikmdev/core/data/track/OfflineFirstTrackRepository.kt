@@ -32,8 +32,8 @@ class OfflineFirstTrackRepository(
         localTrackDataSource.deleteTrack(id)
     }
 
-    override suspend fun exportPendingTracks() {
-        // TODO: export it to CSV file
+    override suspend fun getTracksForExport(): Flow<List<Track>> {
+        return localTrackDataSource.getTracksForExport()
     }
 
     override suspend fun deleteExportedTracks() {

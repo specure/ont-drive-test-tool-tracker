@@ -305,14 +305,31 @@ private fun TrackOverviewScreen(
                 }
             }
 
-            SignalTrackerOutlinedActionButton(
+            Card(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .weight(1f),
-                text = stringResource(id = R.string.export_to_csv),
-                isLoading = state.fileExport?.progress != null && state.fileExport.progress != 100
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(16.dp),
+                    )
             ) {
-                onAction(TrackOverviewAction.OnExportToCsvClick)
+                NetworkInfoRow(
+                    title = stringResource(id = R.string.tracks_count_for_export),
+                    value = state.trackCountForExport.toString(),
+                )
+            }
+
+            if (state.trackCountForExport > 0) {
+                SignalTrackerOutlinedActionButton(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    text = stringResource(id = R.string.export_to_csv),
+                    isLoading = state.fileExport?.progress != null && state.fileExport.progress != 100
+                ) {
+                    onAction(TrackOverviewAction.OnExportToCsvClick)
+                }
             }
 
             Row {
@@ -328,7 +345,7 @@ private fun TrackOverviewScreen(
                 ) {
                     onAction(TrackOverviewAction.OnDownloadTestClick)
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(0.5f))
                 SignalTrackerOutlinedActionButton(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)

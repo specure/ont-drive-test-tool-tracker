@@ -24,4 +24,5 @@ data class TrackOverviewState(
     val currentIperfUploadInfoRaw: String? = null,
     val location: LocationTimestamp? = null,
     val fileExport: FileExportUi? = null,
+    val trackCountForExport: Int = 0,
 )

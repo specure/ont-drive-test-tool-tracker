@@ -44,4 +44,5 @@
     <string name="updated_at">Updated at:</string>
     <string name="primary_signal">Primary signal:</string>
     <string name="location_data_missing">Location data missing!</string>
+    <string name="tracks_count_for_export">Tracks for export:</string>
 </resources>

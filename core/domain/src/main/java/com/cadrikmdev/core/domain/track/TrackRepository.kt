@@ -12,7 +12,7 @@ interface TrackRepository {
 
     suspend fun deleteTrack(id: TrackId)
 
-    suspend fun exportPendingTracks()
+    suspend fun getTracksForExport(): Flow<List<Track>>
 
     suspend fun deleteExportedTracks()
 

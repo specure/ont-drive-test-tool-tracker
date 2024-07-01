@@ -58,7 +58,7 @@ class TrackOverviewViewModel(
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
     private val applicationContext: Context,
     private val iperfParser: IperfOutputParser,
-    private val tracExporter: TracksExporter,
+    private val trackExporter: TracksExporter,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -109,6 +109,12 @@ class TrackOverviewViewModel(
         )
 
     init {
+
+        viewModelScope.launch {
+            trackRepository.getTracksForExport().collect { tracks ->
+                updateTrackSizeForExport(tracks.size)
+            }
+        }
 
         viewModelScope.launch {
             temperatureInfoReceiver.observeTemperature().collect { temperature ->
@@ -221,6 +227,12 @@ class TrackOverviewViewModel(
 //        }
     }
 
+    private fun updateTrackSizeForExport(trackCount: Int) {
+        state = state.copy(
+            trackCountForExport = trackCount
+        )
+    }
+
     private fun updateTemperature(temperatureCelsius: Temperature?) {
         state = state.copy(
             currentTemperatureCelsius = temperatureCelsius
@@ -261,7 +273,7 @@ class TrackOverviewViewModel(
             TrackOverviewAction.OnExportToCsvClick -> {
 
                 this.applicationScope.launch {
-                    tracExporter.exportStateFlow.collect { exportState ->
+                    trackExporter.exportStateFlow.collect { exportState ->
                         when (exportState) {
                             is TracksExporter.ExportState.Initial -> {
                                 state = state.copy(
@@ -293,7 +305,7 @@ class TrackOverviewViewModel(
                                         null
                                     )
                                 )
-                                tracExporter.openFile(exportedFile) { exception ->
+                                trackExporter.openFile(exportedFile) { exception ->
                                     state = state.copy(
                                         fileExport = FileExportUi(
                                             exportState.file,
@@ -329,7 +341,7 @@ class TrackOverviewViewModel(
                 }
 
                 applicationScope.launch {
-                    tracExporter.exportFile()
+                    trackExporter.exportFile()
                 }
             }
             else -> Unit
@@ -343,7 +355,7 @@ class TrackOverviewViewModel(
 
     override fun onCleared() {
         super.onCleared()
-//        temperatureInfoReceiver.unregister()
+        temperatureInfoReceiver.unregister()
     }
 
     fun onEvent(event: TrackOverviewEvent) {
