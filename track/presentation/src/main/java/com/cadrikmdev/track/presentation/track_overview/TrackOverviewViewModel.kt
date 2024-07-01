@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.connectivity.domain.ConnectivityObserver
 import com.cadrikmdev.connectivity.domain.NetworkTracker
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
+import com.cadrikmdev.core.database.export.TracksExporter
 import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationTimestamp
@@ -28,6 +29,8 @@ import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.domain.LocationObserver
+import com.cadrikmdev.track.presentation.track_overview.model.FileExportError
+import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -55,6 +58,7 @@ class TrackOverviewViewModel(
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
     private val applicationContext: Context,
     private val iperfParser: IperfOutputParser,
+    private val tracExporter: TracksExporter,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -252,6 +256,80 @@ class TrackOverviewViewModel(
                     } else {
                         iperfUpload.startTest()
                     }
+                }
+            }
+            TrackOverviewAction.OnExportToCsvClick -> {
+
+                this.applicationScope.launch {
+                    tracExporter.exportStateFlow.collect { exportState ->
+                        when (exportState) {
+                            is TracksExporter.ExportState.Initial -> {
+                                state = state.copy(
+                                    fileExport = FileExportUi(
+                                        null,
+                                        null,
+                                        null,
+                                    )
+                                )
+                            }
+
+                            is TracksExporter.ExportState.Exporting -> {
+                                state = state.copy(
+                                    fileExport = FileExportUi(
+                                        null,
+                                        exportState.progress,
+                                        null,
+                                    )
+                                )
+                            }
+
+                            is TracksExporter.ExportState.Success -> {
+                                // Download completed successfully
+                                val exportedFile = exportState.file
+                                state = state.copy(
+                                    fileExport = FileExportUi(
+                                        exportState.file,
+                                        100,
+                                        null
+                                    )
+                                )
+                                tracExporter.openFile(exportedFile) { exception ->
+                                    state = state.copy(
+                                        fileExport = FileExportUi(
+                                            exportState.file,
+                                            100,
+                                            FileExportError.Unknown(exception.message.toString())
+                                        )
+                                    )
+                                }
+                            }
+
+                            is TracksExporter.ExportState.NothingToExport -> {
+                                state = state.copy(
+                                    fileExport = FileExportUi(
+                                        null,
+                                        null,
+                                        FileExportError.NothingToExport()
+                                    )
+                                )
+                            }
+
+
+                            is TracksExporter.ExportState.Error -> {
+                                state = state.copy(
+                                    fileExport = FileExportUi(
+                                        null,
+                                        null,
+                                        FileExportError.Unknown("Unknown error")
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                applicationScope.launch {
+                    tracExporter.exportFile()
                 }
             }
             else -> Unit

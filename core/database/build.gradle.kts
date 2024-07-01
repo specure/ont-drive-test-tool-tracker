@@ -11,6 +11,9 @@ dependencies {
 
     implementation(libs.org.mongodb.bson)
     implementation(libs.bundles.koin)
+    implementation(libs.csv)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.timber)
 
     implementation(projects.core.domain)
 

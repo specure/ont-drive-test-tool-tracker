@@ -8,5 +8,6 @@ sealed interface TrackOverviewAction {
     data object OnResolveLocationService : TrackOverviewAction
     data object OnDownloadTestClick : TrackOverviewAction
     data object OnUploadTestClick : TrackOverviewAction
+    data object OnExportToCsvClick : TrackOverviewAction
 
 }

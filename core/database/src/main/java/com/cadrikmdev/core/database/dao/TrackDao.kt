@@ -25,6 +25,9 @@ interface TrackDao {
     @Query("SELECT * FROM track_entity WHERE exported=0 ORDER BY timestamp DESC LIMIT :limit")
     fun getLastNTracksForExport(limit: Int): Flow<List<TrackEntity>>
 
+    @Query("DELETE FROM track_entity WHERE exported=1")
+    suspend fun deleteExportedTracks()
+
     @Query("DELETE FROM track_entity WHERE id=:id")
     suspend fun deleteTrack(id: TrackId)
 

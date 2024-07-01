@@ -31,5 +31,5 @@ data class Track(
     val temperatureCelsius: Double?,
     val temperatureTimestamp: String?,
     val temperatureTimestampRaw: Long?,
-    val exported: Boolean = false,
+    var exported: Boolean = false,
 )

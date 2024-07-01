@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="export_complete">Export completed</string>
+    <string name="export_progress">Export progress: %1$d%%</string>
+    <string name="error_during_download">Export error</string>
+    <string name="error_opening_file">Error opening file</string>
+    <string name="export_complete_description">File %1$s exported successfully. Tap to open it.</string>
+    <string name="error">Error</string>
+    <string name="no_tracks_to_export">No data found to export.</string>
+</resources>

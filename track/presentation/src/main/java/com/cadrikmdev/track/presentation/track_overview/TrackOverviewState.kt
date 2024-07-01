@@ -3,6 +3,7 @@ package com.cadrikmdev.track.presentation.track_overview
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationTimestamp
+import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
 
 data class TrackOverviewState(
     val isOnline: Boolean = false,
@@ -22,4 +23,5 @@ data class TrackOverviewState(
     val currentIperfDownloadInfoRaw: String? = null,
     val currentIperfUploadInfoRaw: String? = null,
     val location: LocationTimestamp? = null,
+    val fileExport: FileExportUi? = null,
 )

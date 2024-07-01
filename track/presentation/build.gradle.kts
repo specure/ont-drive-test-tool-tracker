@@ -23,4 +23,5 @@ dependencies {
     implementation(projects.connectivity.presentation)
     implementation(projects.iperf.domain)
     implementation(projects.iperf.presentation)
+    implementation(projects.core.database)
 }

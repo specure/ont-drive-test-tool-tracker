@@ -11,6 +11,7 @@ fun String.permissionToUiName(): Int {
         Manifest.permission.ACCESS_FINE_LOCATION -> R.string.location_permission
         Manifest.permission.POST_NOTIFICATIONS -> R.string.notification_permission
         Manifest.permission.READ_PHONE_STATE -> R.string.read_phone_state
+        Manifest.permission.WRITE_EXTERNAL_STORAGE -> R.string.write_external_storage
         else -> -1
     }
 }

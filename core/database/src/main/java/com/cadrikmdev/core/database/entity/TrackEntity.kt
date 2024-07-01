@@ -3,6 +3,7 @@ package com.cadrikmdev.core.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.cadrikmdev.core.database.Tables
+import com.opencsv.bean.CsvIgnore
 
 @Entity(
     tableName = Tables.TRACK_ENTITY
@@ -37,7 +38,9 @@ data class TrackEntity(
     val temperatureCelsius: Double?,
     val temperatureTimestamp: String?,
     val temperatureTimestampRaw: Long?,
+    @CsvIgnore
     val exported: Boolean = false,
     @PrimaryKey(autoGenerate = true)
+    @CsvIgnore
     val id: Long?
 )

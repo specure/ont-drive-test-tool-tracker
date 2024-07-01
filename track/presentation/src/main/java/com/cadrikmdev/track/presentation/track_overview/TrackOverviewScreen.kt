@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -214,35 +213,143 @@ private fun TrackOverviewScreen(
                 }
             }
 
+
+            state.currentTemperatureCelsius?.let {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            shape = RoundedCornerShape(16.dp),
+                        )
+                ) {
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.temperature),
+                        value = (it.temperatureCelsius ?: "-").toString() + " °C",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.updated_at),
+                        value = (it.timestampMillis.toDuration(DurationUnit.MILLISECONDS)
+                            .toLocalTime() ?: "-").toString(),
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(16.dp),
+                    )
+            ) {
+                NetworkInfoRow(
+                    title = stringResource(id = R.string.operator),
+                    value = state.mobileNetworkInfo?.name.toString() ?: "-",
+                )
+                NetworkInfoRow(
+                    title = stringResource(id = R.string.sim_count),
+                    value = state.mobileNetworkInfo?.simCount.toString() ?: "-",
+                )
+                NetworkInfoRow(
+                    title = stringResource(id = R.string.network_type),
+                    value = state.mobileNetworkInfo?.networkType.toString() ?: "-",
+                )
+                NetworkInfoRow(
+                    title = stringResource(id = R.string.primary_signal),
+                    value = state.mobileNetworkInfo?.primarySignalDbm.toString() ?: "-",
+                )
+                NetworkInfoRow(
+                    title = stringResource(id = R.string.updated_at),
+                    value = state.mobileNetworkInfo?.timestampMillis?.toDuration(DurationUnit.MILLISECONDS)
+                        ?.toLocalTime().toString() ?: "-",
+                )
+            }
+
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(16.dp),
+                    )
+            ) {
+                if (state.location != null) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(id = R.string.location_data_missing),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                state.location?.let { location ->
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.latitude),
+                        value = location.location.location.lat.toString()
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.longitude),
+                        value = location.location.location.long.toString()
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.updated_at),
+                        value = location.location.timestamp.toLocalTime().toString()
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.provider),
+                        value = location.location.source
+                    )
+                }
+            }
+
+            SignalTrackerOutlinedActionButton(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f),
+                text = stringResource(id = R.string.export_to_csv),
+                isLoading = state.fileExport?.progress != null && state.fileExport.progress != 100
+            ) {
+                onAction(TrackOverviewAction.OnExportToCsvClick)
+            }
+
+            Row {
+                SignalTrackerOutlinedActionButton(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .weight(1f),
+                    text = if (state.isIperfDownloadRunning)
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                    else
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_down),
+                    isLoading = false
+                ) {
+                    onAction(TrackOverviewAction.OnDownloadTestClick)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                SignalTrackerOutlinedActionButton(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .weight(1f),
+                    text = if (state.isIperfUploadRunning)
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                    else
+                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_up),
+                    isLoading = false
+                ) {
+                    onAction(TrackOverviewAction.OnUploadTestClick)
+                }
+            }
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                state.currentTemperatureCelsius?.let {
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Box(
-                            modifier = Modifier.alignByBaseline()
-                        ) {
-                            Text(
-                                text = it.temperatureCelsius.toString(),
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier.alignByBaseline()
-                        ) {
-                            Text(
-                                text = "°C",
-                                fontSize = MaterialTheme.typography.bodySmall.fontSize
-                            )
-                        }
-                    }
-                }
 
                 state.currentIperfDownloadSpeed?.let {
                     Row(
@@ -308,149 +415,6 @@ private fun TrackOverviewScreen(
                 }
             }
 
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(280.dp)
-                    .padding(16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        shape = RoundedCornerShape(16.dp),
-                    )
-            ) {
-                Text(
-                    text = state.mobileNetworkInfo?.name.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = state.mobileNetworkInfo?.simOperatorMccMnc.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = state.mobileNetworkInfo?.simCountryIso.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = state.mobileNetworkInfo?.networkType.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = state.mobileNetworkInfo?.isRoaming.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = state.mobileNetworkInfo?.timestampMillis.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = state.mobileNetworkInfo?.isPrimaryDataSubscription.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = state.mobileNetworkInfo?.simCount.toString() ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "${state.mobileNetworkInfo?.primarySignalDbm.toString()} dBm"  ?: "-",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            state.location?.let { location ->
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(id = R.string.latitude),
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = location.location.location.lat.toString(),
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(id = R.string.longitude),
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = location.location.location.long.toString(),
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(id = R.string.timestamp),
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = location.location.timestamp.toLocalTime().toString(),
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(id = R.string.provider),
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = location.location.source,
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                        )
-                    }
-
-                }
-            }
-            Row {
-                SignalTrackerOutlinedActionButton(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .weight(1f),
-                    text = if (state.isIperfDownloadRunning)
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
-                    else
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.start),
-                    isLoading = false
-                ) {
-                    onAction(TrackOverviewAction.OnDownloadTestClick)
-                }
-                SignalTrackerOutlinedActionButton(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .weight(1f),
-                    text = if (state.isIperfUploadRunning)
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
-                    else
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.start),
-                    isLoading = false
-                ) {
-                    onAction(TrackOverviewAction.OnUploadTestClick)
-                }
-            }
-
             Row {
                 state.currentIperfDownloadInfoRaw?.let {
                     Text(
@@ -475,6 +439,24 @@ private fun TrackOverviewScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun NetworkInfoRow(title: String, value: String) {
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = title,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            modifier = Modifier.weight(1f),
+            text = value,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

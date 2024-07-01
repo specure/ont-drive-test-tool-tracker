@@ -1,7 +1,6 @@
 package com.cadrikmdev.signaltracker
 
 import android.app.Application
-import android.content.Context
 import com.cadrikmdev.connectivity.presentation.mobile_network.di.mobileNetworkModule
 import com.cadrikmdev.connectivity.presentation.network.di.connectivityModule
 import com.cadrikmdev.core.data.di.coreDataModule
@@ -11,7 +10,6 @@ import com.cadrikmdev.signaltracker.di.appModule
 import com.cadrikmdev.track.data.di.trackDataModule
 import com.cadrikmdev.track.location.di.locationModule
 import com.cadrikmdev.track.presentation.di.trackPresentationModule
-import com.google.android.play.core.splitcompat.SplitCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
@@ -47,10 +45,5 @@ class SignalTrackerApp : Application() {
                 locationModule,
             )
         }
-    }
-
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        SplitCompat.install(this)
     }
 }
