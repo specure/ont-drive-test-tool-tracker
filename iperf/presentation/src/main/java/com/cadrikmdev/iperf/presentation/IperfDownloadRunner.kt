@@ -53,7 +53,6 @@ class IperfDownloadRunner(
 
 
     override fun startTest() {
-        4
         iperf = IPerf
         iperf.init(
             config.hostname,
@@ -139,6 +138,7 @@ class IperfDownloadRunner(
                                 )
                             } else {
                                 // TODO: parse other states
+                                Timber.d("Iperf download ${text}")
                             }
                             applicationScope.launch {
                                 _testProgressDetailsFlow.emit(testProgressDetails)
@@ -155,6 +155,9 @@ class IperfDownloadRunner(
                                     status = IperfTestStatus.ERROR
                                 )
                                 _testProgressDetailsFlow.emit(testProgressDetails)
+//                                stopTest()
+//                                delay(5000)
+//                                startTest()
                             }
                         }
                     }
