@@ -24,8 +24,8 @@ class NetworkConnectivityObserver(
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    val isOnline = isInternetAvailable()
                     launch {
+                        val isOnline = isInternetAvailable()
                         Timber.d("Sending onAvailable internet connection $isOnline")
                         send(isOnline)
                     }
