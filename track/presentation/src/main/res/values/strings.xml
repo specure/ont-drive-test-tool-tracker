@@ -45,4 +45,5 @@
     <string name="primary_signal">Primary signal:</string>
     <string name="location_data_missing">Location data missing!</string>
     <string name="tracks_count_for_export">Tracks for export:</string>
+    <string name="name">Name:</string>
 </resources>

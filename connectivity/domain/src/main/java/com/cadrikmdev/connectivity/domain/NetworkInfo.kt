@@ -21,7 +21,8 @@ package com.cadrikmdev.connectivity.domain
 abstract class NetworkInfo(
     val type: TransportType,
     val timestampMillis: Long,
-    val cellUUID: String
+    val cellUUID: String,
+    open val capabilitiesRaw: String?
 ) {
 
     /**

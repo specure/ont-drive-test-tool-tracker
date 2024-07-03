@@ -12,7 +12,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.connectivity.domain.ConnectivityObserver
 import com.cadrikmdev.connectivity.domain.NetworkTracker
-import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.database.export.TracksExporter
 import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.Temperature
@@ -123,10 +122,6 @@ class TrackOverviewViewModel(
         }
 
         viewModelScope.launch {
-            temperatureInfoReceiver.register()
-        }
-
-        viewModelScope.launch {
             iPerfDownloadRequestResult.asFlow().collect {
                 state = state.copy(
                     currentIperfDownloadInfoRaw = it
@@ -166,7 +161,7 @@ class TrackOverviewViewModel(
                 if (it.isEmpty()) {
                     state = state.copy(mobileNetworkInfo = null)
                 } else {
-                    state = state.copy(mobileNetworkInfo = it.first() as MobileNetworkInfo)
+                    state = state.copy(mobileNetworkInfo = it.first())
                 }
             }
         }
@@ -370,6 +365,7 @@ class TrackOverviewViewModel(
                 val isAvailable = gpsLocationService.isServiceAvailable()
 
                 updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
+                temperatureInfoReceiver.register()
                 // todo: update wifi state
             }
         }

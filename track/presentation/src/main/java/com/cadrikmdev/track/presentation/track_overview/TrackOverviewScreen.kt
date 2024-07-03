@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.currentStateAsState
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkType
 import com.cadrikmdev.connectivity.domain.mobile.PrimaryDataSubscription
+import com.cadrikmdev.connectivity.domain.wifi.WifiNetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.location.LocationTimestamp
@@ -245,27 +246,48 @@ private fun TrackOverviewScreen(
                         shape = RoundedCornerShape(16.dp),
                     )
             ) {
-                NetworkInfoRow(
-                    title = stringResource(id = R.string.operator),
-                    value = state.mobileNetworkInfo?.name.toString() ?: "-",
-                )
-                NetworkInfoRow(
-                    title = stringResource(id = R.string.sim_count),
-                    value = state.mobileNetworkInfo?.simCount.toString() ?: "-",
-                )
-                NetworkInfoRow(
-                    title = stringResource(id = R.string.network_type),
-                    value = state.mobileNetworkInfo?.networkType.toString() ?: "-",
-                )
-                NetworkInfoRow(
-                    title = stringResource(id = R.string.primary_signal),
-                    value = state.mobileNetworkInfo?.primarySignalDbm.toString() ?: "-",
-                )
-                NetworkInfoRow(
-                    title = stringResource(id = R.string.updated_at),
-                    value = state.mobileNetworkInfo?.timestampMillis?.toDuration(DurationUnit.MILLISECONDS)
-                        ?.toLocalTime().toString() ?: "-",
-                )
+                if (state.mobileNetworkInfo is MobileNetworkInfo) {
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.operator),
+                        value = state.mobileNetworkInfo?.name.toString() ?: "-",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.sim_count),
+                        value = state.mobileNetworkInfo?.simCount.toString() ?: "-",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.network_type),
+                        value = state.mobileNetworkInfo?.networkType.toString() ?: "-",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.primary_signal),
+                        value = state.mobileNetworkInfo?.primarySignalDbm.toString() ?: "-",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.updated_at),
+                        value = state.mobileNetworkInfo?.timestampMillis?.toDuration(DurationUnit.MILLISECONDS)
+                            ?.toLocalTime().toString() ?: "-",
+                    )
+                }
+                if (state.mobileNetworkInfo is WifiNetworkInfo) {
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.network_type),
+                        value = state.mobileNetworkInfo?.type.toString() ?: "-",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.name),
+                        value = state.mobileNetworkInfo?.name.toString() ?: "-",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.primary_signal),
+                        value = state.mobileNetworkInfo?.rssi.toString() ?: "-",
+                    )
+                    NetworkInfoRow(
+                        title = stringResource(id = R.string.updated_at),
+                        value = state.mobileNetworkInfo?.timestampMillis?.toDuration(DurationUnit.MILLISECONDS)
+                            ?.toLocalTime().toString() ?: "-",
+                    )
+                }
             }
 
 
@@ -500,6 +522,7 @@ private fun TrackOverviewScreenPreview() {
                     isPrimaryDataSubscription = PrimaryDataSubscription.TRUE,
                     simCount = 1,
                     primarySignalDbm = -120,
+                    capabilitiesRaw = null,
                 ),
                 currentIperfDownloadInfoRaw = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih ",
                 currentIperfDownloadSpeed = "20",

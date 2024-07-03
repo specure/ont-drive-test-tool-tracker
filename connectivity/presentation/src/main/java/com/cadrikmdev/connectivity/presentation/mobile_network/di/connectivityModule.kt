@@ -1,11 +1,12 @@
 package com.cadrikmdev.connectivity.presentation.mobile_network.di
 
 import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import androidx.core.content.getSystemService
 import com.cadrikmdev.connectivity.domain.NetworkTracker
-import com.cadrikmdev.connectivity.presentation.mobile_network.NetmonsterNetworkTracker
+import com.cadrikmdev.connectivity.presentation.mobile_network.AndroidNetworkTracker
 import cz.mroczis.netmonster.core.INetMonster
 import cz.mroczis.netmonster.core.factory.NetMonsterFactory
 import org.koin.android.ext.koin.androidApplication
@@ -18,5 +19,6 @@ val mobileNetworkModule = module {
     single { androidApplication().getSystemService<TelephonyManager>() }
     single { androidApplication().getSystemService<SubscriptionManager>() }
     single { androidApplication().getSystemService<ConnectivityManager>() }
-    singleOf(::NetmonsterNetworkTracker).bind<NetworkTracker>()
+    single { androidApplication().getSystemService<WifiManager>() }
+    singleOf(::AndroidNetworkTracker).bind<NetworkTracker>()
 }

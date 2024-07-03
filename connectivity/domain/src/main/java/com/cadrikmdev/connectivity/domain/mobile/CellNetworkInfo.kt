@@ -81,7 +81,12 @@ class CellNetworkInfo(
 
     val cellState: String?,
 ) :
-    NetworkInfo(TransportType.CELLULAR, timestampMillis = System.currentTimeMillis(), cellUUID) {
+    NetworkInfo(
+        TransportType.CELLULAR,
+        timestampMillis = System.currentTimeMillis(),
+        cellUUID,
+        capabilitiesRaw = null
+    ) {
     constructor(
         cellUUID: String,
     ) : this(

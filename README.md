@@ -63,25 +63,32 @@ simultaneously with one package of this library.
 
 Make autorestart of Iperf test on error
 
+- problems with server side as after error it is not able to connect again
+- possible solutions:
+  - have multiple instances of server and cycle between them + detect server issue and restart
+    server if possible
+- observation:
+  - When there is a network type switch even between mobile network types (e.g. LTE to HSPDA or EDGE
+    or...) and the test survives, the bandwidth is no more limited - maybe if there was technology
+    with lower
+    speeds, and max bandwidth is not reached then it has like more data buffered and therefore it
+    put more data
+    while it does not empty that buffer to a bandwidth value set originally (observable thru
+    emulator network
+    switching)
+
+There is no check during the running test if mobile data are the one used for network traffic (
+possible to add)
+
 Currently ending and starting phase are not parsed in detail, so we are missing some states of the
 test
-
 - like starting, connecting,
 
-When there is a network type switch even between mobile network types (e.g. LTE to HSPDA or EDGE
-or...)
-and the test survives, the bandwidth is no more limited - maybe if there was technology with lower
-speeds,
-and max bandwidth is not reached then it has like more data buffered and therefore it put more data
-while
-it does not empty that buffer to a bandwidth value set originally (observable thru emulator network
-switching)
 
 Currently we are not able to stop test in execution
 - SOLVED
 
 Do not stop time on pause
-
 - SOLVED
 
 
@@ -93,5 +100,8 @@ period (even few seconds), mostly seen with upload test
 - starting test can take at least 1s with great conditions, during the testing I experienced 
 15s from test start to first bandwidth value acquired from the test
 - unable to force user to not turn on wifi adapter
-- There is no check during the running test if mobile data are the one used for network traffic (
-  possible to add)
+
+## Expected behavior
+
+- battery updates can be not often, but as soon as temperature change, it is updated (sometime even
+  half an hour if environment and execution is)

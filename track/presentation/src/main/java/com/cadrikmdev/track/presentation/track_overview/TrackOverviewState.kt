@@ -1,6 +1,6 @@
 package com.cadrikmdev.track.presentation.track_overview
 
-import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
+import com.cadrikmdev.connectivity.domain.NetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
@@ -12,7 +12,7 @@ data class TrackOverviewState(
     val isWifiServiceEnabled: Boolean = false,
     val isLocationServiceEnabled: Boolean = false,
     val isLocationServiceResolvable: Boolean = false,
-    val mobileNetworkInfo: MobileNetworkInfo? = null,
+    val mobileNetworkInfo: NetworkInfo? = null,
     val currentIperfDownloadSpeed: String? = null,
     val currentIperfDownloadSpeedUnit: String? = null,
     val currentIperfUploadSpeed: String? = null,

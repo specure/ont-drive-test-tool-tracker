@@ -31,7 +31,13 @@ data class MobileNetworkInfo(
     val isPrimaryDataSubscription: PrimaryDataSubscription?,
     val simCount: Int,
 
-    val primarySignalDbm: Int?
+    val primarySignalDbm: Int?,
+    override val capabilitiesRaw: String?
 
-) : NetworkInfo(TransportType.CELLULAR, System.currentTimeMillis(), UUID.randomUUID().toString())
+) : NetworkInfo(
+    TransportType.CELLULAR,
+    System.currentTimeMillis(),
+    UUID.randomUUID().toString(),
+    capabilitiesRaw
+)
 
