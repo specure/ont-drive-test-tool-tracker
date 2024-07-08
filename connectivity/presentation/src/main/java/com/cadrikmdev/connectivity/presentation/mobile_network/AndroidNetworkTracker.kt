@@ -5,7 +5,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.wifi.SupplicantState
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.text.DecimalFormat
@@ -49,6 +52,13 @@ class AndroidNetworkTracker(
     private val connectivityManager: ConnectivityManager,
     private val wifiManager: WifiManager,
 ) : NetworkTracker {
+
+    private var wifiCallback: ConnectivityManager.NetworkCallback? = null
+    private val wifiRequest: NetworkRequest = NetworkRequest.Builder()
+        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        .build()
+
+
 
     override fun observeNetwork(): Flow<List<NetworkInfo?>> {
         val dataEmitter = flow<List<NetworkInfo?>> {
@@ -71,26 +81,10 @@ class AndroidNetworkTracker(
                 } else {
                     val network = connectivityManager.activeNetwork
                     val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-
-                    val networkType = when {
-                        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> TransportType.WIFI
-                        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> TransportType.CELLULAR
-                        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) == true -> TransportType.BLUETOOTH
-                        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true -> TransportType.ETHERNET
-                        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true -> TransportType.VPN
-                        else -> TransportType.UNKNOWN
-                    }
-                    val networkList: List<NetworkInfo> = when (networkType) {
-                        TransportType.CELLULAR -> detectMobileNetwork(networkCapabilities.toString())
-                        TransportType.WIFI -> detectWifiNetwork(networkCapabilities.toString())
-                        TransportType.BLUETOOTH -> listOf(BluetoothNetworkInfo(networkCapabilities.toString()))
-                        TransportType.ETHERNET -> listOf(EthernetNetworkInfo(networkCapabilities.toString()))
-                        TransportType.VPN -> listOf(VpnNetworkInfo(networkCapabilities.toString()))
-                        else -> {
-                            emptyList<NetworkInfo>()
-                        }
-                    }
-
+                    val networkType = getNetworkType(networkCapabilities)
+//                    prepareNetworkCallbacks(networkType)
+                    val networkList: List<NetworkInfo> =
+                        getNetworkInfoDetails(networkType, networkCapabilities)
                     emit(networkList)
                 }
                 delay(700)
@@ -100,11 +94,47 @@ class AndroidNetworkTracker(
         return dataEmitter
     }
 
+    private suspend fun AndroidNetworkTracker.getNetworkInfoDetails(
+        networkType: TransportType,
+        networkCapabilities: NetworkCapabilities?
+    ): List<NetworkInfo> {
+        val networkList: List<NetworkInfo> = when (networkType) {
+            TransportType.CELLULAR -> detectMobileNetwork(networkCapabilities.toString())
+            TransportType.WIFI -> detectWifiNetwork(networkCapabilities.toString()) // TODO: this is not valid point for android S and higher if fine location is permitted and location services are on - process it in wifiCallback and store info
+            TransportType.BLUETOOTH -> listOf(BluetoothNetworkInfo(networkCapabilities.toString()))
+            TransportType.ETHERNET -> listOf(EthernetNetworkInfo(networkCapabilities.toString()))
+            TransportType.VPN -> listOf(VpnNetworkInfo(networkCapabilities.toString()))
+            else -> {
+                emptyList<NetworkInfo>()
+            }
+        }
+        return networkList
+    }
+
+    private fun prepareNetworkCallbacks(networkType: TransportType) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (networkType == TransportType.WIFI) {
+                registerWifiInfoCallback()
+            } else {
+                unregisterWifiInfoCallback()
+            }
+        }
+    }
+
+    private fun getNetworkType(networkCapabilities: NetworkCapabilities?) = when {
+        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> TransportType.WIFI
+        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> TransportType.CELLULAR
+        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) == true -> TransportType.BLUETOOTH
+        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true -> TransportType.ETHERNET
+        networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true -> TransportType.VPN
+        else -> TransportType.UNKNOWN
+    }
+
     private suspend fun detectWifiNetwork(
         networkCapabilitiesRaw: String?
     ): List<NetworkInfo> {
         return withContext(Dispatchers.IO) {
-            val dummyWifiNetwork = listOf(WifiNetworkInfo(capabilitiesRaw = networkCapabilitiesRaw))
+            val basicWifiNetworkInfo = createBasicWifiNetworkInfo(networkCapabilitiesRaw)
 
             if ((ActivityCompat.checkSelfPermission(
                     context,
@@ -116,63 +146,147 @@ class AndroidNetworkTracker(
                         ) != PackageManager.PERMISSION_GRANTED)
                         )
             ) {
-                return@withContext dummyWifiNetwork
+                return@withContext basicWifiNetworkInfo
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                //TODO: get wifi info for new android versions
+            val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val activeNetwork = connectivityManager.activeNetwork
-                connectivityManager.getNetworkCapabilities(activeNetwork)
 
-                return@withContext dummyWifiNetwork
+                val wifiCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+                var wifiInfo: WifiInfo?
+                wifiCapabilities?.transportInfo.let {
+                    wifiInfo = it as WifiInfo
+                }
+                registerWifiInfoCallback()
+
+                wifiInfo
             } else {
-                val info = wifiManager.connectionInfo ?: return@withContext dummyWifiNetwork
+                wifiManager.connectionInfo
+            }
 
-                val address = try {
-                    val ipAddress = info.ipAddress.toBigInteger().toByteArray()
-                    InetAddress.getByAddress(ipAddress).hostAddress
-                } catch (ex: UnknownHostException) {
-                    null
-                }
+            val wifiInfo = processWifiInfo(info, networkCapabilitiesRaw)
+            return@withContext wifiInfo
+        }
+    }
 
-                if (info.supplicantState == SupplicantState.DISCONNECTED || info.frequency == -1) {
-                    return@withContext dummyWifiNetwork
-                }
+    private fun createBasicWifiNetworkInfo(networkCapabilitiesRaw: String?) =
+        listOf(WifiNetworkInfo(capabilitiesRaw = networkCapabilitiesRaw))
 
-                val ssid = if (info.ssid == UNKNOWN_SSID || info.hiddenSSID) {
-                    null
+    private fun processWifiInfo(
+        info: WifiInfo?,
+        networkCapabilitiesRaw: String?
+    ): List<NetworkInfo> {
+        if (info == null) {
+            return createBasicWifiNetworkInfo(networkCapabilitiesRaw)
+        }
+
+        val address = try {
+            val ipAddress = info.ipAddress.toBigInteger().toByteArray()
+            InetAddress.getByAddress(ipAddress).hostAddress
+        } catch (ex: UnknownHostException) {
+            null
+        }
+
+        if (info.supplicantState == SupplicantState.DISCONNECTED || info.frequency == -1) {
+            return createBasicWifiNetworkInfo(networkCapabilitiesRaw)
+        }
+
+        val ssid = if (info.ssid == UNKNOWN_SSID || info.hiddenSSID) {
+            null
+        } else {
+            info.ssid.removeQuotation() ?: ""
+        }
+        return listOf<NetworkInfo>(
+            WifiNetworkInfo(
+                bssid = if (info.bssid == DUMMY_MAC_ADDRESS || info.networkId == -1) null else info.bssid,
+                band = WifiBand.fromFrequency(info.frequency),
+                isSSIDHidden = info.hiddenSSID,
+                ipAddress = address,
+                linkSpeed = info.linkSpeed,
+                rxlinkSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    info.rxLinkSpeedMbps
+                } else UNKNOWN,
+                txlinkSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    info.txLinkSpeedMbps
+                } else UNKNOWN,
+                networkId = if (info.bssid == Companion.DUMMY_MAC_ADDRESS || info.networkId == -1) null else info.networkId,
+                rssi = info.rssi,
+                signalLevel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    wifiManager.calculateSignalLevel(info.rssi)
                 } else {
-                    info.ssid.removeQuotation() ?: ""
+                    WifiManager.calculateSignalLevel(info.rssi, 5)
+                },
+                ssid = ssid,
+                supplicantState = (info.supplicantState
+                    ?: SupplicantState.UNINITIALIZED).name,
+                supplicantDetailedState = (WifiInfo.getDetailedStateOf(info.supplicantState)
+                    ?: android.net.NetworkInfo.DetailedState.IDLE).name,
+                signal = null,
+                capabilitiesRaw = networkCapabilitiesRaw
+            )
+        )
+    }
+
+    private fun registerWifiInfoCallback() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (wifiCallback == null) {
+                if ((ActivityCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_WIFI_STATE
+                    ) != PackageManager.PERMISSION_GRANTED) || (
+                            (ActivityCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            ) != PackageManager.PERMISSION_GRANTED)
+                            )
+                ) {
+                    wifiCallback = object : ConnectivityManager.NetworkCallback() {
+                        override fun onCapabilitiesChanged(
+                            network: Network,
+                            networkCapabilities: NetworkCapabilities
+                        ) {
+                            // TODO: process it correctly
+                            super.onCapabilitiesChanged(network, networkCapabilities)
+                            val wifiInfo = networkCapabilities.transportInfo as WifiInfo
+                            val ssid = wifiInfo.ssid
+                            val wifiNetworkInfo = processWifiInfo(
+                                info = wifiInfo,
+                                networkCapabilitiesRaw = networkCapabilities.toString()
+                            )
+
+                            Timber.d("WIFI SSID no location = ${ssid}")
+                        }
+                    }
+                } else {
+                    wifiCallback = object : ConnectivityManager.NetworkCallback(
+                        FLAG_INCLUDE_LOCATION_INFO
+                    ) {
+                        override fun onCapabilitiesChanged(
+                            network: Network,
+                            networkCapabilities: NetworkCapabilities
+                        ) {
+                            // TODO: process it correctly
+                            super.onCapabilitiesChanged(network, networkCapabilities)
+                            val wifiInfo = networkCapabilities.transportInfo as WifiInfo
+                            val ssid = wifiInfo.ssid
+                            Timber.d("WIFI SSID = ${ssid}")
+                        }
+                    }
                 }
-                return@withContext listOf<NetworkInfo>(
-                    WifiNetworkInfo(
-                        bssid = if (info.bssid == DUMMY_MAC_ADDRESS || info.networkId == -1) null else info.bssid,
-                        band = WifiBand.fromFrequency(info.frequency),
-                        isSSIDHidden = info.hiddenSSID,
-                        ipAddress = address,
-                        linkSpeed = info.linkSpeed,
-                        rxlinkSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            info.rxLinkSpeedMbps
-                        } else UNKNOWN,
-                        txlinkSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            info.txLinkSpeedMbps
-                        } else UNKNOWN,
-                        networkId = if (info.bssid == Companion.DUMMY_MAC_ADDRESS || info.networkId == -1) null else info.networkId,
-                        rssi = info.rssi,
-                        signalLevel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            wifiManager.calculateSignalLevel(info.rssi)
-                        } else {
-                            WifiManager.calculateSignalLevel(info.rssi, 5)
-                        },
-                        ssid = ssid,
-                        supplicantState = (info.supplicantState
-                            ?: SupplicantState.UNINITIALIZED).name,
-                        supplicantDetailedState = (WifiInfo.getDetailedStateOf(info.supplicantState)
-                            ?: android.net.NetworkInfo.DetailedState.IDLE).name,
-                        signal = null,
-                        capabilitiesRaw = networkCapabilitiesRaw
-                    )
-                )
+                wifiCallback?.let { networkCallback ->
+                    connectivityManager.registerNetworkCallback(wifiRequest, networkCallback)
+                    Timber.d("Wifi info callback registered")
+                }
+            }
+        }
+    }
+
+    private fun unregisterWifiInfoCallback() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            wifiCallback?.let { networkCallback ->
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+                Timber.d("Wifi info callback unregistered")
             }
         }
     }
