@@ -100,6 +100,7 @@ fun SignalTrackerToolbar(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .clickable {
+                                        isDropDownOpen = false
                                         onMenuItemClick(index)
                                     }
                                     .fillMaxWidth()
