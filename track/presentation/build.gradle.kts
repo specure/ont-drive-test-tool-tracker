@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.google.maps.android.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.timber)
+    implementation(libs.preference.library)
 
     implementation(projects.core.domain)
     implementation(projects.track.domain)
