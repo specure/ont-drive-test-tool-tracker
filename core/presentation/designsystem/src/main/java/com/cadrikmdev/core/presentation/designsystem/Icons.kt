@@ -96,6 +96,10 @@ val TrackIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.measure)
 
+val SettingsIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.settings)
+
 val StartIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.start)

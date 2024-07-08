@@ -46,4 +46,5 @@
     <string name="location_data_missing">Location data missing!</string>
     <string name="tracks_count_for_export">Tracks for export:</string>
     <string name="name">Name:</string>
+    <string name="setings">Settings</string>
 </resources>

@@ -15,6 +15,7 @@ class AndroidLibraryConventionPlugin: Plugin<Project> {
             pluginManager.run {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
+                apply("org.jetbrains.kotlin.plugin.serialization")
             }
 
             extensions.configure<LibraryExtension> {
@@ -32,6 +33,7 @@ class AndroidLibraryConventionPlugin: Plugin<Project> {
             }
 
             dependencies {
+                "implementation"(project.libs.findLibrary("kotlinx-serialization-json").get())
                 "testImplementation"(kotlin("test"))
                 "testImplementation"(libs.findLibrary("junit").get())
                 "androidTestImplementation"(libs.findLibrary("androidx.junit").get())

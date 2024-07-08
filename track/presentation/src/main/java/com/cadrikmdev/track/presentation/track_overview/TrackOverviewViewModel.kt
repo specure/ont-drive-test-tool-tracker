@@ -236,7 +236,7 @@ class TrackOverviewViewModel(
 
     fun onAction(action: TrackOverviewAction) {
         when (action) {
-            TrackOverviewAction.OnLogoutClick -> logout()
+            TrackOverviewAction.OnSettingsClick -> logout()
             TrackOverviewAction.OnDemoStartClick -> {
                 viewModelScope.launch {
                     startIperf()

@@ -47,12 +47,14 @@ import com.cadrikmdev.core.domain.location.LocationWithDetails
 import com.cadrikmdev.core.presentation.designsystem.ArrowDownIcon
 import com.cadrikmdev.core.presentation.designsystem.ArrowUpIcon
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
+import com.cadrikmdev.core.presentation.designsystem.SettingsIcon
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.TrackIcon
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerFloatingActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
+import com.cadrikmdev.core.presentation.designsystem.components.util.DropDownItem
 import com.cadrikmdev.core.presentation.ui.toLocalTime
 import com.cadrikmdev.track.presentation.R
 import org.koin.androidx.compose.koinViewModel
@@ -62,6 +64,7 @@ import kotlin.time.toDuration
 @Composable
 fun TrackOverviewScreenRoot(
     onStartTrackClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onResolvePermissionClick: () -> Unit,
     viewModel: TrackOverviewViewModel = koinViewModel(),
 ) {
@@ -70,6 +73,7 @@ fun TrackOverviewScreenRoot(
         onAction = { action ->
             when (action) {
                 TrackOverviewAction.OnStartClick -> onStartTrackClick()
+                TrackOverviewAction.OnSettingsClick -> onSettingsClick()
                 TrackOverviewAction.OnResolvePermissionClick -> onResolvePermissionClick()
                 else -> Unit
             }
@@ -112,6 +116,17 @@ private fun TrackOverviewScreen(
                 showBackButton = false,
                 title = stringResource(id = R.string.signaltracker),
                 scrollBehavior = scrollBehavior,
+                menuItems = listOf(
+                    DropDownItem(
+                        icon = SettingsIcon,
+                        title = stringResource(id = R.string.setings)
+                    ),
+                ),
+                onMenuItemClick = { index ->
+                    when (index) {
+                        0 -> onAction(TrackOverviewAction.OnSettingsClick)
+                    }
+                },
                 startContent = {
                     Icon(
                         imageVector = LogoIcon,
