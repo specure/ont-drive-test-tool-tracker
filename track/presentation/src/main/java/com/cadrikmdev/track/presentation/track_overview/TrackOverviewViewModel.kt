@@ -28,6 +28,7 @@ import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.domain.LocationObserver
+import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportError
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +59,7 @@ class TrackOverviewViewModel(
     private val applicationContext: Context,
     private val iperfParser: IperfOutputParser,
     private val trackExporter: TracksExporter,
+    private val appConfig: Config,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -366,7 +368,7 @@ class TrackOverviewViewModel(
 
                 updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
                 temperatureInfoReceiver.register()
-                // todo: update wifi state
+                updateAccordingConfig()
             }
         }
     }
@@ -392,7 +394,15 @@ class TrackOverviewViewModel(
             isPermissionRequired = permissionHandler.getNotGrantedPermissionList().isNotEmpty(),
             isLocationTrackable = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && state.isLocationServiceEnabled
         )
+
         startObservingData(state.isLocationTrackable)
+    }
+
+    private fun updateAccordingConfig() {
+        val enabledSpeedTest = appConfig.isSpeedTestEnabled()
+        state = state.copy(
+            isSpeedTestEnabled = enabledSpeedTest
+        )
     }
 
     fun startObservingData(isLocationTrackable: Boolean) {

@@ -369,127 +369,129 @@ private fun TrackOverviewScreen(
                 }
             }
 
-            Row {
-                SignalTrackerOutlinedActionButton(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .weight(1f),
-                    text = if (state.isIperfDownloadRunning)
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
-                    else
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_down),
-                    isLoading = false
-                ) {
-                    onAction(TrackOverviewAction.OnDownloadTestClick)
-                }
-                Spacer(modifier = Modifier.weight(0.5f))
-                SignalTrackerOutlinedActionButton(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .weight(1f),
-                    text = if (state.isIperfUploadRunning)
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
-                    else
-                        stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_up),
-                    isLoading = false
-                ) {
-                    onAction(TrackOverviewAction.OnUploadTestClick)
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                state.currentIperfDownloadSpeed?.let {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
+            if (state.isSpeedTestEnabled) {
+                Row {
+                    SignalTrackerOutlinedActionButton(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .weight(1f),
+                        text = if (state.isIperfDownloadRunning)
+                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                        else
+                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_down),
+                        isLoading = false
                     ) {
-                        Icon(
-                            imageVector = ArrowDownIcon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(30.dp)
-                        )
-                        Box(
-                            modifier = Modifier.alignByBaseline()
+                        onAction(TrackOverviewAction.OnDownloadTestClick)
+                    }
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    SignalTrackerOutlinedActionButton(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .weight(1f),
+                        text = if (state.isIperfUploadRunning)
+                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                        else
+                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_up),
+                        isLoading = false
+                    ) {
+                        onAction(TrackOverviewAction.OnUploadTestClick)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    state.currentIperfDownloadSpeed?.let {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
                         ) {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.headlineSmall
+                            Icon(
+                                imageVector = ArrowDownIcon,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(30.dp)
                             )
+                            Box(
+                                modifier = Modifier.alignByBaseline()
+                            ) {
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box(
+                                modifier = Modifier.alignByBaseline()
+                            ) {
+                                Text(
+                                    text = state.currentIperfDownloadSpeedUnit.toString(),
+                                    fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                )
+                            }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier.alignByBaseline()
+                    }
+
+
+                    state.currentIperfUploadSpeed?.let {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
                         ) {
-                            Text(
-                                text = state.currentIperfDownloadSpeedUnit.toString(),
-                                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                            Icon(
+                                imageVector = ArrowUpIcon,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(30.dp)
                             )
+                            Box(
+                                modifier = Modifier.alignByBaseline()
+                            ) {
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box(
+                                modifier = Modifier.alignByBaseline()
+                            ) {
+                                Text(
+                                    text = state.currentIperfUploadSpeedUnit.toString(),
+                                    fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                )
+                            }
                         }
                     }
                 }
 
-
-                state.currentIperfUploadSpeed?.let {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        Icon(
-                            imageVector = ArrowUpIcon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(30.dp)
+                Row {
+                    state.currentIperfDownloadInfoRaw?.let {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = it,
+                            fontSize = 8.sp
                         )
-                        Box(
-                            modifier = Modifier.alignByBaseline()
-                        ) {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier.alignByBaseline()
-                        ) {
-                            Text(
-                                text = state.currentIperfUploadSpeedUnit.toString(),
-                                fontSize = MaterialTheme.typography.bodySmall.fontSize
-                            )
-                        }
                     }
-                }
-            }
-
-            Row {
-                state.currentIperfDownloadInfoRaw?.let {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = it,
-                        fontSize = 8.sp
+                    Spacer(
+                        modifier = Modifier
+                            .width(8.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                     )
-                }
-                Spacer(
-                    modifier = Modifier
-                        .width(8.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                    state.currentIperfUploadInfoRaw?.let {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = it,
+                            fontSize = 8.sp
                         )
-                )
-                state.currentIperfUploadInfoRaw?.let {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = it,
-                        fontSize = 8.sp
-                    )
+                    }
                 }
             }
         }

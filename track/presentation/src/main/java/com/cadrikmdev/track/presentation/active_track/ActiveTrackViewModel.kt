@@ -1,28 +1,18 @@
 package com.cadrikmdev.track.presentation.active_track
 
 import android.Manifest
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cadrikmdev.connectivity.domain.ConnectivityObserver
-import com.cadrikmdev.connectivity.domain.NetworkTracker
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
-import com.cadrikmdev.core.domain.track.TrackRepository
-import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
-import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
-import com.cadrikmdev.iperf.domain.IperfOutputParser
 import com.cadrikmdev.permissions.domain.PermissionHandler
-import com.cadrikmdev.track.domain.LocationObserver
 import com.cadrikmdev.track.domain.MeasurementTracker
+import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,18 +25,10 @@ import kotlinx.coroutines.launch
 
 class ActiveTrackViewModel(
     private val measurementTracker: MeasurementTracker,
-    private val trackRepository: TrackRepository,
-    private val connectivityObserver: ConnectivityObserver,
     private val permissionHandler: PermissionHandler,
     private val gpsLocationService: ServiceChecker,
     private val locationServiceObserver: LocationServiceObserver,
-    private val wifiServiceObserver: WifiServiceObserver,
-    private val locationObserver: LocationObserver,
-    private val mobileNetworkObserver: NetworkTracker,
-    private val temperatureInfoReceiver: TemperatureInfoReceiver,
-    private val applicationScope: CoroutineScope,
-    private val applicationContext: Context,
-    private val iperfParser: IperfOutputParser,
+    private val appConfig: Config,
 ) : ViewModel() {
 
     var state by mutableStateOf(
@@ -64,34 +46,6 @@ class ActiveTrackViewModel(
         state.shouldTrack
     }
         .stateIn(viewModelScope, SharingStarted.Lazily, state.shouldTrack)
-
-    private val _iPerfDownloadRequestResult: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-    val iPerfDownloadRequestResult: LiveData<String>
-        get() = _iPerfDownloadRequestResult
-
-    private val _iPerfUploadRequestResult: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-    val iPerfUploadRequestResult: LiveData<String>
-        get() = _iPerfUploadRequestResult
-
-    private val _iPerfDownloadSpeed: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    private val _iPerfUploadSpeed: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    private val _iPerfUploadSpeedUnit: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    private val _iPerfDownloadSpeedUnit: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
 
     private val hasAllPermission = MutableStateFlow(false)
 
@@ -218,6 +172,7 @@ class ActiveTrackViewModel(
 
                 updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
                 updatePermissionsState()
+                updateAccordingAppConfig()
             }
             else -> Unit
         }
@@ -231,5 +186,12 @@ class ActiveTrackViewModel(
     private fun updatePermissionsState() {
         hasAllPermission.value = permissionHandler.getNotGrantedPermissionList().isEmpty()
         isLocationTrackable.value = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && isLocationServiceEnabled.value
+    }
+
+    private fun updateAccordingAppConfig() {
+        val isSpeedTestEnabled = appConfig.isSpeedTestEnabled()
+        state = state.copy(
+            isSpeedTestEnabled = isSpeedTestEnabled
+        )
     }
 }

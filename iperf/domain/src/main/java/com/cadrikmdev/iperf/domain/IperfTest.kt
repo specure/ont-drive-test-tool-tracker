@@ -20,7 +20,8 @@ enum class IperfTestStatus {
     ENDED,
     ERROR,
     STOPPED,
-    UNKNOWN
+    UNKNOWN,
+    DISABLED
 }
 
 enum class IperfTestDirection {

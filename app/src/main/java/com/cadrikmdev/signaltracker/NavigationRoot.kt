@@ -88,7 +88,11 @@ private fun NavGraphBuilder.trackGraph(
             )
         }
         composable<SettingsScreenNav> {
-            SettingsScreenRoot()
+            SettingsScreenRoot(
+                onBackClick = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }

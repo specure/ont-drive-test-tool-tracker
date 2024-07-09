@@ -25,4 +25,7 @@ data class TrackOverviewState(
     val location: LocationTimestamp? = null,
     val fileExport: FileExportUi? = null,
     val trackCountForExport: Int = 0,
-)
+    val isSpeedTestEnabled: Boolean = false,
+) {
+
+}

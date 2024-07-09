@@ -13,4 +13,5 @@ data class ActiveTrackState(
     val isTrackFinished: Boolean = false,
     val isSavingTrack: Boolean = false,
     val isShowingPauseDialog: Boolean = false,
+    val isSpeedTestEnabled: Boolean = false,
 )

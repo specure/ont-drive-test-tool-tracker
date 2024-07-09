@@ -17,4 +17,5 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.track.domain)
     implementation(projects.core.database)
+    implementation(libs.androidx.preference.ktx)
 }

@@ -16,4 +16,5 @@ data class TrackData(
     val iperfTestUpload: IperfTest? = null,
     val iperfTestDownload: IperfTest? = null,
     val internetConnectionConnected: Boolean = false,
+    val isSpeedTestEnabled: Boolean = false,
 )

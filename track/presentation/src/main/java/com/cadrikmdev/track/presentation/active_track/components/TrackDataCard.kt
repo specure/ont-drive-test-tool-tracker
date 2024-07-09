@@ -85,25 +85,27 @@ fun TrackDataCard(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            TrackDataItem(
-                title = stringResource(id = R.string.download),
-                value = "${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}",
+        if (trackData.isSpeedTestEnabled) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(
                 modifier = Modifier
-                    .defaultMinSize(minWidth = 75.dp)
-            )
-            TrackDataItem(
-                title = stringResource(id = R.string.upload),
-                value = "${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}",
-                modifier = Modifier
-                    .defaultMinSize(minWidth = 75.dp)
-            )
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                TrackDataItem(
+                    title = stringResource(id = R.string.download),
+                    value = "${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}",
+                    modifier = Modifier
+                        .defaultMinSize(minWidth = 75.dp)
+                )
+                TrackDataItem(
+                    title = stringResource(id = R.string.upload),
+                    value = "${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}",
+                    modifier = Modifier
+                        .defaultMinSize(minWidth = 75.dp)
+                )
+            }
         }
 
     }
@@ -143,6 +145,7 @@ private fun TrackDataCardPreview() {
         TrackDataCard(
             elapsedTime = 35818.seconds,
             trackData = TrackData(
+                isSpeedTestEnabled = true,
                iperfTestDownload =  IperfTest(
                     testProgress = listOf(
                         IperfTestProgressDownload(

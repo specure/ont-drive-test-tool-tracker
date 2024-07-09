@@ -10,6 +10,9 @@ import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import com.cadrikmdev.core.domain.track.Track
 import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.iperf.domain.IperfRunner
+import com.cadrikmdev.iperf.domain.IperfTest
+import com.cadrikmdev.iperf.domain.IperfTestStatus
+import com.cadrikmdev.track.domain.config.Config
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -43,6 +46,7 @@ class MeasurementTracker(
     private val iperfUploadRunner: IperfRunner,
     private val trackRepository: TrackRepository,
     private val connectivityObserver: ConnectivityObserver,
+    private val appConfig: Config,
 ) {
     private val _trackData = MutableStateFlow(TrackData())
     val trackData = _trackData.asStateFlow()
@@ -112,8 +116,10 @@ class MeasurementTracker(
                     applicationScope.launch {
                         temperatureInfoReceiver.register()
                     }
-                    iperfUploadRunner.startTest()
-                    iperfDownloadRunner.startTest()
+                    if (appConfig.isSpeedTestEnabled()) {
+                        iperfUploadRunner.startTest()
+                        iperfDownloadRunner.startTest()
+                    }
                 }
             }
             .flatMapLatest { isTracking ->
@@ -131,7 +137,6 @@ class MeasurementTracker(
                     )
                 }
                 saveCurrentTrackData(_trackData.value)
-                // TODO: log all values to DB
             }
             .launchIn(applicationScope)
 
@@ -162,20 +167,31 @@ class MeasurementTracker(
             .launchIn(applicationScope)
 
         iperfUploadRunner.testProgressDetailsFlow.onEach { testState ->
+            val updatedTestStatus = updateStatusIfDenied(testState)
             _trackData.update {
                 it.copy(
-                    iperfTestUpload = testState
+                    iperfTestUpload = updatedTestStatus
                 )
             }
         }.launchIn(applicationScope)
 
         iperfDownloadRunner.testProgressDetailsFlow.onEach { testState ->
+            val updatedTestStatus = updateStatusIfDenied(testState)
             _trackData.update {
                 it.copy(
-                    iperfTestDownload = testState
+                    iperfTestDownload = updatedTestStatus
                 )
             }
         }.launchIn(applicationScope)
+    }
+
+    private fun updateStatusIfDenied(testState: IperfTest): IperfTest {
+        val isSpeedTestEnabled = appConfig.isSpeedTestEnabled()
+        println("TEST STATE ${testState.direction}: ${testState.status} enabled: ${appConfig.isSpeedTestEnabled()}")
+        val updatedTestStatus = testState.copy(
+            status = if (isSpeedTestEnabled) testState.status else IperfTestStatus.DISABLED
+        )
+        return updatedTestStatus
     }
 
     fun setIsTracking(isTracking: Boolean) {
@@ -191,6 +207,7 @@ class MeasurementTracker(
     }
 
     fun startObserving() {
+        updateConfiguration()
         startObservingTemperature()
         startObservingLocation()
         startObservingConnectivity()
@@ -234,6 +251,14 @@ class MeasurementTracker(
         internetConnectivityJob = null
     }
 
+    private fun updateConfiguration() {
+        _trackData.update {
+            it.copy(
+                isSpeedTestEnabled = appConfig.isSpeedTestEnabled()
+            )
+        }
+    }
+
     fun finishTrack() {
         stopObserving()
         setIsTracking(false)
@@ -252,18 +277,24 @@ class MeasurementTracker(
                 durationMillis = trackData.duration.inWholeMilliseconds,
                 timestamp = currentMillis.formatMillisToDateString(),
                 timestampRaw = currentMillis,
-                downloadSpeed = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth,
-                downloadSpeedUnit = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit,
-                downloadSpeedTestState = trackData.iperfTestDownload?.status?.toString(),
-                downloadSpeedTestError = if (trackData.iperfTestDownload?.error?.lastOrNull() != null) "${trackData.iperfTestDownload.error.lastOrNull()?.timestamp?.formatMillisToDateString()} ${trackData.iperfTestDownload.error.lastOrNull()?.error}" else null,
-                downloadSpeedTestTimestamp = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.timestampMillis?.formatMillisToDateString(),
-                downloadSpeedTestTimestampRaw = trackData.iperfTestDownload?.testProgress?.lastOrNull()?.timestampMillis,
-                uploadSpeed = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth,
-                uploadSpeedUnit = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit,
-                uploadSpeedTestState = trackData.iperfTestUpload?.status?.toString(),
-                uploadSpeedTestError = if (trackData.iperfTestUpload?.error?.lastOrNull() != null) "${trackData.iperfTestUpload.error.lastOrNull()?.timestamp?.formatMillisToDateString()} ${trackData.iperfTestUpload.error.lastOrNull()?.error}" else null,
-                uploadSpeedTestTimestamp = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis?.formatMillisToDateString(),
-                uploadSpeedTestTimestampRaw = trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis,
+                downloadSpeed = if (trackData.isSpeedTestEnabled) trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth else null,
+                downloadSpeedUnit = if (trackData.isSpeedTestEnabled) trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit else null,
+                downloadSpeedTestState = if (trackData.isSpeedTestEnabled) trackData.iperfTestDownload?.status?.toString() else IperfTestStatus.DISABLED.toString(),
+                downloadSpeedTestError = if (trackData.isSpeedTestEnabled) {
+                    if (trackData.iperfTestDownload?.error?.lastOrNull() != null) "${trackData.iperfTestDownload.error.lastOrNull()?.timestamp?.formatMillisToDateString()} ${trackData.iperfTestDownload.error.lastOrNull()?.error}"
+                    else null
+                } else null,
+                downloadSpeedTestTimestamp = if (trackData.isSpeedTestEnabled) trackData.iperfTestDownload?.testProgress?.lastOrNull()?.timestampMillis?.formatMillisToDateString() else null,
+                downloadSpeedTestTimestampRaw = if (trackData.isSpeedTestEnabled) trackData.iperfTestDownload?.testProgress?.lastOrNull()?.timestampMillis else null,
+                uploadSpeed = if (trackData.isSpeedTestEnabled) trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth else null,
+                uploadSpeedUnit = if (trackData.isSpeedTestEnabled) trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit else null,
+                uploadSpeedTestState = if (trackData.isSpeedTestEnabled) trackData.iperfTestUpload?.status?.toString() else IperfTestStatus.DISABLED.toString(),
+                uploadSpeedTestError = if (trackData.isSpeedTestEnabled) {
+                    if (trackData.iperfTestUpload?.error?.lastOrNull() != null) "${trackData.iperfTestUpload.error.lastOrNull()?.timestamp?.formatMillisToDateString()} ${trackData.iperfTestUpload.error.lastOrNull()?.error}"
+                    else null
+                } else null,
+                uploadSpeedTestTimestamp = if (trackData.isSpeedTestEnabled) trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis?.formatMillisToDateString() else null,
+                uploadSpeedTestTimestampRaw = if (trackData.isSpeedTestEnabled) trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis else null,
                 latitude = trackData.locations.lastOrNull()?.location?.lat,
                 longitude = trackData.locations.lastOrNull()?.location?.long,
                 locationTimestamp = trackData.locations.lastOrNull()?.timestamp?.inWholeMilliseconds?.formatMillisToDateString(),
