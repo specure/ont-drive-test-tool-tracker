@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.cadrikmdev.core.domain.config.Config
+import com.cadrikmdev.core.presentation.AppConfig
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
@@ -55,18 +56,21 @@ fun SettingsScreen(
                         .fillMaxSize()
                         .padding(padding)
                 ) {
-                    switchPreference(
-                        key = Config.SPEED_TEST_ENABLED_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getIsSpeedTestEnabledDefault(),
-                        title = { Text(text = stringResource(id = R.string.speed_test)) },
-                        summary = {
-                            Text(
-                                text = if (it) stringResource(id = R.string.enabled) else stringResource(
-                                    id = R.string.disabled
+                    if (AppConfig.FEATURE_SPEED_TEST_ENABLED) {
+                        switchPreference(
+                            key = Config.SPEED_TEST_ENABLED_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getIsSpeedTestEnabledDefault(),
+                            title = { Text(text = stringResource(id = R.string.speed_test)) },
+                            summary = {
+                                Text(
+                                    text = if (it) stringResource(id = R.string.enabled) else stringResource(
+                                        id = R.string.disabled
+                                    )
                                 )
-                            )
-                        }
-                    )
+                            },
+                        )
+                    }
+
                     textFieldPreference(
                         key = Config.SPEED_TEST_DURATION_SECONDS_CONFIG_KEY,
                         defaultValue = viewModel.appConfig.getSpeedTestDurationSecondsDefault(),

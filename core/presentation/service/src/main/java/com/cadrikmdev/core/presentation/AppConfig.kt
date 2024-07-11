@@ -9,6 +9,7 @@ class AppConfig(
 ) : Config {
 
     companion object {
+        const val FEATURE_SPEED_TEST_ENABLED = BuildConfig.FEATURE_SPEED_TEST_ENABLED
         const val IS_SPEED_TEST_ENABLED_BY_DEFAULT = true
 
         const val SPEED_TEST_DURATION_SECONDS_DEFAULT = 3600 * 8
@@ -27,7 +28,7 @@ class AppConfig(
         return preferences.getBoolean(
             Config.SPEED_TEST_ENABLED_CONFIG_KEY,
             getIsSpeedTestEnabledDefault()
-        )
+        ) && FEATURE_SPEED_TEST_ENABLED
     }
 
     override fun setIsSpeedTestEnabled(enabled: Boolean) {

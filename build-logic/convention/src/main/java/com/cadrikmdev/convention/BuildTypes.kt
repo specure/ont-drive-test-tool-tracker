@@ -20,15 +20,22 @@ internal fun Project.configureBuildTypes(
         }
 
         val hostname = gradleLocalProperties(rootDir, providers).getProperty("HOSTNAME")
+        val speedTestFeatureEnabled =
+            gradleLocalProperties(rootDir, providers).getProperty("FEATURE_SPEED_TEST_ENABLED")
+                .toBoolean()
         when(extensionType) {
             ExtensionType.APPLICATION -> {
                 extensions.configure<ApplicationExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(hostname)
+                            configureDebugBuildType(hostname, speedTestFeatureEnabled)
                         }
                         release {
-                            configureReleaseBuildType(commonExtension, hostname)
+                            configureReleaseBuildType(
+                                commonExtension,
+                                hostname,
+                                speedTestFeatureEnabled
+                            )
                         }
                     }
                 }
@@ -37,10 +44,14 @@ internal fun Project.configureBuildTypes(
                 extensions.configure<LibraryExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(hostname)
+                            configureDebugBuildType(hostname, speedTestFeatureEnabled)
                         }
                         release {
-                            configureReleaseBuildType(commonExtension, hostname)
+                            configureReleaseBuildType(
+                                commonExtension,
+                                hostname,
+                                speedTestFeatureEnabled
+                            )
                         }
                     }
                 }
@@ -50,10 +61,14 @@ internal fun Project.configureBuildTypes(
                 extensions.configure<DynamicFeatureExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(hostname)
+                            configureDebugBuildType(hostname, speedTestFeatureEnabled)
                         }
                         release {
-                            configureReleaseBuildType(commonExtension, hostname)
+                            configureReleaseBuildType(
+                                commonExtension,
+                                hostname,
+                                speedTestFeatureEnabled
+                            )
                             isMinifyEnabled = false
                         }
                     }
@@ -63,15 +78,18 @@ internal fun Project.configureBuildTypes(
     }
 }
 
-private fun BuildType.configureDebugBuildType(hostname: String) {
+private fun BuildType.configureDebugBuildType(hostname: String, speedTestFeatureEnabled: Boolean) {
     buildConfigField("String", "BASE_URL", "\"$hostname\"")
+    buildConfigField("boolean", "FEATURE_SPEED_TEST_ENABLED", "$speedTestFeatureEnabled")
 }
 
 private fun BuildType.configureReleaseBuildType(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
-    hostname: String
+    hostname: String,
+    speedTestFeatureEnabled: Boolean,
 ) {
     buildConfigField("String", "BASE_URL", "\"$hostname\"")
+    buildConfigField("boolean", "FEATURE_SPEED_TEST_ENABLED", "$speedTestFeatureEnabled")
     isMinifyEnabled = true
     proguardFiles(
         commonExtension.getDefaultProguardFile("proguard-android-optimize.txt"),
