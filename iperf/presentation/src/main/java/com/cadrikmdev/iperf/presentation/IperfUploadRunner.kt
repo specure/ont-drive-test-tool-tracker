@@ -1,6 +1,7 @@
 package com.cadrikmdev.iperf.presentation
 
 import android.content.Context
+import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.iperf.domain.IperfError
 import com.cadrikmdev.iperf.domain.IperfOutputParser
 import com.cadrikmdev.iperf.domain.IperfRunner
@@ -25,24 +26,29 @@ class IperfUploadRunner(
     private val applicationContext: Context,
     private val applicationScope: CoroutineScope,
     private val iperfParser: IperfOutputParser,
+    private val appConfig: Config,
 ): IperfRunner {
 
         private var iperf = IPerf
         private val config: IPerfConfig
         get() {
-            val hostname: String = BuildConfig.BASE_URL
+            val hostname: String = appConfig.getUploadSpeedTestServerAddress()
+                ?: appConfig.getUploadSpeedTestServerAddressDefault()
             val stream = File(applicationContext.filesDir, "iperf3.UXXXXXX")
             return IPerfConfig(
                 hostname = hostname,
                 stream = stream.path,
-                duration = 3600 * 8, // 8h
+                duration = appConfig.getSpeedTestDurationSeconds()
+                    ?: appConfig.getSpeedTestDurationSecondsDefault(),
                 interval = 1,
-                port = 5202,
+                port = appConfig.getUploadSpeedTestServerPort()
+                    ?: appConfig.getUploadSpeedTestServerPortDefault(),
                 download = false,
                 useUDP = false,
                 json = false,
                 debug = false,
-                maxBandwidthBitPerSecond = 2000000,
+                maxBandwidthBitPerSecond = appConfig.getUploadSpeedTestMaxBandwidthBitsPerSecond()
+                    ?: appConfig.getUploadSpeedTestMaxBandwidthBitsPerSecondDefault(),
             )
         }
     private var testProgressDetails: IperfTest = IperfTest(

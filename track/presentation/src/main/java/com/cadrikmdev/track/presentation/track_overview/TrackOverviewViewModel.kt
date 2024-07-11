@@ -68,8 +68,10 @@ class TrackOverviewViewModel(
     private val downloadResultBuilder: StringBuilder = StringBuilder()
     private val uploadResultBuilder: StringBuilder = StringBuilder()
 
-    private val iperfUpload = IperfUploadRunner(applicationContext, applicationScope, iperfParser)
-    private val iperfDownload = IperfDownloadRunner(applicationContext, applicationScope, iperfParser)
+    private val iperfUpload =
+        IperfUploadRunner(applicationContext, applicationScope, iperfParser, appConfig)
+    private val iperfDownload =
+        IperfDownloadRunner(applicationContext, applicationScope, iperfParser, appConfig)
 
     private val _iPerfDownloadRequestResult: MutableLiveData<String> by lazy {
         MutableLiveData<String>()

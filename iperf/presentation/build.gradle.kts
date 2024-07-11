@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.timber)
     implementation(projects.iperf.domain)
+    implementation(projects.core.domain)
     implementation(projects.iperfJniUpload.iperf)
     implementation(projects.iperfJniDownload.iperf)
     testImplementation(libs.junit)

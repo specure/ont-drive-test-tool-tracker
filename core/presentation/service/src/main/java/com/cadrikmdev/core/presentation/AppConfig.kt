@@ -9,6 +9,8 @@ class AppConfig(
 ) : Config {
 
     companion object {
+        const val IS_SPEED_TEST_ENABLED_BY_DEFAULT = true
+
         const val SPEED_TEST_DURATION_SECONDS_DEFAULT = 3600 * 8
         const val SPEED_TEST_PROGRESS_UPDATE_INTERVAL_SECONDS_DEFAULT = 1
 
@@ -22,7 +24,10 @@ class AppConfig(
     }
 
     override fun isSpeedTestEnabled(): Boolean {
-        return preferences.getBoolean(Config.SPEED_TEST_ENABLED_CONFIG_KEY, false)
+        return preferences.getBoolean(
+            Config.SPEED_TEST_ENABLED_CONFIG_KEY,
+            getIsSpeedTestEnabledDefault()
+        )
     }
 
     override fun setIsSpeedTestEnabled(enabled: Boolean) {
@@ -30,7 +35,7 @@ class AppConfig(
     }
 
     override fun getIsSpeedTestEnabledDefault(): Boolean {
-        return true
+        return IS_SPEED_TEST_ENABLED_BY_DEFAULT
     }
 
     override fun setUploadSpeedTestServerAddress(serverAddress: String) {
@@ -66,21 +71,24 @@ class AppConfig(
         return UPLOAD_SPEED_TEST_SERVER_PORT_DEFAULT
     }
 
-    override fun setUploadSpeedTestMaxBandwidthBitsPerSecond(maxBandwidthBps: Int) {
+    override fun setUploadSpeedTestMaxBandwidthBitsPerSecond(maxBandwidthBitsPerSecond: Int) {
         preferences.edit()
-            .putInt(Config.UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY, maxBandwidthBps)
+            .putInt(
+                Config.UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
+                maxBandwidthBitsPerSecond
+            )
             .apply()
     }
 
     override fun getUploadSpeedTestMaxBandwidthBitsPerSecond(): Int? {
-        val maxBandwidth = preferences.getInt(
+        val maxBandwidth = preferences.getFloat(
             Config.UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
-            Config.UNKNOWN_VALUE
+            Config.UNKNOWN_VALUE.toFloat()
         )
-        return if (maxBandwidth == Config.UNKNOWN_VALUE) {
+        return if (maxBandwidth == Config.UNKNOWN_VALUE.toFloat()) {
             null
         } else {
-            maxBandwidth
+            maxBandwidth.toInt()
         }
     }
 
@@ -121,22 +129,22 @@ class AppConfig(
         return DOWNLOAD_SPEED_TEST_SERVER_PORT_DEFAULT
     }
 
-    override fun setDownloadSpeedTestMaxBandwidth(maxBandwidthBps: Int) {
-        preferences.edit().putInt(
+    override fun setDownloadSpeedTestMaxBandwidth(maxBandwidthBitsPerSecond: Int) {
+        preferences.edit().putFloat(
             Config.DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
-            maxBandwidthBps
+            maxBandwidthBitsPerSecond.toFloat()
         ).apply()
     }
 
     override fun getDownloadSpeedTestMaxBandwidthBitsPerSeconds(): Int? {
-        val maxBandwidth = preferences.getInt(
+        val maxBandwidth = preferences.getFloat(
             Config.DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
-            Config.UNKNOWN_VALUE
+            Config.UNKNOWN_VALUE.toFloat()
         )
-        return if (maxBandwidth == Config.UNKNOWN_VALUE) {
+        return if (maxBandwidth == Config.UNKNOWN_VALUE.toFloat()) {
             null
         } else {
-            maxBandwidth
+            maxBandwidth.toInt()
         }
     }
 
@@ -144,18 +152,18 @@ class AppConfig(
         return DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_DEFAULT
     }
 
-    override fun setMaxSpeedTestDurationSeconds(durationMillis: Int) {
-        preferences.edit().putInt(Config.SPEED_TEST_DURATION_SECONDS_CONFIG_KEY, durationMillis)
+    override fun setMaxSpeedTestDurationSeconds(durationSeconds: Int) {
+        preferences.edit().putInt(Config.SPEED_TEST_DURATION_SECONDS_CONFIG_KEY, durationSeconds)
             .apply()
     }
 
     override fun getSpeedTestDurationSeconds(): Int? {
-        val maxDurationMillis =
+        val maxDurationSeconds =
             preferences.getInt(Config.SPEED_TEST_DURATION_SECONDS_CONFIG_KEY, Config.UNKNOWN_VALUE)
-        return if (maxDurationMillis == Config.UNKNOWN_VALUE) {
+        return if (maxDurationSeconds == Config.UNKNOWN_VALUE) {
             null
         } else {
-            maxDurationMillis
+            maxDurationSeconds
         }
     }
 

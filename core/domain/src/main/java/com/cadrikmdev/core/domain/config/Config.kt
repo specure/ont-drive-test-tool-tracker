@@ -41,7 +41,7 @@ interface Config {
 
     fun getUploadSpeedTestServerPortDefault(): Int
 
-    fun setUploadSpeedTestMaxBandwidthBitsPerSecond(maxBandwidthBps: Int)
+    fun setUploadSpeedTestMaxBandwidthBitsPerSecond(maxBandwidthBitsPerSecond: Int)
 
     fun getUploadSpeedTestMaxBandwidthBitsPerSecond(): Int?
 
@@ -65,7 +65,7 @@ interface Config {
 
     fun getDownloadSpeedTestMaxBandwidthBitsPerSecondsDefault(): Int
 
-    fun setMaxSpeedTestDurationSeconds(durationMillis: Int)
+    fun setMaxSpeedTestDurationSeconds(durationSeconds: Int)
 
     fun getSpeedTestDurationSeconds(): Int?
 

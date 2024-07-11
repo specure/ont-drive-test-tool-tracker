@@ -41,10 +41,12 @@ val trackPresentationModule = module {
             get(),
             get(),
             get(),
+            get(),
         )
     }
     single<IperfRunner>(named("iperfUploadRunner")) {
         IperfUploadRunner(
+            get(),
             get(),
             get(),
             get(),
