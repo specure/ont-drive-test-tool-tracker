@@ -119,7 +119,7 @@ private fun TrackOverviewScreen(
                 menuItems = listOf(
                     DropDownItem(
                         icon = SettingsIcon,
-                        title = stringResource(id = R.string.setings)
+                        title = stringResource(id = R.string.settings)
                     ),
                 ),
                 onMenuItemClick = { index ->

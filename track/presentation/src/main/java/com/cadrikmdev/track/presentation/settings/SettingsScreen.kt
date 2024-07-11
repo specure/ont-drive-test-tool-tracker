@@ -14,8 +14,13 @@ import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToo
 import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.R
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import me.zhanghai.compose.preference.preferenceCategory
+import me.zhanghai.compose.preference.sliderPreference
 import me.zhanghai.compose.preference.switchPreference
+import me.zhanghai.compose.preference.textFieldPreference
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
+import kotlin.math.round
 
 @Composable
 fun SettingsScreenRoot(
@@ -23,8 +28,8 @@ fun SettingsScreenRoot(
     viewModel: SettingsScreenViewModel = koinViewModel(),
 ) {
     SettingsScreen(
-        onBackClick
-
+        onBackClick,
+        viewModel
     )
 }
 
@@ -32,13 +37,14 @@ fun SettingsScreenRoot(
 @Composable
 fun SettingsScreen(
     onBackClick: () -> Unit,
+    viewModel: SettingsScreenViewModel
 ) {
     SignalTrackerTheme {
         SignalTrackerScaffold(
             topAppBar = {
                 SignalTrackerToolbar(
                     showBackButton = true,
-                    title = stringResource(id = R.string.setings),
+                    title = stringResource(id = R.string.settings),
                     onBackClick = onBackClick
                 )
             },
@@ -51,9 +57,118 @@ fun SettingsScreen(
                 ) {
                     switchPreference(
                         key = Config.SPEED_TEST_ENABLED_CONFIG_KEY,
-                        defaultValue = false,
-                        title = { Text(text = "Speed test") },
-                        summary = { Text(text = if (it) "On" else "Off") }
+                        defaultValue = viewModel.appConfig.getIsSpeedTestEnabledDefault(),
+                        title = { Text(text = stringResource(id = R.string.speed_test)) },
+                        summary = {
+                            Text(
+                                text = if (it) stringResource(id = R.string.enabled) else stringResource(
+                                    id = R.string.disabled
+                                )
+                            )
+                        }
+                    )
+                    textFieldPreference(
+                        key = Config.SPEED_TEST_DURATION_SECONDS_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getSpeedTestDurationSecondsDefault(),
+                        title = { Text(text = stringResource(id = R.string.duration_seconds)) },
+                        textToValue = {
+                            try {
+                                val value = it.toInt()
+                                if (value > 0) {
+                                    value
+                                } else {
+                                    viewModel.appConfig.getSpeedTestDurationSecondsDefault()
+                                }
+                            } catch (e: Exception) {
+                                Timber.e(e.localizedMessage)
+                                viewModel.appConfig.getDownloadSpeedTestServerPortDefault()
+                            }
+                        },
+                        summary = { Text(text = it.toString()) }
+                    )
+
+                    preferenceCategory(
+                        key = "download_test_category",
+                        title = { Text(text = stringResource(id = R.string.download_test)) },
+                    )
+                    textFieldPreference(
+                        key = Config.DOWNLOAD_SPEED_TEST_SERVER_ADDRESS_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getDownloadSpeedTestServerAddressDefault(),
+                        title = { Text(text = stringResource(id = R.string.server_url)) },
+                        textToValue = { it },
+                        summary = { Text(text = it) }
+                    )
+                    textFieldPreference(
+                        key = Config.DOWNLOAD_SPEED_TEST_SERVER_PORT_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getDownloadSpeedTestServerPortDefault(),
+                        title = { Text(text = stringResource(id = R.string.server_port)) },
+                        textToValue = {
+                            try {
+                                it.toInt()
+                            } catch (e: Exception) {
+                                Timber.e(e.localizedMessage)
+                                viewModel.appConfig.getDownloadSpeedTestServerPortDefault()
+                            }
+                        },
+                        summary = { Text(text = it.toString()) }
+                    )
+                    val downloadMaxBandwidthBitsPerSecondValue = 100000000f
+                    val downloadMaxBandwidthBitsPerSecondValueStep = 10000000
+                    val megaBitsToBitsRatio = 1000000
+                    sliderPreference(
+                        key = Config.DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getDownloadSpeedTestMaxBandwidthBitsPerSecondsDefault()
+                            .toFloat(),
+                        valueRange = 0f..downloadMaxBandwidthBitsPerSecondValue,
+                        valueSteps = (downloadMaxBandwidthBitsPerSecondValue / downloadMaxBandwidthBitsPerSecondValueStep - 1).toInt(),
+                        valueText = {
+                            Text(
+                                text = round(it / megaBitsToBitsRatio).toInt().toString()
+                            )
+                        },
+                        title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
+                        summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
+                    )
+
+                    preferenceCategory(
+                        key = "upload_test_category",
+                        title = { Text(text = stringResource(id = R.string.upload_test)) },
+                    )
+                    textFieldPreference(
+                        key = Config.UPLOAD_SPEED_TEST_SERVER_ADDRESS_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getUploadSpeedTestServerAddressDefault(),
+                        title = { Text(text = stringResource(id = R.string.server_url)) },
+                        textToValue = { it },
+                        summary = { Text(text = it) }
+                    )
+                    textFieldPreference(
+                        key = Config.UPLOAD_SPEED_TEST_SERVER_PORT_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getUploadSpeedTestServerPortDefault(),
+                        title = { Text(text = stringResource(id = R.string.server_port)) },
+                        textToValue = {
+                            try {
+                                it.toInt()
+                            } catch (e: Exception) {
+                                Timber.e(e.localizedMessage)
+                            }
+                        },
+                        summary = { Text(text = it.toString()) },
+                    )
+                    val uploadMaxBandwidthBitsPerSecondValue = 10000000F
+                    val uploadMaxBandwidthBitsPerSecondValueStep = 10000000
+                    sliderPreference(
+                        key = Config.UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getUploadSpeedTestMaxBandwidthBitsPerSecondDefault()
+                            .toFloat(),
+                        valueRange = 0f..uploadMaxBandwidthBitsPerSecondValue,
+                        valueSteps = (uploadMaxBandwidthBitsPerSecondValue / uploadMaxBandwidthBitsPerSecondValueStep - 1).toInt(),
+                        valueText = {
+                            Text(
+                                text = round(it / megaBitsToBitsRatio).toInt().toString()
+                            )
+                        },
+                        title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
+                        summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
                     )
                 }
             }

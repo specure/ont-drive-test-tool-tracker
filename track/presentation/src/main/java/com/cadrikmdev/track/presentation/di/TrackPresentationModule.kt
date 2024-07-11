@@ -14,7 +14,9 @@ import com.cadrikmdev.iperf.presentation.IperfAndroidParser
 import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
 import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.track.domain.MeasurementTracker
+import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackViewModel
+import com.cadrikmdev.track.presentation.settings.AppConfig
 import com.cadrikmdev.track.presentation.settings.SettingsScreenViewModel
 import com.cadrikmdev.track.presentation.track_overview.TrackOverviewViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -33,6 +35,7 @@ val trackPresentationModule = module {
     singleOf(::TemperatureInfoReceiver).bind<TemperatureInfoObserver>()
     singleOf(::AndroidWifiServiceObserver).bind<WifiServiceObserver>()
     singleOf(::IperfAndroidParser).bind<IperfOutputParser>()
+    singleOf(::AppConfig).bind<Config>()
     single<IperfRunner>(named("iperfDownloadRunner")) {
         IperfDownloadRunner(
             get(),
