@@ -15,6 +15,7 @@ import com.cadrikmdev.connectivity.domain.NetworkTracker
 import com.cadrikmdev.core.database.export.TracksExporter
 import com.cadrikmdev.core.domain.SessionStorage
 import com.cadrikmdev.core.domain.Temperature
+import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.TrackRepository
@@ -28,7 +29,6 @@ import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.domain.LocationObserver
-import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportError
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
 import kotlinx.coroutines.CoroutineScope

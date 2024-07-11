@@ -1,8 +1,8 @@
-package com.cadrikmdev.track.presentation.settings
+package com.cadrikmdev.core.presentation
 
 import android.content.SharedPreferences
-import com.cadrikmdev.core.presentation.ui.BuildConfig
-import com.cadrikmdev.track.domain.config.Config
+import com.cadrikmdev.core.domain.config.Config
+import com.cadrikmdev.core.presentation.service.BuildConfig
 
 class AppConfig(
     private val preferences: SharedPreferences

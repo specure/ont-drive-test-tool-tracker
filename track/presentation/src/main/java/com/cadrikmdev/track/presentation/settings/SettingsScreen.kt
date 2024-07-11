@@ -8,10 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
-import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.R
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.preferenceCategory

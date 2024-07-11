@@ -1,8 +1,10 @@
 package com.cadrikmdev.track.presentation.di
 
+import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
+import com.cadrikmdev.core.presentation.AppConfig
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.location.AndroidLocationServiceObserver
 import com.cadrikmdev.core.presentation.service.location.GpsLocationServiceChecker
@@ -14,9 +16,7 @@ import com.cadrikmdev.iperf.presentation.IperfAndroidParser
 import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
 import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.track.domain.MeasurementTracker
-import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackViewModel
-import com.cadrikmdev.track.presentation.settings.AppConfig
 import com.cadrikmdev.track.presentation.settings.SettingsScreenViewModel
 import com.cadrikmdev.track.presentation.track_overview.TrackOverviewViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf

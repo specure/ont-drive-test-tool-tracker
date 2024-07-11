@@ -7,11 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.track.domain.MeasurementTracker
-import com.cadrikmdev.track.domain.config.Config
 import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

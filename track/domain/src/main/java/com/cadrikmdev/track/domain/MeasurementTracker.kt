@@ -5,6 +5,7 @@ import com.cadrikmdev.connectivity.domain.NetworkTracker
 import com.cadrikmdev.connectivity.domain.TransportType
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.core.domain.Timer
+import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import com.cadrikmdev.core.domain.track.Track
@@ -12,7 +13,6 @@ import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.iperf.domain.IperfRunner
 import com.cadrikmdev.iperf.domain.IperfTest
 import com.cadrikmdev.iperf.domain.IperfTestStatus
-import com.cadrikmdev.track.domain.config.Config
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

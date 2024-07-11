@@ -1,4 +1,4 @@
-package com.cadrikmdev.track.domain.config
+package com.cadrikmdev.core.domain.config
 
 interface Config {
 
