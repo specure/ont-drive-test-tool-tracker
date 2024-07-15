@@ -50,5 +50,13 @@ gradlePlugin {
             id = "signaltracker.jvm.ktor"
             implementationClass = "JvmKtorConventionPlugin"
         }
+        register("jvmJunit5") {
+            id = "signaltracker.jvm.junit5"
+            implementationClass = "JvmJUnit5ConventionPlugin"
+        }
+        register("androidJunit5") {
+            id = "signaltracker.android.junit5"
+            implementationClass = "androidJUnit5ConventionPlugin"
+        }
     }
 }
