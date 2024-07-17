@@ -123,45 +123,51 @@ period (even few seconds), mostly seen with upload test
 
 Time format or local date and time is "yyyy-MM-dd HH:mm:ss"
 
-**durationMillis** - Test duration from the time user hit start button in milliseconds
-**timestamp** - Local Date and time of the entry  
-**timestampRaw** - Unix timestamp of the entry (System.currentTimeMillis())
-**downloadSpeed** - download speed (for unit see **downloadSpeedUnit**)
-**downloadSpeedUnit** - unit of the speed [bits/sec|Mbits/sec|Kbits/sec|Gbits/sec]
-**downloadSpeedTestState** - **INITIALIZING**/**RUNNING**/**ERROR** - **INITIALIZING** when test is
-starting and establishing connection to server, **RUNNING** - when there is speed measured and data
-are transferred from client to server or vice-versa, **ERROR** - when some error happened,
-description of the error should be in **downloadSpeedTestError** field
-**downloadSpeedTestError** - String of the error, null if no error occurred or there are no details
-for error
-**downloadSpeedTestTimestamp** - Local Date and time of the download speed part update time
-**downloadSpeedTestTimestampRaw** - Unix timestamp of the download speed part (
-System.currentTimeMillis())
-**uploadSpeed** - upload speed (for unit see **uploadSpeedUnit**)
-**uploadSpeedUnit** - unit of the speed [bits/sec|Mbits/sec|Kbits/sec|Gbits/sec]
-**uploadSpeedTestState** - **INITIALIZING**/**RUNNING**/**ERROR** - **INITIALIZING** when test is
-starting and establishing connection to server, **RUNNING** - when there is speed measured and data
-are transferred from client to server or vice-versa, **ERROR** - when some error happened,
-description of the error should be in **uploadSpeedTestError** field
-**uploadSpeedTestError** - String of the error, null if no error occurred or there are no details
-for error
-**uploadSpeedTestTimestamp** - Local Date and time of the upload speed part update time
-**uploadSpeedTestTimestampRaw** - Unix timestamp of the upload speed part (
-System.currentTimeMillis())
-**latitude** - GPS latitude coordinate
-**longitude** - GPS longitude coordinate
-**locationTimestamp** - Local Date and time of the location part update time
-**locationTimestampRaw** - Unix timestamp of the location part (System.currentTimeMillis())
-**networkType** - Main network type (CELLULAR, WIFI, BLUETOOTH, VPN, ETHERNET, UNKNOWN)
-**mobileNetworkOperator** - Network operator obtained from network
-**mobileNetworkType** - String representation of mobile network type e.g. (LTE, EDGE, HSPDA, ...)
-**signalStrength** - in dBm, primary connected cell signal
-**networkInfoTimestamp** - Local Date and time of the network info part update time
-**networkInfoTimestampRaw** - Unix timestamp of the network info part (System.currentTimeMillis())
-**connectionStatus** - **CONNECTED**/**DISCONNECTED** - **CONNECTED** when network is available and
-address is able to be resolved by DNS, **DISCONNECTED** otherwise
-**temperatureCelsius** - Device temperature in Celsius degrees
-**temperatureTimestamp** - Local Date and time of the temperature part update time
-**temperatureTimestampRaw** - Unix timestamp of the temperature part (System.currentTimeMillis()) -
+- **durationMillis** - Test duration from the time user hit start button in milliseconds
+- **timestamp** - Local Date and time of the entry
+- **timestampRaw** - Unix timestamp of the entry (System.currentTimeMillis())
+- **downloadSpeed** - download speed (for unit see **downloadSpeedUnit**)
+- **downloadSpeedUnit** - unit of the speed [bits/sec|Mbits/sec|Kbits/sec|Gbits/sec]
+- **downloadSpeedTestState** - **INITIALIZING**/**RUNNING**/**ERROR** - **INITIALIZING** when test
+  is
+  starting and establishing connection to server, **RUNNING** - when there is speed measured and
+  data
+  are transferred from client to server or vice-versa, **ERROR** - when some error happened,
+  description of the error should be in **downloadSpeedTestError** field
+- **downloadSpeedTestError** - String of the error, null if no error occurred or there are no
+  details
+  for error
+- **downloadSpeedTestTimestamp** - Local Date and time of the download speed part update time
+- **downloadSpeedTestTimestampRaw** - Unix timestamp of the download speed part (
+  System.currentTimeMillis())
+- **uploadSpeed** - upload speed (for unit see **uploadSpeedUnit**)
+- **uploadSpeedUnit** - unit of the speed [bits/sec|Mbits/sec|Kbits/sec|Gbits/sec]
+- **uploadSpeedTestState** - **INITIALIZING**/**RUNNING**/**ERROR** - **INITIALIZING** when test is
+  starting and establishing connection to server, **RUNNING** - when there is speed measured and
+  data
+  are transferred from client to server or vice-versa, **ERROR** - when some error happened,
+  description of the error should be in **uploadSpeedTestError** field
+- **uploadSpeedTestError** - String of the error, null if no error occurred or there are no details
+  for error
+- **uploadSpeedTestTimestamp** - Local Date and time of the upload speed part update time
+- **uploadSpeedTestTimestampRaw** - Unix timestamp of the upload speed part (
+  System.currentTimeMillis())
+- **latitude** - GPS latitude coordinate
+- **longitude** - GPS longitude coordinate
+- **locationTimestamp** - Local Date and time of the location part update time
+- **locationTimestampRaw** - Unix timestamp of the location part (System.currentTimeMillis())
+- **networkType** - Main network type (CELLULAR, WIFI, BLUETOOTH, VPN, ETHERNET, UNKNOWN)
+- **mobileNetworkOperator** - Network operator obtained from network
+- **mobileNetworkType** - String representation of mobile network type e.g. (LTE, EDGE, HSPDA, ...)
+- **signalStrength** - in dBm, primary connected cell signal
+- **networkInfoTimestamp** - Local Date and time of the network info part update time
+- **networkInfoTimestampRaw** - Unix timestamp of the network info part (System.currentTimeMillis())
+- **connectionStatus** - **CONNECTED**/**DISCONNECTED** - **CONNECTED** when network is available
+  and
+  address is able to be resolved by DNS, **DISCONNECTED** otherwise
+- **temperatureCelsius** - Device temperature in Celsius degrees
+- **temperatureTimestamp** - Local Date and time of the temperature part update time
+- **temperatureTimestampRaw** - Unix timestamp of the temperature part (
+  System.currentTimeMillis()) -
 do not need to be very fresh if temperature does not change (it should update only if temperature
 changes)
