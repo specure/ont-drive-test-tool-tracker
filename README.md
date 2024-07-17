@@ -12,6 +12,16 @@ this is meant to be build on macOS or linux-based systems.
 
 ## Build:
 
+Create or add values to local.properties file:
+HOSTNAME=<YOUR_IPERF_HOSTNAME>
+FEATURE_SPEED_TEST_ENABLED=<true OR false>
+MAPS_API_KEY=<GOOGLE MAPS API KEY>
+
+example:
+HOSTNAME=myiperfhostname.com
+FEATURE_SPEED_TEST_ENABLED=true
+MAPS_API_KEY=dfsfdsggfkg-fgsdgljsgn-gfsgs
+
 in iperf-jni-upload folder
 
 git submodule init
