@@ -28,6 +28,7 @@ import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
 import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
+import com.cadrikmdev.track.domain.BluetoothService
 import com.cadrikmdev.track.domain.LocationObserver
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportError
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
@@ -60,6 +61,7 @@ class TrackOverviewViewModel(
     private val iperfParser: IperfOutputParser,
     private val trackExporter: TracksExporter,
     private val appConfig: Config,
+    private val bluetoothService: BluetoothService,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -397,6 +399,9 @@ class TrackOverviewViewModel(
             isLocationTrackable = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && state.isLocationServiceEnabled
         )
 
+        if (!state.isPermissionRequired) {
+            bluetoothService.startGattServer()
+        }
         startObservingData(state.isLocationTrackable)
     }
 

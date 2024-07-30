@@ -21,4 +21,7 @@
     <string name="write_external_storage">Write external storage</string>
     <string name="test_down">Test Dw</string>
     <string name="test_up">Test Up</string>
+    <string name="bluetooth_connect">Bluetooth connect</string>
+    <string name="permission_bluetooth_connect_rationale">It seems you permanently declined bluetooth connect permission. You can go to app settings to grant it</string>
+    <string name="permission_bluetooth_connect_description">We need bluetooth connect permission to connect to managing app, where you can remotely control tracking app and see its status.</string>
 </resources>
