@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattServer
 import android.bluetooth.BluetoothGattServerCallback
-import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothServerSocket
@@ -45,35 +44,6 @@ class AndroidBluetoothService(private val context: Context) : BluetoothService {
             // Bluetooth is not supported or not enabled
             return
         }
-        gattServer = bluetoothManager.openGattServer(context, gattServerCallback)
-        // Create the GATT service
-        val gattService =
-            BluetoothGattService(serviceUUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
-
-        // Create the GATT characteristic
-        val characteristic = BluetoothGattCharacteristic(
-            characteristicUUID,
-            BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_NOTIFY or BluetoothGattCharacteristic.PROPERTY_WRITE,
-            BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE
-        )
-
-        // Optionally add a descriptor
-        val descriptor = BluetoothGattDescriptor(
-            characteristicUUID, // Client Characteristic Configuration UUID
-            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE
-        )
-        characteristic.addDescriptor(descriptor)
-
-        // Add the characteristic to the service
-        gattService.addCharacteristic(characteristic)
-
-        // TODO: Add your service to a Bluetooth GATT server here (Not available in Android SDK directly, usually part of peripheral devices)
-
-
-        gattServer?.addService(gattService)
-        bluetoothAdapter?.let {
-            startAdvertising(it)
-        }
 
         Timber.d("starting listenning for connections with service uuid = ${serviceUUID}")
         // You can set up Bluetooth classic (RFCOMM) or use BLE advertising for discovery
@@ -82,13 +52,17 @@ class AndroidBluetoothService(private val context: Context) : BluetoothService {
             val serverSocket: BluetoothServerSocket? =
                 it.listenUsingRfcommWithServiceRecord("MyService", serviceUUID)
             // Accept connections from clients (running in a separate thread)
+            Timber.d("starting listenning for connections with service uuid = ${serviceUUID}")
             Thread {
                 var shouldLoop = true
+                Timber.d("Waiting for client to connect")
                 while (shouldLoop) {
                     try {
+                        Timber.d("Trying to establish conection with client")
                         val socket: BluetoothSocket? = serverSocket?.accept()
                         socket?.let {
                             // Handle the connection in a separate thread
+                            Timber.d("Connection made successfully with client")
                             manageConnectedSocket(it)
                         }
                     } catch (e: IOException) {
