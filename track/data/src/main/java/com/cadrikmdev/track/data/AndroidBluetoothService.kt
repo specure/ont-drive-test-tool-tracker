@@ -1,23 +1,19 @@
 package com.cadrikmdev.track.data
 
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattServer
-import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
-import android.bluetooth.le.AdvertiseCallback
-import android.bluetooth.le.AdvertiseData
-import android.bluetooth.le.AdvertiseSettings
 import android.content.Context
-import android.os.ParcelUuid
 import com.cadrikmdev.track.domain.BluetoothService
 import com.cadrikmdev.track.domain.ManagerControlServiceProtocol
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import timber.log.Timber
 import java.io.IOException
 import java.util.UUID
@@ -25,9 +21,6 @@ import java.util.UUID
 class AndroidBluetoothService(private val context: Context) : BluetoothService {
 
     private val serviceUUID: UUID = ManagerControlServiceProtocol.customServiceUUID
-    private val characteristicUUID: UUID =
-        ManagerControlServiceProtocol.customCharacteristicServiceUUID
-
 
     private var bluetoothServerSocket: BluetoothServerSocket? = null
     private var bluetoothSocket: BluetoothSocket? = null
@@ -67,123 +60,81 @@ class AndroidBluetoothService(private val context: Context) : BluetoothService {
                         }
                     } catch (e: IOException) {
                         Timber.e("Socket's accept() method failed", e)
-                        shouldLoop = false
+                        shouldLoop = true // todo change to false
                     }
                 }
             }.start()
         }
     }
 
-    private fun startAdvertising(bluetoothAdapter: BluetoothAdapter) {
-        val advertiser = bluetoothAdapter.bluetoothLeAdvertiser
-        val settings = AdvertiseSettings.Builder()
-            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
-            .setConnectable(true)
-            .build()
-
-        val data = AdvertiseData.Builder()
-            .setIncludeDeviceName(true)
-            .addServiceUuid(ParcelUuid(serviceUUID))
-            .build()
-
-        advertiser.startAdvertising(settings, data, advertiseCallback)
-    }
-
-    private val gattServerCallback = object : BluetoothGattServerCallback() {
-        override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
-            super.onConnectionStateChange(device, status, newState)
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                // Device connected
-                Timber.d("GATT connected successfully")
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                // Device disconnected
-                Timber.d("GATT disconnected")
-            }
-        }
-
-        override fun onCharacteristicReadRequest(
-            device: BluetoothDevice, requestId: Int,
-            offset: Int, characteristic: BluetoothGattCharacteristic
-        ) {
-            super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
-            if (characteristic.uuid == characteristicUUID) {
-                val value = byteArrayOf(0x01, 0x02) // Example value
-                gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, value)
-            }
-        }
-
-        override fun onCharacteristicWriteRequest(
-            device: BluetoothDevice, requestId: Int,
-            characteristic: BluetoothGattCharacteristic, preparedWrite: Boolean,
-            responseNeeded: Boolean, offset: Int, value: ByteArray
-        ) {
-            super.onCharacteristicWriteRequest(
-                device,
-                requestId,
-                characteristic,
-                preparedWrite,
-                responseNeeded,
-                offset,
-                value
-            )
-            if (characteristic.uuid == characteristicUUID) {
-                // Handle the write request
-                if (responseNeeded) {
-                    gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
-                }
-            }
-        }
-
-        override fun onDescriptorWriteRequest(
-            device: BluetoothDevice, requestId: Int,
-            descriptor: BluetoothGattDescriptor, preparedWrite: Boolean,
-            responseNeeded: Boolean, offset: Int, value: ByteArray
-        ) {
-            super.onDescriptorWriteRequest(
-                device,
-                requestId,
-                descriptor,
-                preparedWrite,
-                responseNeeded,
-                offset,
-                value
-            )
-            if (descriptor.uuid == characteristicUUID) {
-                // Handle descriptor write request
-                if (responseNeeded) {
-                    gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
-                }
-            }
-        }
-    }
-
-    private val advertiseCallback = object : AdvertiseCallback() {
-        override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
-            super.onStartSuccess(settingsInEffect)
-            Timber.d("Advertising started successfully")
-            // Advertising started successfully
-        }
-
-        override fun onStartFailure(errorCode: Int) {
-            super.onStartFailure(errorCode)
-            // Advertising failed
-            Timber.d("Advertising started failed")
-        }
-    }
     private fun manageConnectedSocket(socket: BluetoothSocket) {
         // Implement logic for communication with the connected client
         bluetoothSocket = socket
-        // Read/write data using socket.inputStream and socket.outputStream
-    }
 
-    fun onDestroy() {
-        gattServer?.close()
-        bluetoothAdapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
+        CoroutineScope(Dispatchers.IO).launch {
+            val inputStream = socket.inputStream
+            val outputStream = socket.outputStream
+            val reader = inputStream.bufferedReader()
+
+            try {
+                // Using supervisorScope to manage child coroutines
+                supervisorScope {
+                    // Coroutine for receiving data
+                    val receiveJob = launch {
+                        try {
+                            while (isActive) {
+                                val message = reader.readLine() ?: break
+                                Timber.d("Received: $message")
+                                // Handle the received message
+                            }
+                        } catch (e: IOException) {
+                            Timber.e(e, "Error occurred during receiving data")
+                        } catch (e: Exception) {
+                            Timber.e(e, "Unexpected error in receiving coroutine: ${e.message}")
+                        }
+                    }
+
+                    // Coroutine for sending data
+                    val sendJob = launch {
+                        try {
+                            while (isActive) {
+                                val message = "Server message"
+                                outputStream.write((message + "\n").toByteArray())
+                                outputStream.flush()
+                                delay(5000) // Wait for 5 seconds before sending the next message
+                            }
+                        } catch (e: IOException) {
+                            Timber.e(e, "Error occurred during sending data")
+                        } catch (e: Exception) {
+                            Timber.e(e, "Unexpected error in sending coroutine: ${e.message}")
+                        }
+                    }
+
+                    // Await completion of both coroutines
+                    receiveJob.join()
+                    sendJob.join()
+                }
+            } catch (e: IOException) {
+                Timber.e(e, "Error occurred during communication")
+            } finally {
+                // Ensure the streams and socket are closed properly
+                try {
+                    reader.close()
+                    outputStream.close()
+                    socket.close()
+                    Timber.d("Socket closed: ${socket.remoteDevice.address}")
+                } catch (e: IOException) {
+                    Timber.e(e, "Error occurred while closing the socket")
+                }
+            }
+        }
     }
 
     override fun stopGattServer() {
-        bluetoothServerSocket?.close()
-        bluetoothSocket?.close()
+        try {
+            bluetoothSocket?.close()
+        } catch (e: IOException) {
+            Timber.e(e, "Error occurred while closing the socket")
+        }
     }
 }
