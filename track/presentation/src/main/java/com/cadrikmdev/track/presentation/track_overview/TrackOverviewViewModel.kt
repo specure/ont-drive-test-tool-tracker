@@ -22,13 +22,13 @@ import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
+import com.cadrikmdev.intercom.domain.BluetoothServerService
 import com.cadrikmdev.iperf.domain.IperfOutputParser
 import com.cadrikmdev.iperf.domain.IperfTestStatus
 import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
 import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
-import com.cadrikmdev.track.domain.BluetoothService
 import com.cadrikmdev.track.domain.LocationObserver
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportError
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
@@ -61,7 +61,7 @@ class TrackOverviewViewModel(
     private val iperfParser: IperfOutputParser,
     private val trackExporter: TracksExporter,
     private val appConfig: Config,
-    private val bluetoothService: BluetoothService,
+    private val bluetoothService: BluetoothServerService,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())

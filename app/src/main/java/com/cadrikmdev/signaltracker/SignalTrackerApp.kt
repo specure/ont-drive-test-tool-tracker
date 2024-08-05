@@ -5,6 +5,7 @@ import com.cadrikmdev.connectivity.presentation.mobile_network.di.mobileNetworkM
 import com.cadrikmdev.connectivity.presentation.network.di.connectivityModule
 import com.cadrikmdev.core.data.di.coreDataModule
 import com.cadrikmdev.core.database.di.databaseModule
+import com.cadrikmdev.intercom.data.di.intercomDataModule
 import com.cadrikmdev.permissions.presentation.di.permissionsModule
 import com.cadrikmdev.signaltracker.di.appModule
 import com.cadrikmdev.track.data.di.trackDataModule
@@ -38,6 +39,7 @@ class SignalTrackerApp : Application() {
                 connectivityModule,
                 coreDataModule,
                 databaseModule,
+                intercomDataModule,
                 mobileNetworkModule,
                 permissionsModule,
                 trackDataModule,

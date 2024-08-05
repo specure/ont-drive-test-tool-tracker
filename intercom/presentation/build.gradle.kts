@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.track.presentation"
+    namespace = "com.cadrikmdev.intercom.presentation"
 }
 
 dependencies {
@@ -16,13 +16,12 @@ dependencies {
     implementation(libs.preference.library)
 
     implementation(projects.core.domain)
-    implementation(projects.track.domain)
+    implementation(projects.intercom.domain)
     implementation(projects.permissions.domain)
     implementation(projects.permissions.presentation)
     implementation(projects.core.presentation.service)
     implementation(projects.connectivity.domain)
     implementation(projects.connectivity.presentation)
-    implementation(projects.intercom.domain)
     implementation(projects.iperf.domain)
     implementation(projects.iperf.presentation)
     implementation(projects.core.database)

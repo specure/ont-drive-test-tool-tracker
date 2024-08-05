@@ -1,4 +1,4 @@
-package com.cadrikmdev.track.domain
+package com.cadrikmdev.intercom.domain
 
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package com.cadrikmdev.track.data
+package com.cadrikmdev.intercom.data
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGattServer
@@ -6,8 +6,7 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import com.cadrikmdev.track.domain.BluetoothService
-import com.cadrikmdev.track.domain.ManagerControlServiceProtocol
+import com.cadrikmdev.intercom.domain.ManagerControlServiceProtocol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,7 +17,9 @@ import timber.log.Timber
 import java.io.IOException
 import java.util.UUID
 
-class AndroidBluetoothService(private val context: Context) : BluetoothService {
+class AndroidBluetoothServerService(
+    private val context: Context
+) : com.cadrikmdev.intercom.domain.BluetoothServerService {
 
     private val serviceUUID: UUID = ManagerControlServiceProtocol.customServiceUUID
 
@@ -26,6 +27,14 @@ class AndroidBluetoothService(private val context: Context) : BluetoothService {
     private var bluetoothSocket: BluetoothSocket? = null
     private var gattServer: BluetoothGattServer? = null
     private var bluetoothAdapter: BluetoothAdapter? = null
+
+//    var getStatusUpdate: () -> MeasurementProgress? = {
+//        null
+//    }
+//
+//    fun setStatusUpdate(statusUpdate: () -> MeasurementProgress?) {
+//        this.getStatusUpdate = statusUpdate
+//    }
 
     override fun startGattServer() {
         val bluetoothManager =
@@ -98,7 +107,8 @@ class AndroidBluetoothService(private val context: Context) : BluetoothService {
                     val sendJob = launch {
                         try {
                             while (isActive) {
-                                val message = "Server message"
+                                var message = "Server message from ${bluetoothAdapter?.name}"
+//                                message += getStatusUpdate().toString()
                                 outputStream.write((message + "\n").toByteArray())
                                 outputStream.flush()
                                 delay(5000) // Wait for 5 seconds before sending the next message
