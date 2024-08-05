@@ -63,6 +63,7 @@ val trackPresentationModule = module {
             get(),
             get(),
             get(),
+            get(),
         )
     }
 }

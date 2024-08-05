@@ -10,6 +10,10 @@ import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import com.cadrikmdev.core.domain.track.Track
 import com.cadrikmdev.core.domain.track.TrackRepository
+import com.cadrikmdev.intercom.domain.BluetoothServerService
+import com.cadrikmdev.intercom.domain.data.MeasurementProgress
+import com.cadrikmdev.intercom.domain.data.MeasurementState
+import com.cadrikmdev.intercom.domain.data.TestError
 import com.cadrikmdev.iperf.domain.IperfRunner
 import com.cadrikmdev.iperf.domain.IperfTest
 import com.cadrikmdev.iperf.domain.IperfTestStatus
@@ -46,6 +50,7 @@ class MeasurementTracker(
     private val iperfUploadRunner: IperfRunner,
     private val trackRepository: TrackRepository,
     private val connectivityObserver: ConnectivityObserver,
+    private val intercomService: BluetoothServerService,
     private val appConfig: Config,
 ) {
     private val _trackData = MutableStateFlow(TrackData())
@@ -74,6 +79,30 @@ class MeasurementTracker(
         )
 
     init {
+        applicationScope.launch {
+            intercomService.startGattServer()
+            intercomService.setMeasurementProgressCallback {
+                MeasurementProgress(
+                    state = if (trackData.value.isError()) {
+                        MeasurementState.ERROR
+                    } else {
+                        MeasurementState.RUNNING
+                    },
+                    error = if (trackData.value.isError()) {
+                        if (trackData.value.isUploadTestError()) {
+                            TestError.UPLOAD_TEST_ERROR
+                        } else if (trackData.value.isDownloadTestError()) {
+                            TestError.DOWNLOAD_TEST_ERROR
+                        } else {
+                            TestError.UNKNOWN_ERROR
+                        }
+                    } else {
+                        null
+                    },
+                    timestamp = System.currentTimeMillis()
+                )
+            }
+        }
 
         applicationScope.launch {
             temperatureInfoReceiver.observeTemperature().collect { temperature ->

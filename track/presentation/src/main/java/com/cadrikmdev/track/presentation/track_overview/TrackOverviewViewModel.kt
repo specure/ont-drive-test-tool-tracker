@@ -399,9 +399,9 @@ class TrackOverviewViewModel(
             isLocationTrackable = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && state.isLocationServiceEnabled
         )
 
-        if (!state.isPermissionRequired) {
-            bluetoothService.startGattServer()
-        }
+//        if (!state.isPermissionRequired) {
+//            bluetoothService.startGattServer()
+//        }
         startObservingData(state.isLocationTrackable)
     }
 

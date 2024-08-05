@@ -17,4 +17,16 @@ data class TrackData(
     val iperfTestDownload: IperfTest? = null,
     val internetConnectionConnected: Boolean = false,
     val isSpeedTestEnabled: Boolean = false,
-)
+) {
+    fun isError(): Boolean {
+        return (isSpeedTestEnabled && (iperfTestUpload?.error?.isNotEmpty() == true || iperfTestDownload?.error?.isNotEmpty() == true))
+    }
+
+    fun isDownloadTestError(): Boolean {
+        return (isSpeedTestEnabled && iperfTestDownload?.error?.isNotEmpty() == true)
+    }
+
+    fun isUploadTestError(): Boolean {
+        return (isSpeedTestEnabled && iperfTestUpload?.error?.isNotEmpty() == true)
+    }
+}

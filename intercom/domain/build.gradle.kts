@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.signaltracker.jvm.library)
+    kotlin("plugin.serialization")
 }
 
 dependencies {

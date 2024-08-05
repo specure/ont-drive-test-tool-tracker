@@ -6,20 +6,24 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import com.cadrikmdev.intercom.domain.BluetoothServerService
 import com.cadrikmdev.intercom.domain.ManagerControlServiceProtocol
+import com.cadrikmdev.intercom.domain.data.MeasurementProgress
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.io.IOException
 import java.util.UUID
 
 class AndroidBluetoothServerService(
     private val context: Context
-) : com.cadrikmdev.intercom.domain.BluetoothServerService {
+) : BluetoothServerService {
 
     private val serviceUUID: UUID = ManagerControlServiceProtocol.customServiceUUID
 
@@ -28,13 +32,13 @@ class AndroidBluetoothServerService(
     private var gattServer: BluetoothGattServer? = null
     private var bluetoothAdapter: BluetoothAdapter? = null
 
-//    var getStatusUpdate: () -> MeasurementProgress? = {
-//        null
-//    }
-//
-//    fun setStatusUpdate(statusUpdate: () -> MeasurementProgress?) {
-//        this.getStatusUpdate = statusUpdate
-//    }
+    var getStatusUpdate: () -> MeasurementProgress? = {
+        null
+    }
+
+    override fun setMeasurementProgressCallback(statusUpdate: () -> MeasurementProgress?) {
+        this.getStatusUpdate = statusUpdate
+    }
 
     override fun startGattServer() {
         val bluetoothManager =
@@ -107,8 +111,11 @@ class AndroidBluetoothServerService(
                     val sendJob = launch {
                         try {
                             while (isActive) {
-                                var message = "Server message from ${bluetoothAdapter?.name}"
-//                                message += getStatusUpdate().toString()
+                                var message = "Server message from ${bluetoothAdapter?.name}\n"
+                                val statusUpdate = getStatusUpdate()
+                                statusUpdate?.let {
+                                    message += Json.encodeToString(it)
+                                }
                                 outputStream.write((message + "\n").toByteArray())
                                 outputStream.flush()
                                 delay(5000) // Wait for 5 seconds before sending the next message
