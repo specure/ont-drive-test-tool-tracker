@@ -55,6 +55,10 @@ class AndroidBluetoothServerService(
         // You can set up Bluetooth classic (RFCOMM) or use BLE advertising for discovery
         // For RFCOMM, you would use something like the following:
         bluetoothAdapter?.let {
+            if (bluetoothSocket?.isConnected == true) {
+                Timber.d("Bluetooth socket is already created.")
+                return
+            }
             val serverSocket: BluetoothServerSocket? =
                 it.listenUsingRfcommWithServiceRecord("MyService", serviceUUID)
             // Accept connections from clients (running in a separate thread)
@@ -118,7 +122,7 @@ class AndroidBluetoothServerService(
                                 }
                                 outputStream.write((message + "\n").toByteArray())
                                 outputStream.flush()
-                                delay(5000) // Wait for 5 seconds before sending the next message
+                                delay(1000) // Wait for 1 seconds before sending the next message
                             }
                         } catch (e: IOException) {
                             Timber.e(e, "Error occurred during sending data")
