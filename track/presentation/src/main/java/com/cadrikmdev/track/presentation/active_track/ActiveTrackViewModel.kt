@@ -107,18 +107,14 @@ class ActiveTrackViewModel(
     fun onAction(action: ActiveTrackAction) {
         when (action) {
             ActiveTrackAction.OnFinishTrackClick -> {
-                state = state.copy(
-                    isTrackFinished = true,
-                    isSavingTrack = false,
-                    shouldTrack = false,
-                )
+                state = state.stopTracking()
                 finishTrack()
             }
 
             ActiveTrackAction.OnResumeTrackClick -> {
                 state = state.copy(
                     shouldTrack = true,
-                    isShowingPauseDialog = false,
+                    isShowingFinishConfirmationDialog = false,
                 )
             }
 
@@ -131,7 +127,7 @@ class ActiveTrackViewModel(
             ActiveTrackAction.OnToggleTrackClick -> {
                 state = state.copy(
                     hasStartedTracking = true,
-                    isShowingPauseDialog = shouldTrack.value,
+                    isShowingFinishConfirmationDialog = shouldTrack.value,
                     shouldTrack = true,
                 )
             }
@@ -151,7 +147,7 @@ class ActiveTrackViewModel(
             state = state.copy(
                 shouldTrack = false,
                 isSavingTrack = false,
-                isShowingPauseDialog = false
+                isShowingFinishConfirmationDialog = false
             )
         }
     }

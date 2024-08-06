@@ -86,7 +86,11 @@ class MeasurementTracker(
                     state = if (trackData.value.isError()) {
                         MeasurementState.ERROR
                     } else {
-                        MeasurementState.RUNNING
+                        if (isTracking.value) {
+                            MeasurementState.RUNNING
+                        } else {
+                            MeasurementState.IDLE
+                        }
                     },
                     error = if (trackData.value.isError()) {
                         if (trackData.value.isUploadTestError()) {

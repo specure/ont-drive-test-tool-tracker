@@ -234,7 +234,7 @@ private fun ActiveTrackScreen(
         }
     }
 
-    if (state.isShowingPauseDialog && state.hasStartedTracking) {
+    if (state.isShowingFinishConfirmationDialog && state.hasStartedTracking) {
         SignalTrackerDialog(
             title = stringResource(
                 id = R.string.want_finish_tracking
