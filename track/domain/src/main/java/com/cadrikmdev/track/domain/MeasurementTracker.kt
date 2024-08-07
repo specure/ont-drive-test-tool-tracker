@@ -14,6 +14,7 @@ import com.cadrikmdev.intercom.domain.BluetoothServerService
 import com.cadrikmdev.intercom.domain.data.MeasurementProgress
 import com.cadrikmdev.intercom.domain.data.MeasurementState
 import com.cadrikmdev.intercom.domain.data.TestError
+import com.cadrikmdev.intercom.domain.message.TrackerAction
 import com.cadrikmdev.iperf.domain.IperfRunner
 import com.cadrikmdev.iperf.domain.IperfTest
 import com.cadrikmdev.iperf.domain.IperfTestStatus
@@ -106,6 +107,14 @@ class MeasurementTracker(
                     timestamp = System.currentTimeMillis()
                 )
             }
+            intercomService.receivedActionFlow.onEach { action ->
+                when (action) {
+                    TrackerAction.StartTest -> _isTracking.emit(true)
+                    TrackerAction.StopTest -> _isTracking.emit(false)
+                    else -> { /* do nothing */
+                    }
+                }
+            }.launchIn(applicationScope)
         }
 
         applicationScope.launch {

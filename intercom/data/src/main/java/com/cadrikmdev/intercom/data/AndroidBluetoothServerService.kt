@@ -9,20 +9,24 @@ import android.content.Context
 import com.cadrikmdev.intercom.domain.BluetoothServerService
 import com.cadrikmdev.intercom.domain.ManagerControlServiceProtocol
 import com.cadrikmdev.intercom.domain.data.MeasurementProgress
+import com.cadrikmdev.intercom.domain.data.MeasurementState
+import com.cadrikmdev.intercom.domain.message.MessageProcessor
+import com.cadrikmdev.intercom.domain.message.TrackerAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.io.IOException
 import java.util.UUID
 
 class AndroidBluetoothServerService(
-    private val context: Context
+    private val context: Context,
+    private val messageProcessor: MessageProcessor,
 ) : BluetoothServerService {
 
     private val serviceUUID: UUID = ManagerControlServiceProtocol.customServiceUUID
@@ -33,8 +37,15 @@ class AndroidBluetoothServerService(
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     var getStatusUpdate: () -> MeasurementProgress? = {
-        null
+        MeasurementProgress(
+            state = MeasurementState.NOT_ACTIVATED,
+            error = null,
+            timestamp = System.currentTimeMillis()
+        )
     }
+
+    private val _receivedActionFlow = MutableStateFlow<TrackerAction?>(null)
+    override val receivedActionFlow: StateFlow<TrackerAction?> get() = _receivedActionFlow
 
     override fun setMeasurementProgressCallback(statusUpdate: () -> MeasurementProgress?) {
         this.getStatusUpdate = statusUpdate
@@ -103,11 +114,13 @@ class AndroidBluetoothServerService(
                                 val message = reader.readLine() ?: break
                                 Timber.d("Received: $message")
                                 // Handle the received message
+                                val action = messageProcessor.processMessage(message)
+                                launch(Dispatchers.IO) {
+                                    _receivedActionFlow.emit(action)
+                                }
                             }
                         } catch (e: IOException) {
                             Timber.e(e, "Error occurred during receiving data")
-                        } catch (e: Exception) {
-                            Timber.e(e, "Unexpected error in receiving coroutine: ${e.message}")
                         }
                     }
 
@@ -115,19 +128,18 @@ class AndroidBluetoothServerService(
                     val sendJob = launch {
                         try {
                             while (isActive) {
-                                var message = "Server message from ${bluetoothAdapter?.name}\n"
-                                val statusUpdate = getStatusUpdate()
-                                statusUpdate?.let {
-                                    message += Json.encodeToString(it)
+                                val message = getStatusUpdate()
+                                val encodedMessage = messageProcessor.sendMessage(message)
+                                Timber.d("Sending: $encodedMessage")
+                                val byteArray = encodedMessage?.toByteArray()
+                                byteArray?.let {
+                                    outputStream.write(it)
+                                    outputStream.flush()
                                 }
-                                outputStream.write((message + "\n").toByteArray())
-                                outputStream.flush()
                                 delay(1000) // Wait for 1 seconds before sending the next message
                             }
                         } catch (e: IOException) {
                             Timber.e(e, "Error occurred during sending data")
-                        } catch (e: Exception) {
-                            Timber.e(e, "Unexpected error in sending coroutine: ${e.message}")
                         }
                     }
 
