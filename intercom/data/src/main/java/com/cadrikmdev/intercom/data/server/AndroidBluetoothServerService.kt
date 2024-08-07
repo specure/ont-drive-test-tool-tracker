@@ -1,4 +1,4 @@
-package com.cadrikmdev.intercom.data
+package com.cadrikmdev.intercom.data.server
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGattServer
@@ -6,12 +6,12 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import com.cadrikmdev.intercom.domain.BluetoothServerService
 import com.cadrikmdev.intercom.domain.ManagerControlServiceProtocol
 import com.cadrikmdev.intercom.domain.data.MeasurementProgress
 import com.cadrikmdev.intercom.domain.data.MeasurementState
 import com.cadrikmdev.intercom.domain.message.MessageProcessor
 import com.cadrikmdev.intercom.domain.message.TrackerAction
+import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

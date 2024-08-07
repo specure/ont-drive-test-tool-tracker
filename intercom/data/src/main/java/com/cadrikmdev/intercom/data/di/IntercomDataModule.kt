@@ -1,12 +1,11 @@
 package com.cadrikmdev.intercom.data.di
 
-import com.cadrikmdev.intercom.data.AndroidBluetoothServerService
 import com.cadrikmdev.intercom.data.AndroidMessageProcessor
-import com.cadrikmdev.intercom.domain.BluetoothServerService
+import com.cadrikmdev.intercom.data.server.AndroidBluetoothServerService
 import com.cadrikmdev.intercom.domain.message.MessageProcessor
+import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
-
 import org.koin.dsl.module
 
 val intercomDataModule = module {

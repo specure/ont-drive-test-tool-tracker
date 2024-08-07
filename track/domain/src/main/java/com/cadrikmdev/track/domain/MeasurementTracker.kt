@@ -10,11 +10,11 @@ import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.track.TemperatureInfoObserver
 import com.cadrikmdev.core.domain.track.Track
 import com.cadrikmdev.core.domain.track.TrackRepository
-import com.cadrikmdev.intercom.domain.BluetoothServerService
 import com.cadrikmdev.intercom.domain.data.MeasurementProgress
 import com.cadrikmdev.intercom.domain.data.MeasurementState
 import com.cadrikmdev.intercom.domain.data.TestError
 import com.cadrikmdev.intercom.domain.message.TrackerAction
+import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import com.cadrikmdev.iperf.domain.IperfRunner
 import com.cadrikmdev.iperf.domain.IperfTest
 import com.cadrikmdev.iperf.domain.IperfTestStatus
