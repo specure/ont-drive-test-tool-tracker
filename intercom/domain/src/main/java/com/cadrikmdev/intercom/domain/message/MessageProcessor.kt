@@ -6,4 +6,6 @@ interface MessageProcessor {
     fun processMessage(message: String?): TrackerAction?
 
     fun sendMessage(payload: MeasurementProgress?): String?
+
+    fun sendAction(action: TrackerAction?): String?
 }

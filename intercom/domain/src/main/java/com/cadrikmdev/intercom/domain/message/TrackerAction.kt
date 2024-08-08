@@ -6,11 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface TrackerAction {
     @Serializable
-    data object StartTest : TrackerAction
-
+    data class StartTest(val address: String) : TrackerAction
     @Serializable
-    data object StopTest : TrackerAction
-
+    data class StopTest(val address: String) : TrackerAction
     @Serializable
     data class UpdateProgress(val progress: MeasurementProgress) : TrackerAction
 }

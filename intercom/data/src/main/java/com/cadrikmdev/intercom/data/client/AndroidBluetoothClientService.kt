@@ -19,26 +19,41 @@ import com.cadrikmdev.intercom.domain.client.BluetoothClientService
 import com.cadrikmdev.intercom.domain.client.BluetoothError
 import com.cadrikmdev.intercom.domain.client.DeviceNode
 import com.cadrikmdev.intercom.domain.client.DeviceType
+import com.cadrikmdev.intercom.domain.message.MessageProcessor
+import com.cadrikmdev.intercom.domain.message.TrackerAction
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import timber.log.Timber
 import java.io.IOException
+import java.io.OutputStream
 
 class AndroidBluetoothClientService(
     private val context: Context,
     private val applicationScope: CoroutineScope,
+    private val messageProcessor: MessageProcessor,
 ) : BluetoothClientService {
+
+    override val sendActionFlow: MutableStateFlow<TrackerAction?> =
+        MutableStateFlow<TrackerAction?>(null)
+
+    val sendActionJob: Job = sendActionFlow.onEach {
+
+    }.launchIn(
+        applicationScope
+    )
 
     private var _pairedDevices = MutableStateFlow<Set<BluetoothDevice>>(setOf())
     val pairedDevices = _pairedDevices.asStateFlow()
@@ -46,7 +61,67 @@ class AndroidBluetoothClientService(
     private var _connections = MutableStateFlow<Map<String, BluetoothSocket>>(mapOf())
     val connections = _connections.asStateFlow()
 
+    private var _outputStream = MutableStateFlow<Map<String, OutputStream>>(mapOf())
+    val outputStream = _outputStream.asStateFlow()
+
     private var bluetoothAdapter: BluetoothAdapter? = null
+
+    init {
+        sendActionFlow.onEach { action ->
+            val actionDeviceAddress = when (action) {
+                is TrackerAction.StartTest -> action.address
+                is TrackerAction.StopTest -> action.address
+                is TrackerAction.UpdateProgress -> null
+                null -> null
+            }
+
+            _connections.value.forEach { deviceAddress, socket ->
+                if (deviceAddress == actionDeviceAddress && socket.isConnected) {
+                    Timber.d("Establishing output stream to $deviceAddress")
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val outputStream = _outputStream.value[deviceAddress] ?: socket.outputStream
+                        _outputStream.value.plus(Pair(deviceAddress, outputStream))
+                        Timber.d("Trying to send action: $action")
+                        try {
+                            // Using supervisorScope to ensure child coroutines are handled properly
+                            supervisorScope {
+                                val sendJob = launch {
+                                    try {
+                                        if (isActive) { // Check if the coroutine is still active
+                                            val message =
+                                                messageProcessor.sendAction(sendActionFlow.value)
+                                            Timber.d("Sending: $message")
+                                            message?.let {
+                                                outputStream.write((message).toByteArray())
+                                                outputStream.flush()
+                                            }
+                                        }
+                                    } catch (e: IOException) {
+                                        Timber.e(e, "Error occurred during sending data")
+                                    }
+                                }
+
+                                // Wait for both jobs to complete, or for cancellation
+                                sendJob.join()
+                            }
+                        } catch (e: IOException) {
+                            Timber.e(e, "Error occurred during communication")
+                        } finally {
+                            // Ensure the streams and socket are closed
+                            try {
+//                                outputStream.close()
+//                                _outputStream.value = removeKeyFromMap(_outputStream.value, name)
+                            } catch (e: IOException) {
+                                Timber.e(e, "Error occurred while closing the socket")
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        }.launchIn(applicationScope)
+    }
 
     override fun observeConnectedDevices(localDeviceType: DeviceType): Flow<Set<DeviceNode>> {
         return callbackFlow {
@@ -185,7 +260,7 @@ class AndroidBluetoothClientService(
                 return true
             }
             _connections.value[deviceAddress]?.close()
-            _connections.value = removeKeyFromMap(deviceAddress)
+            _connections.value = removeKeyFromMap(_connections.value, deviceAddress)
             return true
         } catch (e: IOException) {
             Timber.e(e, "Error occurred while closing the socket")
@@ -194,8 +269,10 @@ class AndroidBluetoothClientService(
 
     }
 
-    private fun removeKeyFromMap(deviceAddress: String) =
-        _connections.value.filter { it.key != deviceAddress }
+    private fun <T> removeKeyFromMap(map: Map<String, T>, key: String): Map<String, T> {
+        return map.filter { it.key != key }
+    }
+
 
     private fun manageConnectedSocket(socket: BluetoothSocket) {
         // Implement logic for communication with the connected server
@@ -227,10 +304,13 @@ class AndroidBluetoothClientService(
                     val sendJob = launch {
                         try {
                             while (isActive) { // Check if the coroutine is still active
-                                val message = "Client message"
-                                outputStream.write((message + "\n").toByteArray())
-                                outputStream.flush()
-                                delay(5000) // Wait for 5 seconds before sending the next message
+                                sendActionJob.join()
+                                val message = messageProcessor.sendAction(sendActionFlow.value)
+                                Timber.d("Sending: $message")
+                                message?.let {
+                                    outputStream.write((message).toByteArray())
+                                    outputStream.flush()
+                                }
                             }
                         } catch (e: IOException) {
                             Timber.e(e, "Error occurred during sending data")

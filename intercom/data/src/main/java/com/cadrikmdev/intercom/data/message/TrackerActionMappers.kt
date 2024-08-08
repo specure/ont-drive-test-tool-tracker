@@ -4,16 +4,16 @@ import com.cadrikmdev.intercom.domain.message.TrackerAction
 
 fun TrackerActionDto.toTrackerAction(): TrackerAction {
     return when (this) {
-        TrackerActionDto.StartTest -> TrackerAction.StartTest
-        TrackerActionDto.StopTest -> TrackerAction.StopTest
+        is TrackerActionDto.StartTest -> TrackerAction.StartTest(address)
+        is TrackerActionDto.StopTest -> TrackerAction.StopTest(address)
         is TrackerActionDto.UpdateProgress -> TrackerAction.UpdateProgress(progress)
     }
 }
 
 fun TrackerAction.toTrackerActionDto(): TrackerActionDto {
     return when (this) {
-        TrackerAction.StartTest -> TrackerActionDto.StartTest
-        TrackerAction.StopTest -> TrackerActionDto.StopTest
+        is TrackerAction.StartTest -> TrackerActionDto.StartTest(address)
+        is TrackerAction.StopTest -> TrackerActionDto.StopTest(address)
         is TrackerAction.UpdateProgress -> TrackerActionDto.UpdateProgress(progress)
     }
 }
