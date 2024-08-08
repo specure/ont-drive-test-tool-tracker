@@ -95,6 +95,7 @@ class AndroidBluetoothClientService(
                                                 outputStream.write((message).toByteArray())
                                                 outputStream.flush()
                                             }
+                                            sendActionFlow.value = null
                                         }
                                     } catch (e: IOException) {
                                         Timber.e(e, "Error occurred during sending data")
@@ -269,7 +270,7 @@ class AndroidBluetoothClientService(
 
     }
 
-    private fun <T> removeKeyFromMap(map: Map<String, T>, key: String): Map<String, T> {
+    private fun <T> removeKeyFromMap(map: Map<String, T>, key: String) : Map<String, T> {
         return map.filter { it.key != key }
     }
 

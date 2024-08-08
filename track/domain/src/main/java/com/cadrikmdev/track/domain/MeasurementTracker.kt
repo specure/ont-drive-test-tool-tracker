@@ -109,8 +109,8 @@ class MeasurementTracker(
             }
             intercomService.receivedActionFlow.onEach { action ->
                 when (action) {
-                    TrackerAction.StartTest -> _isTracking.emit(true)
-                    TrackerAction.StopTest -> _isTracking.emit(false)
+                    is TrackerAction.StartTest -> _isTracking.emit(true)
+                    is TrackerAction.StopTest -> _isTracking.emit(false)
                     else -> { /* do nothing */
                     }
                 }
