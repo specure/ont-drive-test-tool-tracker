@@ -13,12 +13,13 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.cadrikmdev.core.domain.util.Result
-import com.cadrikmdev.intercom.data.client.mappers.toDeviceNode
+import com.cadrikmdev.intercom.data.client.mappers.toTrackingDevice
 import com.cadrikmdev.intercom.domain.ManagerControlServiceProtocol
 import com.cadrikmdev.intercom.domain.client.BluetoothClientService
 import com.cadrikmdev.intercom.domain.client.BluetoothError
-import com.cadrikmdev.intercom.domain.client.DeviceNode
 import com.cadrikmdev.intercom.domain.client.DeviceType
+import com.cadrikmdev.intercom.domain.client.TrackingDevice
+import com.cadrikmdev.intercom.domain.data.MeasurementState
 import com.cadrikmdev.intercom.domain.message.MessageProcessor
 import com.cadrikmdev.intercom.domain.message.TrackerAction
 import kotlinx.coroutines.CompletableDeferred
@@ -54,6 +55,8 @@ class AndroidBluetoothClientService(
     }.launchIn(
         applicationScope
     )
+
+    override val trackingDevices = MutableStateFlow<Map<String, TrackingDevice>>(mapOf())
 
     private var _pairedDevices = MutableStateFlow<Set<BluetoothDevice>>(setOf())
     val pairedDevices = _pairedDevices.asStateFlow()
@@ -124,14 +127,14 @@ class AndroidBluetoothClientService(
         }.launchIn(applicationScope)
     }
 
-    override fun observeConnectedDevices(localDeviceType: DeviceType): Flow<Set<DeviceNode>> {
+    override fun observeConnectedDevices(localDeviceType: DeviceType): Flow<Map<String, TrackingDevice>> {
         return callbackFlow {
 
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             if (bluetoothAdapter == null) {
                 // Device doesn't support Bluetooth
                 Timber.e("Device doesn't support Bluetooth")
-                send(setOf())
+                send(mapOf())
                 return@callbackFlow
             }
 
@@ -139,7 +142,7 @@ class AndroidBluetoothClientService(
                 // Bluetooth is not enabled
                 Timber.d("Bluetooth is not enabled")
                 // You can request user to enable Bluetooth here
-                send(setOf())
+                send(mapOf())
                 return@callbackFlow
             }
 
@@ -157,10 +160,13 @@ class AndroidBluetoothClientService(
                     }
                     Timber.d("Updating paired devices: $pairedDevices")
 
-                    val pairedNodes: Set<DeviceNode> = pairedDevices?.mapNotNull {
-                        it.toDeviceNode()
-                    }?.toSet() ?: setOf()
+                    val pairedNodes: HashMap<String, TrackingDevice> = pairedDevices?.mapNotNull {
+                        it.toTrackingDevice()
+                    }
+                        ?.associateBy { it.address }
+                        ?.toMap(HashMap()) ?: (HashMap())
                     trySend(pairedNodes)
+                    trackingDevices.tryEmit(pairedNodes)
 
                     if (action == BluetoothDevice.ACTION_BOND_STATE_CHANGED) {
                         val device =
@@ -179,15 +185,19 @@ class AndroidBluetoothClientService(
         }
     }
 
-    private suspend fun ProducerScope<Set<DeviceNode>>.getPairedDevicesEndedWithError(
+    private suspend fun ProducerScope<Map<String, TrackingDevice>>.getPairedDevicesEndedWithError(
         bluetoothAdapter: BluetoothAdapter
     ): Boolean {
         try {
             val pairedDevices: Set<BluetoothDevice> = getPairedDevices(bluetoothAdapter)
             Timber.d("Obtaining paired devices ${pairedDevices}")
-            val pairedNodes: Set<DeviceNode> =
-                pairedDevices.mapNotNull { it.toDeviceNode() }.toSet()
+            val pairedNodes: HashMap<String, TrackingDevice> =
+                pairedDevices
+                    .mapNotNull { it.toTrackingDevice() }
+                    .associateBy { it.address }
+                    .toMap(HashMap())
             trySend(pairedNodes)
+            trackingDevices.emit(pairedNodes)
         } catch (e: SecurityException) {
             awaitClose()
             return true
@@ -257,6 +267,7 @@ class AndroidBluetoothClientService(
 
     override fun disconnectFromDevice(deviceAddress: String): Boolean {
         try {
+            markDeviceDisconnected(deviceAddress)
             if (_connections.value[deviceAddress] == null) {
                 return true
             }
@@ -278,12 +289,25 @@ class AndroidBluetoothClientService(
     private fun manageConnectedSocket(socket: BluetoothSocket) {
         // Implement logic for communication with the connected server
         _connections.value = _connections.value.plus(Pair(socket.remoteDevice.address, socket))
+        val connectedDevice = trackingDevices.value[socket.remoteDevice.address]?.copy(
+            connected = true
+        )
+        connectedDevice?.let {
+            val tmpTrackingDevices = trackingDevices.value.toMutableMap()
+            tmpTrackingDevices[socket.remoteDevice.address] = it
+            // Coroutine for receiving data
+            CoroutineScope(Dispatchers.IO).launch {
+                trackingDevices.emit(tmpTrackingDevices)
+            }
+        }
+
         // Launch a coroutine for receiving data
 
         CoroutineScope(Dispatchers.IO).launch {
             val inputStream = socket.inputStream
             val outputStream = socket.outputStream
             val reader = inputStream.bufferedReader()
+            val address = socket.remoteDevice.address
 
             try {
                 // Using supervisorScope to ensure child coroutines are handled properly
@@ -295,10 +319,17 @@ class AndroidBluetoothClientService(
                                 val message = reader.readLine() ?: break
                                 Timber.d("Received: $message")
                                 // Handle the received message
+                                val action = messageProcessor.processMessage(message)
+                                if (action is TrackerAction.UpdateProgress) {
+                                    updateStatus(address, action)
+                                }
                             }
                         } catch (e: IOException) {
                             Timber.e(e, "Error occurred during receiving data")
+                        } finally {
+                            markDeviceDisconnected(address)
                         }
+
                     }
 
                     // Coroutine for sending data
@@ -315,6 +346,8 @@ class AndroidBluetoothClientService(
                             }
                         } catch (e: IOException) {
                             Timber.e(e, "Error occurred during sending data")
+                        } finally {
+                            markDeviceDisconnected(address)
                         }
                     }
 
@@ -327,6 +360,7 @@ class AndroidBluetoothClientService(
             } finally {
                 // Ensure the streams and socket are closed
                 try {
+                    markDeviceDisconnected(address)
                     reader.close()
                     outputStream.close()
                     socket.close()
@@ -334,6 +368,37 @@ class AndroidBluetoothClientService(
                 } catch (e: IOException) {
                     Timber.e(e, "Error occurred while closing the socket")
                 }
+            }
+        }
+    }
+
+    private fun updateStatus(address: String, updateProgress: TrackerAction.UpdateProgress) {
+        val updatedDevice = trackingDevices.value[address]?.copy(
+            status = updateProgress.progress.state.toString(),
+            updateTimestamp = updateProgress.progress.timestamp
+        )
+        updatedDevice?.let {
+            val tmpTrackingDevices = trackingDevices.value.toMutableMap()
+            tmpTrackingDevices[address] = it
+            // Coroutine for receiving data
+            CoroutineScope(Dispatchers.IO).launch {
+                trackingDevices.emit(tmpTrackingDevices)
+            }
+        }
+    }
+
+    private fun markDeviceDisconnected(address: String) {
+        val connectedDevice = trackingDevices.value[address]?.copy(
+            connected = false,
+            status = MeasurementState.UNKNOWN.toString(),
+            updateTimestamp = System.currentTimeMillis()
+        )
+        connectedDevice?.let {
+            val tmpTrackingDevices = trackingDevices.value.toMutableMap()
+            tmpTrackingDevices[address] = it
+            // Coroutine for receiving data
+            CoroutineScope(Dispatchers.IO).launch {
+                trackingDevices.emit(tmpTrackingDevices)
             }
         }
     }

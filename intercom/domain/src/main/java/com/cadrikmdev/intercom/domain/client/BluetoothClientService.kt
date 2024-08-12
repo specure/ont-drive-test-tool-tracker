@@ -7,9 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 interface BluetoothClientService {
 
+    val trackingDevices: MutableStateFlow<Map<String, TrackingDevice>>
+
     val sendActionFlow: MutableStateFlow<TrackerAction?>
 
-    fun observeConnectedDevices(localDeviceType: DeviceType): Flow<Set<DeviceNode>>
+    fun observeConnectedDevices(localDeviceType: DeviceType): Flow<Map<String, TrackingDevice>>
 
     suspend fun connectToDevice(deviceAddress: String): Result<Boolean, BluetoothError>
 

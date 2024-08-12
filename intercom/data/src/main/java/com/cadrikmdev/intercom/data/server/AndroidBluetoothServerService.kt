@@ -129,12 +129,16 @@ class AndroidBluetoothServerService(
                         try {
                             while (isActive) {
                                 val message = getStatusUpdate()
-                                val encodedMessage = messageProcessor.sendMessage(message)
-                                Timber.d("Sending: $encodedMessage")
-                                val byteArray = encodedMessage?.toByteArray()
-                                byteArray?.let {
-                                    outputStream.write(it)
-                                    outputStream.flush()
+                                message?.let {
+                                    val encodedMessage = messageProcessor.sendAction(
+                                        TrackerAction.UpdateProgress(progress = it)
+                                    )
+                                    Timber.d("Sending: $encodedMessage")
+                                    val byteArray = encodedMessage?.toByteArray()
+                                    byteArray?.let {
+                                        outputStream.write(it)
+                                        outputStream.flush()
+                                    }
                                 }
                                 delay(1000) // Wait for 1 seconds before sending the next message
                             }
