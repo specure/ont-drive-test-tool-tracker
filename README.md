@@ -62,6 +62,11 @@ to get all source files
 
 ## TODO:
 
+After returning to tracking from notification = Iperf tests break
+
+Notification does not shows current time - as it is not associated correctly with current data
+instances (I assume it has connection with previous issue)
+
 For now we have doubled IPERF library just with different .so file to build and different package 
 name to be able to create 2 different instances of the IPERF library which we need to perform 
 simultaneously upload and download.
