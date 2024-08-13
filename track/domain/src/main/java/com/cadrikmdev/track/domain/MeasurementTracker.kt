@@ -95,11 +95,11 @@ class MeasurementTracker(
                     },
                     error = if (trackData.value.isError()) {
                         if (trackData.value.isUploadTestError()) {
-                            TestError.UPLOAD_TEST_ERROR
+                            TestError.UPLOAD_TEST_ERROR.toString()
                         } else if (trackData.value.isDownloadTestError()) {
-                            TestError.DOWNLOAD_TEST_ERROR
+                            TestError.DOWNLOAD_TEST_ERROR.toString()
                         } else {
-                            TestError.UNKNOWN_ERROR
+                            TestError.UNKNOWN_ERROR.toString()
                         }
                     } else {
                         null

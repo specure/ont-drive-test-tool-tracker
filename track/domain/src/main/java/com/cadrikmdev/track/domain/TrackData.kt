@@ -4,6 +4,7 @@ import com.cadrikmdev.connectivity.domain.NetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.LocationWithDetails
 import com.cadrikmdev.iperf.domain.IperfTest
+import com.cadrikmdev.iperf.domain.IperfTestStatus
 import kotlin.time.Duration
 
 data class TrackData(
@@ -19,14 +20,14 @@ data class TrackData(
     val isSpeedTestEnabled: Boolean = false,
 ) {
     fun isError(): Boolean {
-        return (isSpeedTestEnabled && (iperfTestUpload?.error?.isNotEmpty() == true || iperfTestDownload?.error?.isNotEmpty() == true))
+        return isDownloadTestError() || isUploadTestError()
     }
 
     fun isDownloadTestError(): Boolean {
-        return (isSpeedTestEnabled && iperfTestDownload?.error?.isNotEmpty() == true)
+        return (isSpeedTestEnabled && (iperfTestDownload?.error?.isNotEmpty() == true || iperfTestDownload?.status == IperfTestStatus.ERROR))
     }
 
     fun isUploadTestError(): Boolean {
-        return (isSpeedTestEnabled && iperfTestUpload?.error?.isNotEmpty() == true)
+        return (isSpeedTestEnabled && (iperfTestUpload?.error?.isNotEmpty() == true || iperfTestUpload?.status == IperfTestStatus.ERROR))
     }
 }
