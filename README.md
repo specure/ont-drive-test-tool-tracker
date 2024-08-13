@@ -1,4 +1,4 @@
-### SignalTracker android app
+# SignalTracker android app
 
 This project meant to be for tracking signal
 
@@ -171,3 +171,47 @@ Time format or local date and time is "yyyy-MM-dd HH:mm:ss"
   System.currentTimeMillis()) -
 do not need to be very fresh if temperature does not change (it should update only if temperature
 changes)
+
+## Testing scenarios
+
+## Testing scenarios with manager app
+
+### Testing resetting values
+
+device C setup (signal tracker client):
+
+- installed signal tracker app with default values, all permissions granted
+- keep iperf settings same as on C2 to make them collide
+- go to active track screen
+
+device M setup (signal tracker manager):
+
+- installed signal tracker manager app with defaults, all permissions granted
+- connect to C
+- start C with manager app - wait to get running state
+- stop with app on C - finish it
+- go back to tracking screen on C
+- countdown should not start again
+- countdown should be on 00:00:00
+- should be able to start by M and C
+
+### Showing test error
+
+device C1 setup (signal tracker client 1):
+
+- installed signal tracker app with default values, all permissions granted
+- keep iperf settings same as on C2 to make them collide
+- go to active track screen
+
+device C2 setup (signal tracker client 2):
+
+- installed signal tracker app with default values, all permissions granted
+- keep iperf settings same as on C1 to make them collide
+- go to active track screen
+
+device M setup (signal tracker manager):
+
+- installed signal tracker manager app with defaults, all permissions granted
+- connect to C1 and to C2
+- start C1 with manager app - wait to get running state
+- start C2 with manager app - should get error state on C2 

@@ -15,8 +15,8 @@ import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -44,8 +44,8 @@ class AndroidBluetoothServerService(
         )
     }
 
-    private val _receivedActionFlow = MutableStateFlow<TrackerAction?>(null)
-    override val receivedActionFlow: StateFlow<TrackerAction?> get() = _receivedActionFlow
+    private val _receivedActionFlow = MutableSharedFlow<TrackerAction?>()
+    override val receivedActionFlow: SharedFlow<TrackerAction?> get() = _receivedActionFlow
 
     override fun setMeasurementProgressCallback(statusUpdate: () -> MeasurementProgress?) {
         this.getStatusUpdate = statusUpdate

@@ -2,11 +2,11 @@ package com.cadrikmdev.intercom.domain.server
 
 import com.cadrikmdev.intercom.domain.data.MeasurementProgress
 import com.cadrikmdev.intercom.domain.message.TrackerAction
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface BluetoothServerService {
 
-    val receivedActionFlow: StateFlow<TrackerAction?>
+    val receivedActionFlow: SharedFlow<TrackerAction?>
 
     fun startGattServer()
 

@@ -21,8 +21,10 @@ import com.cadrikmdev.iperf.domain.IperfTestStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.filterNotNull
@@ -56,6 +58,9 @@ class MeasurementTracker(
 ) {
     private val _trackData = MutableStateFlow(TrackData())
     val trackData = _trackData.asStateFlow()
+
+    private val _trackActions = MutableSharedFlow<TrackerAction?>(replay = 0)
+    val trackActions = _trackActions.asSharedFlow()
 
     private val _isTracking = MutableStateFlow(false)
     val isTracking = _isTracking.asStateFlow()
@@ -109,10 +114,23 @@ class MeasurementTracker(
             }
             intercomService.receivedActionFlow.onEach { action ->
                 when (action) {
-                    is TrackerAction.StartTest -> _isTracking.emit(true)
-                    is TrackerAction.StopTest -> _isTracking.emit(false)
-                    else -> { /* do nothing */
+                    is TrackerAction.StartTest -> {
+                        clearData()
+                        startObserving()
+                        _isTracking.emit(true)
+                        _trackActions.emit(TrackerAction.StartTest(""))
+                        println("Emitting start action in Tracker")
                     }
+
+                    is TrackerAction.StopTest -> {
+                        _isTracking.emit(false)
+                        _trackActions.emit(TrackerAction.StopTest(""))
+                        // we can clear all data, because they are already in DB
+                        clearData()
+                        println("Emitting stop action in Tracker")
+                    }
+
+                    else -> Unit
                 }
             }.launchIn(applicationScope)
         }
@@ -301,11 +319,16 @@ class MeasurementTracker(
         }
     }
 
+    fun clearData() {
+        _elapsedTime.value = Duration.ZERO
+        _trackData.value = TrackData()
+        startObserving()
+    }
+
     fun finishTrack() {
         stopObserving()
         setIsTracking(false)
-        _elapsedTime.value = Duration.ZERO
-        _trackData.value = TrackData()
+        clearData()
     }
 
     private suspend fun saveCurrentTrackData(trackData: TrackData) {

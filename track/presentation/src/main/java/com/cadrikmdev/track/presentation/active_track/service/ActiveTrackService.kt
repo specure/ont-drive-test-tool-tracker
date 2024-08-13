@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
@@ -31,6 +32,9 @@ class ActiveTrackService : Service() {
         getSystemService<NotificationManager>()!!
     }
 
+    private lateinit var wakeLock: PowerManager.WakeLock
+
+
     private val baseNotification by lazy {
         NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(com.cadrikmdev.core.presentation.designsystem.R.drawable.logo)
@@ -45,6 +49,19 @@ class ActiveTrackService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
+
+    override fun onCreate() {
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKE_LOG_TAG)
+
+        // Acquire the wake lock
+        wakeLock.acquire()
+    }
+
+    override fun onDestroy() {
+        wakeLock.release()
+    }
+
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
@@ -123,6 +140,9 @@ class ActiveTrackService : Service() {
 
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
+
+        const val WAKE_LOG_TAG = "SIGNAL_TRACKER:WAKE_LOCK_TAG"
+
 
         private const val EXTRA_ACTIVITY_CLASS = "EXTRA_ACTIVITY_CLASS"
 

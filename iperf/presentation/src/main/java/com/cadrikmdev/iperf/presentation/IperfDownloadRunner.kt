@@ -115,7 +115,9 @@ class IperfDownloadRunner(
                             Timber.d("iPerf download request done")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
-                                    status = IperfTestStatus.ENDED,
+                                    status = if (testProgressDetails.status == IperfTestStatus.ERROR) {
+                                        IperfTestStatus.ERROR
+                                    } else IperfTestStatus.ENDED,
                                     testProgress = testProgressDetails.testProgress.plus(
                                         zeroDownloadSpeedProgress
                                     ),
@@ -176,7 +178,9 @@ class IperfDownloadRunner(
                             Timber.d("iPerf download request done")
                             applicationScope.launch {
                                 testProgressDetails = testProgressDetails.copy(
-                                    status = IperfTestStatus.ENDED,
+                                    status = if (testProgressDetails.status == IperfTestStatus.ERROR) {
+                                        IperfTestStatus.ERROR
+                                    } else IperfTestStatus.ENDED,
                                     testProgress = testProgressDetails.testProgress.plus(
                                         zeroDownloadSpeedProgress
                                     ),

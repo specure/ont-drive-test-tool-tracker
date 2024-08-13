@@ -47,6 +47,7 @@ import com.cadrikmdev.track.presentation.util.hasNotificationPermission
 import com.cadrikmdev.track.presentation.util.shouldShowLocationPermissionRationale
 import com.cadrikmdev.track.presentation.util.shouldShowNotificationPermissionRationale
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @Composable
 fun ActiveTrackScreenRoot(
@@ -104,6 +105,7 @@ private fun ActiveTrackScreen(
     LaunchedEffect(lifecycleState) {
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
+                Timber.d("OnResume called")
                 onEvent(ActiveTrackEvent.OnUpdatePermissionStatus)
             }
             Lifecycle.State.DESTROYED,
