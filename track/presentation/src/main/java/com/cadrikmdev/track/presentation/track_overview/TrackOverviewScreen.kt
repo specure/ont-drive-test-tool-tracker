@@ -140,6 +140,7 @@ private fun TrackOverviewScreen(
         floatingActionButton = {
             SignalTrackerFloatingActionButton(
                 icon = TrackIcon,
+                enabled = state.isPossibleToStartMeasurement(),
                 onClick = { onAction(TrackOverviewAction.OnStartClick) })
         }
     ) { padding ->

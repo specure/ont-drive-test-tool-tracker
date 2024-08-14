@@ -27,5 +27,7 @@ data class TrackOverviewState(
     val trackCountForExport: Int = 0,
     val isSpeedTestEnabled: Boolean = false,
 ) {
-
+    fun isPossibleToStartMeasurement(): Boolean {
+        return isLocationServiceEnabled && !isWifiServiceEnabled && isLocationTrackable && isLocationServiceResolvable && location != null && !isPermissionRequired
+    }
 }

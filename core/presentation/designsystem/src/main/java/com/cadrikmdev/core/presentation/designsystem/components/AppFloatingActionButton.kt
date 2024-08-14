@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -25,28 +26,43 @@ fun SignalTrackerFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
-    iconSize: Dp = 25.dp
+    iconSize: Dp = 25.dp,
+    enabled: Boolean = true,
 ) {
     Box(
         modifier = Modifier
             .size(75.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
-            .clickable(onClick = onClick),
+            .clickable(onClick = if (enabled) {
+                onClick
+            } else {
+                {}
+            }),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary)
+                .background(
+                    if (enabled) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        ButtonDefaults.buttonColors().disabledContainerColor
+                    }
+                )
                 .padding(12.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = if (enabled) {
+                    MaterialTheme.colorScheme.onPrimary
+                } else {
+                    ButtonDefaults.buttonColors().disabledContentColor
+                },
                 modifier = Modifier.size(iconSize)
             )
         }
@@ -62,6 +78,7 @@ fun SignalTrackerFloatingActionButtonPreview(
     SignalTrackerTheme {
         SignalTrackerFloatingActionButton(
             icon = TrackIcon,
+            enabled = false,
             onClick = {}
         )
     }
