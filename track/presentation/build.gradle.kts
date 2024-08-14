@@ -22,6 +22,7 @@ dependencies {
     implementation(projects.core.presentation.service)
     implementation(projects.connectivity.domain)
     implementation(projects.connectivity.presentation)
+    implementation(projects.intercom.domain)
     implementation(projects.iperf.domain)
     implementation(projects.iperf.presentation)
     implementation(projects.core.database)

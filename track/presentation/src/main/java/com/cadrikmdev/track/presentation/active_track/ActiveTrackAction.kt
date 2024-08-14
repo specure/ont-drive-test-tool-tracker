@@ -17,5 +17,8 @@ sealed interface ActiveTrackAction {
     ) : ActiveTrackAction
 
     data object DismissRationaleDialog : ActiveTrackAction
+    data object OnStopTrackClick : ActiveTrackAction
+    data object OnStartTrackClick : ActiveTrackAction
+
     class OnTrackProcessed(val mapPictureBytes: ByteArray) : ActiveTrackAction
 }

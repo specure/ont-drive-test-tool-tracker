@@ -10,8 +10,9 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.cadrikmdev.permissions.presentation.screen.permissions.PermissionsScreen
 import com.cadrikmdev.permissions.presentation.util.openAppSettings
+import com.cadrikmdev.signaltracker.util.extensions.startTrackingService
+import com.cadrikmdev.signaltracker.util.extensions.stopTrackingService
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackScreenRoot
-import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
 import com.cadrikmdev.track.presentation.settings.SettingsScreenRoot
 import com.cadrikmdev.track.presentation.settings.navigation.SettingsScreenNav
 import com.cadrikmdev.track.presentation.track_overview.TrackOverviewScreenRoot
@@ -71,18 +72,9 @@ private fun NavGraphBuilder.trackGraph(
                 },
                 onServiceToggle = { shouldServiceRun ->
                     if (shouldServiceRun) {
-                        context.startService(
-                            ActiveTrackService.createStartIntent(
-                                context = context,
-                                activityClass = MainActivity::class.java
-                            )
-                        )
+                        context.startTrackingService()
                     } else {
-                        context.startService(
-                            ActiveTrackService.createStopIntent(
-                                context = context,
-                            )
-                        )
+                        context.stopTrackingService()
                     }
                 }
             )

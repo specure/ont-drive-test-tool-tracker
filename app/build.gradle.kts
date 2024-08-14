@@ -71,6 +71,9 @@ dependencies {
     implementation(projects.connectivity.domain)
     implementation(projects.connectivity.presentation)
 
+    implementation(projects.intercom.domain)
+    implementation(projects.intercom.data)
+
     implementation(projects.permissions.presentation)
     implementation(projects.track.domain)
     implementation(projects.track.data)

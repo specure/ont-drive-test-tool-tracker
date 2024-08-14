@@ -22,6 +22,8 @@ import com.cadrikmdev.core.domain.track.TrackRepository
 import com.cadrikmdev.core.domain.wifi.WifiServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
+import com.cadrikmdev.intercom.domain.message.TrackerAction
+import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import com.cadrikmdev.iperf.domain.IperfOutputParser
 import com.cadrikmdev.iperf.domain.IperfTestStatus
 import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
@@ -60,6 +62,7 @@ class TrackOverviewViewModel(
     private val iperfParser: IperfOutputParser,
     private val trackExporter: TracksExporter,
     private val appConfig: Config,
+    private val intercomService: BluetoothServerService,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -397,6 +400,15 @@ class TrackOverviewViewModel(
             isLocationTrackable = (permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) || permissionHandler.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) && state.isLocationServiceEnabled
         )
 
+        if (!state.isPermissionRequired) {
+            intercomService.startGattServer()
+            intercomService.receivedActionFlow.onEach { action ->
+                if (action is TrackerAction.StartTest) {
+                    Timber.d("Received start tracking request in overview screen")
+                    // TODO: start tracking screen with automated start
+                }
+            }.launchIn(viewModelScope)
+        }
         startObservingData(state.isLocationTrackable)
     }
 

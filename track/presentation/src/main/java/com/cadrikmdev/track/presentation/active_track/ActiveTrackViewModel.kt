@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.domain.location.service.LocationServiceObserver
 import com.cadrikmdev.core.presentation.service.ServiceChecker
+import com.cadrikmdev.intercom.domain.message.TrackerAction
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.active_track.service.ActiveTrackService
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ActiveTrackViewModel(
     private val measurementTracker: MeasurementTracker,
@@ -76,6 +78,15 @@ class ActiveTrackViewModel(
             updateGpsLocationServiceStatus(serviceStatus.isGpsEnabled, isAvailable)
         }.launchIn(viewModelScope)
 
+        measurementTracker.trackActions.onEach { action ->
+            when (action) {
+                is TrackerAction.StartTest -> onAction(ActiveTrackAction.OnStartTrackClick)
+                is TrackerAction.StopTest -> onAction(ActiveTrackAction.OnStopTrackClick)
+                is TrackerAction.UpdateProgress -> Unit
+                null -> Unit
+            }
+        }.launchIn(viewModelScope)
+
         isTracking
             .onEach { isTracking ->
                 measurementTracker.setIsTracking(isTracking)
@@ -107,18 +118,14 @@ class ActiveTrackViewModel(
     fun onAction(action: ActiveTrackAction) {
         when (action) {
             ActiveTrackAction.OnFinishTrackClick -> {
-                state = state.copy(
-                    isTrackFinished = true,
-                    isSavingTrack = false,
-                    shouldTrack = false,
-                )
-                finishTrack()
+                state = state.stopTracking()
+                finishTrackAndLeave()
             }
 
             ActiveTrackAction.OnResumeTrackClick -> {
                 state = state.copy(
                     shouldTrack = true,
-                    isShowingPauseDialog = false,
+                    isShowingFinishConfirmationDialog = false,
                 )
             }
 
@@ -129,15 +136,38 @@ class ActiveTrackViewModel(
             }
 
             ActiveTrackAction.OnToggleTrackClick -> {
+                if (!shouldTrack.value) {
+                    onResumeChecks()
+                }
                 state = state.copy(
                     hasStartedTracking = true,
-                    isShowingPauseDialog = shouldTrack.value,
+                    isShowingFinishConfirmationDialog = shouldTrack.value,
                     shouldTrack = true,
                 )
             }
 
-            is ActiveTrackAction.OnTrackProcessed -> {
+            ActiveTrackAction.OnStartTrackClick -> {
+                Timber.d("Received Start action")
+                onResumeChecks()
+                state = state.copy(
+                    hasStartedTracking = true,
+                    isShowingFinishConfirmationDialog = false,
+                    shouldTrack = true,
+                )
+            }
+
+            ActiveTrackAction.OnStopTrackClick -> {
+                Timber.d("Received Stop action")
+                measurementTracker.setIsTracking(false)
+                state = state.copy(
+                    isShowingFinishConfirmationDialog = false,
+                    shouldTrack = false,
+                )
                 finishTrack()
+            }
+
+            is ActiveTrackAction.OnTrackProcessed -> {
+                finishTrackAndLeave()
             }
 
             else -> Unit
@@ -147,11 +177,22 @@ class ActiveTrackViewModel(
     private fun finishTrack() {
         viewModelScope.launch {
             measurementTracker.finishTrack()
+            state = state.copy(
+                shouldTrack = false,
+                isSavingTrack = false,
+                isShowingFinishConfirmationDialog = false
+            )
+        }
+    }
+
+    private fun finishTrackAndLeave() {
+        viewModelScope.launch {
+            measurementTracker.finishTrack()
             eventChannel.send(ActiveTrackEvent.TrackSaved)
             state = state.copy(
                 shouldTrack = false,
                 isSavingTrack = false,
-                isShowingPauseDialog = false
+                isShowingFinishConfirmationDialog = false
             )
         }
     }
@@ -166,16 +207,20 @@ class ActiveTrackViewModel(
     fun onEvent(event: ActiveTrackEvent) {
         when (event) {
             ActiveTrackEvent.OnUpdatePermissionStatus -> {
-                permissionHandler.checkPermissionsState()
-                val isGpsEnabled = gpsLocationService.isServiceEnabled()
-                val isAvailable = gpsLocationService.isServiceAvailable()
-
-                updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
-                updatePermissionsState()
-                updateAccordingAppConfig()
+                onResumeChecks()
             }
             else -> Unit
         }
+    }
+
+    private fun onResumeChecks() {
+        permissionHandler.checkPermissionsState()
+        val isGpsEnabled = gpsLocationService.isServiceEnabled()
+        val isAvailable = gpsLocationService.isServiceAvailable()
+
+        updateGpsLocationServiceStatus(isGpsEnabled, isAvailable)
+        updatePermissionsState()
+        updateAccordingAppConfig()
     }
 
     private fun updateGpsLocationServiceStatus(isGpsEnabled: Boolean, isAvailable: Boolean) {
