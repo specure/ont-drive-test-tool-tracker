@@ -31,6 +31,7 @@ import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.domain.LocationObserver
+import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportError
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
 import kotlinx.coroutines.CoroutineScope
@@ -63,6 +64,7 @@ class TrackOverviewViewModel(
     private val trackExporter: TracksExporter,
     private val appConfig: Config,
     private val intercomService: BluetoothServerService,
+    private val measurementTracker: MeasurementTracker,
 ) : ViewModel() {
 
     var state by mutableStateOf(TrackOverviewState())
@@ -364,6 +366,7 @@ class TrackOverviewViewModel(
         when (event) {
             TrackOverviewEvent.OnUpdatePermissionStatus -> {
                 permissionHandler.checkPermissionsState()
+                measurementTracker.setPreparedForRemoteController(false)
                 updatePermissionsState()
             }
 

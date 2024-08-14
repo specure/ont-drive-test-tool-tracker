@@ -62,6 +62,9 @@ to get all source files
 
 ## TODO:
 
+Send not activated state as soon as app is back in the overview/home screen instead of active track
+screen
+
 After returning to tracking from notification = Iperf tests break
 
 Notification does not shows current time after stopping and starting from manager app - as it is not

@@ -66,8 +66,10 @@ class ActiveTrackViewModel(
         hasAllPermission
             .onEach { hasPermission ->
                 if (hasPermission) {
+                    measurementTracker.setPreparedForRemoteController(true)
                     measurementTracker.startObserving()
                 } else {
+                    measurementTracker.setPreparedForRemoteController(false)
                     measurementTracker.stopObserving()
                 }
             }

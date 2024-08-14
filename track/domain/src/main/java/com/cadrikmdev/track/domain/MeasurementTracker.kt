@@ -72,6 +72,8 @@ class MeasurementTracker(
 
     private var internetConnectivityJob: Job? = null
 
+    private var isPreparedForRemoteController = false
+
     val currentLocation = isObservingLocation
         .flatMapLatest { isObservingLocation ->
             if (isObservingLocation) {
@@ -89,14 +91,18 @@ class MeasurementTracker(
             intercomService.startGattServer()
             intercomService.setMeasurementProgressCallback {
                 MeasurementProgress(
-                    state = if (trackData.value.isError()) {
-                        MeasurementState.ERROR
-                    } else {
-                        if (isTracking.value) {
-                            MeasurementState.RUNNING
+                    state = if (isPreparedForRemoteController) {
+                        if (trackData.value.isError()) {
+                            MeasurementState.ERROR
                         } else {
-                            MeasurementState.IDLE
+                            if (isTracking.value) {
+                                MeasurementState.RUNNING
+                            } else {
+                                MeasurementState.IDLE
+                            }
                         }
+                    } else {
+                        MeasurementState.NOT_ACTIVATED
                     },
                     error = if (trackData.value.isError()) {
                         if (trackData.value.isUploadTestError()) {
@@ -219,9 +225,9 @@ class MeasurementTracker(
                 val newLocationsList = listOf(locationWithDetails.location)
 
                 _trackData.update {
-                        it.copy(
-                            locations = newLocationsList
-                        )
+                    it.copy(
+                        locations = newLocationsList
+                    )
                 }
             }
             .launchIn(applicationScope)
@@ -245,6 +251,14 @@ class MeasurementTracker(
         }.launchIn(applicationScope)
     }
 
+    fun setIsTracking(isTracking: Boolean) {
+        this._isTracking.value = isTracking
+    }
+
+    fun setPreparedForRemoteController(isPrepared: Boolean) {
+        this.isPreparedForRemoteController = isPrepared
+    }
+
     private fun updateStatusIfDenied(testState: IperfTest): IperfTest {
         val isSpeedTestEnabled = appConfig.isSpeedTestEnabled()
         println("TEST STATE ${testState.direction}: ${testState.status} enabled: ${appConfig.isSpeedTestEnabled()}")
@@ -254,9 +268,6 @@ class MeasurementTracker(
         return updatedTestStatus
     }
 
-    fun setIsTracking(isTracking: Boolean) {
-        this._isTracking.value = isTracking
-    }
 
     private fun startObservingLocation() {
         isObservingLocation.value = true
