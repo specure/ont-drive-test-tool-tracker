@@ -64,7 +64,8 @@ to get all source files
 
 After returning to tracking from notification = Iperf tests break
 
-Notification does not shows current time - as it is not associated correctly with current data
+Notification does not shows current time after stopping and starting from manager app - as it is not
+associated correctly with current data
 instances (I assume it has connection with previous issue)
 
 For now we have doubled IPERF library just with different .so file to build and different package 
@@ -82,6 +83,7 @@ Make autorestart of Iperf test on error
 - possible solutions:
   - have multiple instances of server and cycle between them + detect server issue and restart
     server if possible
+
 - observation:
   - When there is a network type switch even between mobile network types (e.g. LTE to HSPDA or EDGE
     or...) and the test survives, the bandwidth is no more limited - maybe if there was technology
