@@ -42,7 +42,10 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
+private const val INTERVAL_CORRECTION_THRESHOLD_MILLIS = 200
 
 class MeasurementTracker(
     private val locationObserver: LocationObserver,
@@ -56,6 +59,7 @@ class MeasurementTracker(
     private val intercomService: BluetoothServerService,
     private val appConfig: Config,
 ) {
+    private var latestSavedValueTimestamp: Long = 0
     private val _trackData = MutableStateFlow(TrackData())
     val trackData = _trackData.asStateFlow()
 
@@ -77,7 +81,7 @@ class MeasurementTracker(
     val currentLocation = isObservingLocation
         .flatMapLatest { isObservingLocation ->
             if (isObservingLocation) {
-                locationObserver.observeLocation(1000L)
+                locationObserver.observeLocation(1000)
             } else flowOf()
         }
         .stateIn(
@@ -165,6 +169,7 @@ class MeasurementTracker(
         _isTracking
             .onEach { isTracking ->
                 if (!isTracking) {
+                    clearSavedTime()
                     val newList = buildList {
                         addAll(trackData.value.locations)
                     }.toList()
@@ -202,8 +207,24 @@ class MeasurementTracker(
                         duration = _elapsedTime.value
                     )
                 }
-                saveCurrentTrackData(_trackData.value)
+                if (isTimeToSaveNewLog()) {
+                    println("Saving log record ${appConfig.getTrackingLogIntervalSeconds()}")
+                    saveCurrentTrackData(_trackData.value)
+                    setNewSavedTime()
+                }
             }
+            /**
+             * Basically could be replaced by "sample" - but sometimes there will not be the latest values, but it is not probably necessary
+             * sample is more about catching the state at a regular interval, potentially missing out on recent items that were emitted just after the interval.
+             * throttleLatest ensures that you get the most recent item within each time window, but only emits after the window ends, which might include items that sample could miss or exclude.
+             */
+//            .throttleLatest(appConfig.getTrackingLogIntervalSeconds().toDuration(DurationUnit.SECONDS).inWholeMilliseconds)
+//            .sample(appConfig.getTrackingLogIntervalSeconds().toDuration(DurationUnit.SECONDS).inWholeMilliseconds)
+//            .onEach {
+//                println("Saving log record ${appConfig.getTrackingLogIntervalSeconds()}")
+//                if ()
+//                saveCurrentTrackData(_trackData.value)
+//            }
             .launchIn(applicationScope)
 
 
@@ -250,6 +271,18 @@ class MeasurementTracker(
             }
         }.launchIn(applicationScope)
     }
+
+    private fun setNewSavedTime() {
+        this.latestSavedValueTimestamp = System.currentTimeMillis()
+    }
+
+    private fun clearSavedTime() {
+        this.latestSavedValueTimestamp = 0
+    }
+
+    private fun isTimeToSaveNewLog() =
+        System.currentTimeMillis() - latestSavedValueTimestamp > appConfig.getTrackingLogIntervalSeconds()
+            .toDuration(DurationUnit.SECONDS).inWholeMilliseconds - INTERVAL_CORRECTION_THRESHOLD_MILLIS
 
     fun setIsTracking(isTracking: Boolean) {
         this._isTracking.value = isTracking

@@ -56,6 +56,28 @@ fun SettingsScreen(
                         .fillMaxSize()
                         .padding(padding)
                 ) {
+                    preferenceCategory(
+                        key = "tracking_log_category",
+                        title = { Text(text = stringResource(id = R.string.tracking_log)) },
+                    )
+                    val trackingLogMaxIntervalSeconds = 10F
+                    val trackingLogIntervalSecondsStep = 1
+                    val steps =
+                        (trackingLogMaxIntervalSeconds.toInt() / trackingLogIntervalSecondsStep - 2)
+                    println("Saving interval steps $steps")
+                    sliderPreference(
+                        key = Config.TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY,
+                        defaultValue = viewModel.appConfig.getTrackingLogIntervalSecondsDefault()
+                            .toFloat(),
+                        valueRange = 1f..trackingLogMaxIntervalSeconds,
+                        valueSteps = steps,
+                        valueText = {
+                            Text(
+                                text = round(it).toInt().toString()
+                            )
+                        },
+                        title = { Text(text = stringResource(id = R.string.tracking_log_interval_seconds)) },
+                    )
                     if (AppConfig.FEATURE_SPEED_TEST_ENABLED) {
                         switchPreference(
                             key = Config.SPEED_TEST_ENABLED_CONFIG_KEY,

@@ -22,6 +22,8 @@ class AppConfig(
         const val UPLOAD_SPEED_TEST_SERVER_ADDRESS_DEFAULT = BuildConfig.BASE_URL
         const val UPLOAD_SPEED_TEST_SERVER_PORT_DEFAULT = 5202
         const val UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_DEFAULT = 2000000
+
+        const val TRACKING_LOG_INTERVAL_SECONDS = 1
     }
 
     override fun isSpeedTestEnabled(): Boolean {
@@ -192,5 +194,23 @@ class AppConfig(
 
     override fun getSpeedTestProgressUpdateIntervalSecondsDefault(): Int {
         return SPEED_TEST_PROGRESS_UPDATE_INTERVAL_SECONDS_DEFAULT
+    }
+
+    override fun setTrackingLogIntervalSeconds(intervalSeconds: Int) {
+        preferences.edit()
+            .putFloat(Config.TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY, intervalSeconds.toFloat())
+            .apply()
+    }
+
+    override fun getTrackingLogIntervalSeconds(): Int {
+        val logIntervalMillis = preferences.getFloat(
+            Config.TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY,
+            getTrackingLogIntervalSecondsDefault().toFloat()
+        )
+        return logIntervalMillis.toInt()
+    }
+
+    override fun getTrackingLogIntervalSecondsDefault(): Int {
+        return TRACKING_LOG_INTERVAL_SECONDS
     }
 }

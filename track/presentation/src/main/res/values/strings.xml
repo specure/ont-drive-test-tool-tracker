@@ -57,4 +57,6 @@
     <string name="max_bandwidth">Max. bandwidth (Mbits/s)</string>
     <string name="max_bandwidth_details">(0 for unlimited)</string>
     <string name="duration_seconds">Duration (sec)</string>
+    <string name="tracking_log">Tracking log</string>
+    <string name="tracking_log_interval_seconds">Tracking log interval (s)</string>
 </resources>

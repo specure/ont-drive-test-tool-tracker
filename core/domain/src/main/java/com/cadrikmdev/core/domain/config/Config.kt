@@ -19,6 +19,8 @@ interface Config {
             "DOWNLOAD_SPEED_TEST_SERVER_PORT_CONFIG_KEY"
         const val DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY =
             "DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY"
+        const val TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY =
+            "TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY"
 
         const val UNKNOWN_VALUE = Integer.MIN_VALUE
     }
@@ -76,4 +78,10 @@ interface Config {
     fun getSpeedTestProgressUpdateIntervalSeconds(): Int?
 
     fun getSpeedTestProgressUpdateIntervalSecondsDefault(): Int
+
+    fun setTrackingLogIntervalSeconds(intervalSeconds: Int)
+
+    fun getTrackingLogIntervalSeconds(): Int
+
+    fun getTrackingLogIntervalSecondsDefault(): Int
 }

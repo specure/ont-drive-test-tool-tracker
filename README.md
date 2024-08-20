@@ -62,8 +62,11 @@ to get all source files
 
 ## TODO:
 
+Handle when user do not give bluetooth permission or add settings to enable manager app for
+bluetooth
+
 Send not activated state as soon as app is back in the overview/home screen instead of active track
-screen
+screen - FIXED
 
 After returning to tracking from notification = Iperf tests break
 
