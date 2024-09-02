@@ -173,13 +173,41 @@ private fun TrackOverviewScreen(
                 Text(text = stringResource(id = R.string.wifi_service_enabled))
                 if (state.isWifiServiceEnabled)
                     Text(
-                        text = stringResource(id = R.string.available),
+                        text = stringResource(id = R.string.enabled),
                         color = MaterialTheme.colorScheme.error
                     )
                 else
                     Text(
-                        text = stringResource(id = R.string.unavailable),
+                        text = stringResource(id = R.string.disabled),
                     )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = stringResource(id = R.string.location_service))
+                if (state.isLocationServiceEnabled) {
+                    Text(
+                        text = stringResource(id = R.string.enabled)
+                    )
+                } else if (state.isLocationServiceResolvable) {
+                    SignalTrackerOutlinedActionButton(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = stringResource(id = com.cadrikmdev.permissions.presentation.R.string.resolve),
+                        isLoading = false
+                    ) {
+                        onAction(TrackOverviewAction.OnResolveLocationService)
+                    }
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.disabled),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
             if (state.isPermissionRequired) {
                 Row(
@@ -201,35 +229,6 @@ private fun TrackOverviewScreen(
                     }
                 }
             }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(text = stringResource(id = R.string.location_service))
-                if (state.isLocationServiceEnabled) {
-                    Text(
-                        text = stringResource(id = R.string.available)
-                    )
-                } else if (state.isLocationServiceResolvable) {
-                    SignalTrackerOutlinedActionButton(
-                        modifier = Modifier.padding(start = 16.dp),
-                        text = stringResource(id = com.cadrikmdev.permissions.presentation.R.string.resolve),
-                        isLoading = false
-                    ) {
-                        onAction(TrackOverviewAction.OnResolveLocationService)
-                    }
-                } else {
-                    Text(
-                        text = stringResource(id = R.string.unavailable),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-
 
             state.currentTemperatureCelsius?.let {
                 Card(
