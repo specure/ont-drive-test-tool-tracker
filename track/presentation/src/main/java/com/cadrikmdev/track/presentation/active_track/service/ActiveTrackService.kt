@@ -108,6 +108,12 @@ class ActiveTrackService : Service() {
             if (elapsedTime.inWholeSeconds > previousElapsedTime.inWholeSeconds) {
                 val notification = baseNotification
                     .setContentText(elapsedTime.formatted())
+                    .apply {
+                        priority = NotificationCompat.PRIORITY_MIN
+                    }
+                    .setSilent(true)
+                    .setOnlyAlertOnce(true)
+                    .setOngoing(true)
                     .build()
                 notificationManager.notify(1, notification)
                 previousElapsedTime = elapsedTime
@@ -128,7 +134,7 @@ class ActiveTrackService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 getString(R.string.active_track),
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_NONE
             )
             notificationManager.createNotificationChannel(channel)
         }
