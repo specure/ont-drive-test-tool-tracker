@@ -1,3 +1,8 @@
+1.1.1-alpha
+----------------
+Make notification updates not trigger vibration on paired device
+
+
 1.1.0-alpha
 ----------------
 Added support for managing the app from other device via SignalTrackerManager app

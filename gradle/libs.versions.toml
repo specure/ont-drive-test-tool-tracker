@@ -56,12 +56,12 @@ composeUiTestManifest = "1.6.8"
 coroutines-test = "1.8.1"
 
 # Project versions
-projectApplicationId = "com.cadrikmdev.signaltracker"
-projectVersionName = "1.0"
+projectApplicationId = "com.specure.signaltracker"
+projectVersionName = "1.1.1-alpha"
 projectMinSdkVersion = "28"
 projectTargetSdkVersion = "34"
 projectCompileSdkVersion = "34"
-projectVersionCode = "1"
+projectVersionCode = "2"
 
 [libraries]
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
