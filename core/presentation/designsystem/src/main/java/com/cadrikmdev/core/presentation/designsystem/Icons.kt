@@ -56,6 +56,10 @@ val FinishIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.finish)
 
+val InfoIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.info)
+
 val KeyboardArrowDownIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.keyboard_arrow_down)

@@ -59,4 +59,7 @@
     <string name="duration_seconds">Duration (sec)</string>
     <string name="tracking_log">Tracking log</string>
     <string name="tracking_log_interval_seconds">Tracking log interval (sec)</string>
+    <string name="about">About</string>
+    <string name="version">Version</string>
+    <string name="developed_by">Developed by</string>
 </resources>

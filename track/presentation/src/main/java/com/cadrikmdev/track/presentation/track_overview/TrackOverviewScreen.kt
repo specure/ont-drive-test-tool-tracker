@@ -46,6 +46,7 @@ import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.location.LocationWithDetails
 import com.cadrikmdev.core.presentation.designsystem.ArrowDownIcon
 import com.cadrikmdev.core.presentation.designsystem.ArrowUpIcon
+import com.cadrikmdev.core.presentation.designsystem.InfoIcon
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
 import com.cadrikmdev.core.presentation.designsystem.SettingsIcon
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
@@ -65,6 +66,7 @@ import kotlin.time.toDuration
 fun TrackOverviewScreenRoot(
     onStartTrackClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onAboutClick: () -> Unit,
     onResolvePermissionClick: () -> Unit,
     viewModel: TrackOverviewViewModel = koinViewModel(),
 ) {
@@ -74,6 +76,7 @@ fun TrackOverviewScreenRoot(
             when (action) {
                 TrackOverviewAction.OnStartClick -> onStartTrackClick()
                 TrackOverviewAction.OnSettingsClick -> onSettingsClick()
+                TrackOverviewAction.OnAboutClick -> onAboutClick()
                 TrackOverviewAction.OnResolvePermissionClick -> onResolvePermissionClick()
                 else -> Unit
             }
@@ -121,10 +124,15 @@ private fun TrackOverviewScreen(
                         icon = SettingsIcon,
                         title = stringResource(id = R.string.settings)
                     ),
+                    DropDownItem(
+                        icon = InfoIcon,
+                        title = stringResource(id = R.string.about)
+                    ),
                 ),
                 onMenuItemClick = { index ->
                     when (index) {
                         0 -> onAction(TrackOverviewAction.OnSettingsClick)
+                        1 -> onAction(TrackOverviewAction.OnAboutClick)
                     }
                 },
                 startContent = {

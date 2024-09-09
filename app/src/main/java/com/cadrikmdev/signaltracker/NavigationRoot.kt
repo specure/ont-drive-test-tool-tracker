@@ -12,6 +12,8 @@ import com.cadrikmdev.permissions.presentation.screen.permissions.PermissionsScr
 import com.cadrikmdev.permissions.presentation.util.openAppSettings
 import com.cadrikmdev.signaltracker.util.extensions.startTrackingService
 import com.cadrikmdev.signaltracker.util.extensions.stopTrackingService
+import com.cadrikmdev.track.presentation.about.AboutScreenNav
+import com.cadrikmdev.track.presentation.about.AboutScreenRoot
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackScreenRoot
 import com.cadrikmdev.track.presentation.settings.SettingsScreenRoot
 import com.cadrikmdev.track.presentation.settings.navigation.SettingsScreenNav
@@ -49,6 +51,9 @@ private fun NavGraphBuilder.trackGraph(
                 onSettingsClick = {
                     navController.navigate(SettingsScreenNav)
                 },
+                onAboutClick = {
+                    navController.navigate(AboutScreenNav)
+                },
                 onResolvePermissionClick = {
                     navController.navigate("permissions")
                 }
@@ -81,6 +86,13 @@ private fun NavGraphBuilder.trackGraph(
         }
         composable<SettingsScreenNav> {
             SettingsScreenRoot(
+                onBackClick = {
+                    navController.navigateUp()
+                }
+            )
+        }
+        composable<AboutScreenNav> {
+            AboutScreenRoot(
                 onBackClick = {
                     navController.navigateUp()
                 }

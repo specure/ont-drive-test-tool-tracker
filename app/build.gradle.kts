@@ -7,6 +7,7 @@ android {
     namespace = "com.cadrikmdev.signaltracker"
 
     defaultConfig {
+        versionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
