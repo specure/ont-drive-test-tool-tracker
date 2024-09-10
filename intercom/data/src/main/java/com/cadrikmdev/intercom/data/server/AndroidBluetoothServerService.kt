@@ -1,11 +1,15 @@
 package com.cadrikmdev.intercom.data.server
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGattServer
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
 import com.cadrikmdev.intercom.domain.ManagerControlServiceProtocol
 import com.cadrikmdev.intercom.domain.data.MeasurementProgress
 import com.cadrikmdev.intercom.domain.data.MeasurementState
@@ -57,7 +61,7 @@ class AndroidBluetoothServerService(
         bluetoothAdapter = bluetoothManager.adapter
 
         // Ensure Bluetooth is supported and enabled on the device
-        if (bluetoothAdapter == null || bluetoothAdapter?.isEnabled != true) {
+        if (!isBluetoothConnectPermissionGranted() || bluetoothAdapter == null || bluetoothAdapter?.isEnabled != true) {
             // Bluetooth is not supported or not enabled
             return
         }
@@ -166,6 +170,16 @@ class AndroidBluetoothServerService(
             }
         }
     }
+
+    private fun isBluetoothConnectPermissionGranted() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
 
     override fun stopGattServer() {
         try {

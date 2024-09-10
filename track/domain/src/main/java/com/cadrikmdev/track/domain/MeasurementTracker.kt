@@ -91,59 +91,7 @@ class MeasurementTracker(
         )
 
     init {
-        applicationScope.launch {
-            intercomService.startGattServer()
-            intercomService.setMeasurementProgressCallback {
-                MeasurementProgress(
-                    state = if (isPreparedForRemoteController) {
-                        if (trackData.value.isError()) {
-                            MeasurementState.ERROR
-                        } else {
-                            if (isTracking.value) {
-                                MeasurementState.RUNNING
-                            } else {
-                                MeasurementState.IDLE
-                            }
-                        }
-                    } else {
-                        MeasurementState.NOT_ACTIVATED
-                    },
-                    error = if (trackData.value.isError()) {
-                        if (trackData.value.isUploadTestError()) {
-                            TestError.UPLOAD_TEST_ERROR.toString()
-                        } else if (trackData.value.isDownloadTestError()) {
-                            TestError.DOWNLOAD_TEST_ERROR.toString()
-                        } else {
-                            TestError.UNKNOWN_ERROR.toString()
-                        }
-                    } else {
-                        null
-                    },
-                    timestamp = System.currentTimeMillis()
-                )
-            }
-            intercomService.receivedActionFlow.onEach { action ->
-                when (action) {
-                    is TrackerAction.StartTest -> {
-                        clearData()
-                        startObserving()
-                        _isTracking.emit(true)
-                        _trackActions.emit(TrackerAction.StartTest(""))
-                        println("Emitting start action in Tracker")
-                    }
-
-                    is TrackerAction.StopTest -> {
-                        _isTracking.emit(false)
-                        _trackActions.emit(TrackerAction.StopTest(""))
-                        // we can clear all data, because they are already in DB
-                        clearData()
-                        println("Emitting stop action in Tracker")
-                    }
-
-                    else -> Unit
-                }
-            }.launchIn(applicationScope)
-        }
+        startIntercomServices()
 
         applicationScope.launch {
             temperatureInfoReceiver.observeTemperature().collect { temperature ->
@@ -299,6 +247,62 @@ class MeasurementTracker(
             status = if (isSpeedTestEnabled) testState.status else IperfTestStatus.DISABLED
         )
         return updatedTestStatus
+    }
+
+    fun startIntercomServices() {
+        applicationScope.launch {
+            intercomService.startGattServer()
+            intercomService.setMeasurementProgressCallback {
+                MeasurementProgress(
+                    state = if (isPreparedForRemoteController) {
+                        if (trackData.value.isError()) {
+                            MeasurementState.ERROR
+                        } else {
+                            if (isTracking.value) {
+                                MeasurementState.RUNNING
+                            } else {
+                                MeasurementState.IDLE
+                            }
+                        }
+                    } else {
+                        MeasurementState.NOT_ACTIVATED
+                    },
+                    error = if (trackData.value.isError()) {
+                        if (trackData.value.isUploadTestError()) {
+                            TestError.UPLOAD_TEST_ERROR.toString()
+                        } else if (trackData.value.isDownloadTestError()) {
+                            TestError.DOWNLOAD_TEST_ERROR.toString()
+                        } else {
+                            TestError.UNKNOWN_ERROR.toString()
+                        }
+                    } else {
+                        null
+                    },
+                    timestamp = System.currentTimeMillis()
+                )
+            }
+            intercomService.receivedActionFlow.onEach { action ->
+                when (action) {
+                    is TrackerAction.StartTest -> {
+                        clearData()
+                        startObserving()
+                        _isTracking.emit(true)
+                        _trackActions.emit(TrackerAction.StartTest(""))
+                        println("Emitting start action in Tracker")
+                    }
+
+                    is TrackerAction.StopTest -> {
+                        _isTracking.emit(false)
+                        _trackActions.emit(TrackerAction.StopTest(""))
+                        // we can clear all data, because they are already in DB
+                        clearData()
+                        println("Emitting stop action in Tracker")
+                    }
+
+                    else -> Unit
+                }
+            }.launchIn(applicationScope)
+        }
     }
 
 

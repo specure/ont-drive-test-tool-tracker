@@ -1,6 +1,7 @@
 1.1.1-alpha
 ----------------
-Make notification updates not trigger vibration on paired device
+Make notification updates not trigger vibration on paired device.
+Added About screen
 
 
 1.1.0-alpha
