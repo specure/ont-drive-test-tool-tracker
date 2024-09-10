@@ -323,9 +323,11 @@ private fun TrackOverviewScreen(
                         shape = RoundedCornerShape(16.dp),
                     )
             ) {
-                if (state.location != null) {
+                if (state.location == null) {
                     Text(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         text = stringResource(id = R.string.location_data_missing),
                         color = MaterialTheme.colorScheme.error
                     )
@@ -556,6 +558,7 @@ private fun TrackOverviewScreenPreview() {
                     22.3,
                     System.currentTimeMillis(),
                 ),
+//                location = null,
                 location = LocationTimestamp(
                     location = LocationWithDetails(
                         location = Location(4.94135, 4.8965),

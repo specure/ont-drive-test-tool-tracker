@@ -424,7 +424,6 @@ class TrackOverviewViewModel(
 
     fun startObservingData(isLocationTrackable: Boolean) {
         isObservingLocation.value = isLocationTrackable
-        // TODO: if all necessary prerequisities are fullfilled then we can run measurement tracker to track values and save it to DB
     }
 
     fun onOnlineStatusChange(isOnline: Boolean) {
