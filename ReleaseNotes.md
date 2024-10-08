@@ -1,3 +1,8 @@
+1.2.0-alpha
+----------------
+Added speeds in Megabits per second to logs to compare them easier
+Added button in settings to device radio settings to restrict technology
+
 1.1.1-alpha
 ----------------
 Make notification updates not trigger vibration on paired device.

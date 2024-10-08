@@ -57,7 +57,7 @@ coroutines-test = "1.8.1"
 
 # Project versions
 projectApplicationId = "com.specure.signaltracker"
-projectVersionName = "1.1.1-alpha"
+projectVersionName = "1.2.0-alpha"
 projectMinSdkVersion = "28"
 projectTargetSdkVersion = "34"
 projectCompileSdkVersion = "34"
