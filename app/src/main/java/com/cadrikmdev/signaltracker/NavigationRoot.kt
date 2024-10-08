@@ -1,5 +1,11 @@
 package com.cadrikmdev.signaltracker
 
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
@@ -85,9 +91,13 @@ private fun NavGraphBuilder.trackGraph(
             )
         }
         composable<SettingsScreenNav> {
+            val context = LocalContext.current
             SettingsScreenRoot(
                 onBackClick = {
                     navController.navigateUp()
+                },
+                onOpenRadioSettingsClick = {
+                    openRadioInfoActivity(context)
                 }
             )
         }
@@ -124,4 +134,36 @@ private fun NavGraphBuilder.permissionsGraph(
             )
         }
     }
+}
+
+private fun openRadioInfoActivity(context: Context) {
+    try {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val radioInfoComponentName =
+                ComponentName("com.android.phone", "com.android.phone.settings.RadioInfo")
+            Intent().apply {
+                component = radioInfoComponentName
+            }
+        } else {
+            val i = Intent(Intent.ACTION_VIEW)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                i.setClassName("com.android.phone", "com.android.phone.settings.RadioInfo")
+            } else {
+                i.setClassName("com.android.settings", "com.android.settings.RadioInfo")
+            }
+        }
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        showNotSupportedToast(context)
+    } catch (e: SecurityException) {
+        showNotSupportedToast(context)
+    }
+}
+
+private fun showNotSupportedToast(context: Context) {
+    Toast.makeText(
+        context,
+        com.cadrikmdev.track.presentation.R.string.open_device_radio_settings_error,
+        Toast.LENGTH_SHORT
+    ).show()
 }

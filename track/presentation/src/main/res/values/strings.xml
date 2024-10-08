@@ -62,4 +62,7 @@
     <string name="about">About</string>
     <string name="version">Version</string>
     <string name="developed_by">Developed by</string>
+    <string name="device_radio_settings">Device radio settings</string>
+    <string name="open_device_radio_settings">Open device radio settings</string>
+    <string name="open_device_radio_settings_error">Unable to open device radio settings</string>
 </resources>

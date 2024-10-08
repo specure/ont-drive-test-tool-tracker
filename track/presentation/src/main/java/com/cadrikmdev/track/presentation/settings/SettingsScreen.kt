@@ -15,6 +15,7 @@ import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerSca
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
 import com.cadrikmdev.track.presentation.R
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
+import me.zhanghai.compose.preference.preference
 import me.zhanghai.compose.preference.preferenceCategory
 import me.zhanghai.compose.preference.sliderPreference
 import me.zhanghai.compose.preference.switchPreference
@@ -26,10 +27,12 @@ import kotlin.math.round
 @Composable
 fun SettingsScreenRoot(
     onBackClick: () -> Unit,
+    onOpenRadioSettingsClick: () -> Unit,
     viewModel: SettingsScreenViewModel = koinViewModel(),
 ) {
     SettingsScreen(
         onBackClick,
+        onOpenRadioSettingsClick,
         viewModel
     )
 }
@@ -38,6 +41,7 @@ fun SettingsScreenRoot(
 @Composable
 fun SettingsScreen(
     onBackClick: () -> Unit,
+    onOpenRadioSettingsClick: () -> Unit,
     viewModel: SettingsScreenViewModel
 ) {
     SignalTrackerTheme {
@@ -56,6 +60,16 @@ fun SettingsScreen(
                         .fillMaxSize()
                         .padding(padding)
                 ) {
+                    preferenceCategory(
+                        key = "device_radio_settings_category",
+                        title = { Text(text = stringResource(id = R.string.device_radio_settings)) },
+                    )
+                    preference(
+                        key = "device_radio_settings",
+                        title = { Text(text = stringResource(id = R.string.open_device_radio_settings)) },
+                        onClick = onOpenRadioSettingsClick
+                    )
+
                     preferenceCategory(
                         key = "tracking_log_category",
                         title = { Text(text = stringResource(id = R.string.tracking_log)) },
