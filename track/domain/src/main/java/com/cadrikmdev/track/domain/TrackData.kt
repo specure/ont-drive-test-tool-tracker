@@ -30,4 +30,36 @@ data class TrackData(
     fun isUploadTestError(): Boolean {
         return (isSpeedTestEnabled && (iperfTestUpload?.error?.isNotEmpty() == true || iperfTestUpload?.status == IperfTestStatus.ERROR))
     }
+
+    fun getDownloadSpeedInMbitsPerSec(): Double? {
+        val speed =
+            if (isSpeedTestEnabled) iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth else null
+        val unit =
+            if (isSpeedTestEnabled) iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit else null
+
+        if (speed == null || unit == null) {
+            return null
+        }
+        return transformToMbitsPerSec(unit, speed)
+    }
+
+    fun getUploadSpeedInMbitsPerSec(): Double? {
+        val speed =
+            if (isSpeedTestEnabled) iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth else null
+        val unit =
+            if (isSpeedTestEnabled) iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit else null
+
+        if (speed == null || unit == null) {
+            return null
+        }
+        return transformToMbitsPerSec(unit, speed)
+    }
+
+    private fun transformToMbitsPerSec(unit: String, speed: Double) = when (unit) {
+        "bits/sec" -> speed / 1_000_000f
+        "Kbits/sec" -> speed / 1_000f
+        "Mbits/sec" -> speed
+        "Gbits/sec" -> speed * 1_000f
+        else -> null
+    }
 }

@@ -4,7 +4,10 @@ import android.app.NotificationManager
 import androidx.core.content.FileProvider
 import androidx.core.content.getSystemService
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.cadrikmdev.core.database.RoomLocalTrackDataSource
+import com.cadrikmdev.core.database.Tables
 import com.cadrikmdev.core.database.TrackDatabase
 import com.cadrikmdev.core.database.export.CoreFileProvider
 import com.cadrikmdev.core.database.export.DatabaseWorkerScheduler
@@ -22,11 +25,24 @@ import org.koin.dsl.module
 
 val databaseModule = module {
     single {
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN downloadSpeedMegaBitsPerSec,  TEXT")
+                database.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN uploadSpeedMegaBitsPerSec,  TEXT")
+            }
+        }
+
         Room.databaseBuilder(
             androidApplication(),
             TrackDatabase::class.java,
-            "run.db"
-        ).build()
+            "track_database.db"
+        )
+            .addMigrations(MIGRATION_1_2)
+            .fallbackToDestructiveMigration()
+            .build()
+
+
     }
 
     workerOf(::MarkAsExportedWorker)

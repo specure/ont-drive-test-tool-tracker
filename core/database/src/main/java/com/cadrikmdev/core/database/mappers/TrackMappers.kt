@@ -36,6 +36,8 @@ fun TrackEntity.toTrack(): Track {
         temperatureTimestamp = temperatureTimestamp,
         temperatureTimestampRaw = temperatureTimestampRaw,
         exported = exported,
+        uploadSpeedMegaBitsPerSec = uploadSpeedMegaBitsPerSec,
+        downloadSpeedMegaBitsPerSec = downloadSpeedMegaBitsPerSec,
     )
 }
 
@@ -72,5 +74,7 @@ fun Track.toTrackEntity(): TrackEntity {
         temperatureTimestamp = temperatureTimestamp,
         temperatureTimestampRaw = temperatureTimestampRaw,
         exported = exported,
+        uploadSpeedMegaBitsPerSec = uploadSpeedMegaBitsPerSec,
+        downloadSpeedMegaBitsPerSec = downloadSpeedMegaBitsPerSec,
     )
 }
