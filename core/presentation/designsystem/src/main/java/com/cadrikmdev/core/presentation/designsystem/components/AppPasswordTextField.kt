@@ -15,10 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text2.BasicSecureTextField
-import androidx.compose.foundation.text2.input.TextFieldState
-import androidx.compose.foundation.text2.input.TextObfuscationMode
-import androidx.compose.foundation.text2.input.rememberTextFieldState
+import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.TextObfuscationMode
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -84,7 +85,7 @@ fun SignalTrackerPasswordTextField(
             textStyle = LocalTextStyle.current.copy(
                 color = MaterialTheme.colorScheme.onBackground
             ),
-            keyboardType = KeyboardType.Password,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
