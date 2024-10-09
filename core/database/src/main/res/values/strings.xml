@@ -7,4 +7,7 @@
     <string name="export_complete_description">File %1$s exported successfully. Tap to open it.</string>
     <string name="error">Error</string>
     <string name="no_tracks_to_export">No data found to export.</string>
+    <string name="export_database_complete">Export database complete</string>
+    <string name="export_database_progress">Export database progress: %1$d%%</string>
+    <string name="export_database_complete_description">Database %1$s exported successfully. Tap to open it.</string>
 </resources>

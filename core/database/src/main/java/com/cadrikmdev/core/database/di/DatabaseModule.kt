@@ -10,6 +10,7 @@ import com.cadrikmdev.core.database.RoomLocalTrackDataSource
 import com.cadrikmdev.core.database.Tables
 import com.cadrikmdev.core.database.TrackDatabase
 import com.cadrikmdev.core.database.export.CoreFileProvider
+import com.cadrikmdev.core.database.export.DatabaseExporter
 import com.cadrikmdev.core.database.export.DatabaseWorkerScheduler
 import com.cadrikmdev.core.database.export.DeleteAllWorker
 import com.cadrikmdev.core.database.export.DeleteExportedWorker
@@ -22,6 +23,8 @@ import org.koin.androidx.workmanager.dsl.workerOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+
+const val TRACK_DATABASE_NAME = "track_database.db"
 
 val databaseModule = module {
     single {
@@ -36,7 +39,7 @@ val databaseModule = module {
         Room.databaseBuilder(
             androidApplication(),
             TrackDatabase::class.java,
-            "track_database.db"
+            TRACK_DATABASE_NAME
         )
             .addMigrations(MIGRATION_1_2)
             .fallbackToDestructiveMigration()
@@ -61,6 +64,13 @@ val databaseModule = module {
             get(),
             get(),
             get()
+        )
+    }
+
+    single {
+        DatabaseExporter(
+            get(),
+            get(),
         )
     }
 

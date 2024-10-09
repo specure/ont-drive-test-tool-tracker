@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.presentation.AppConfig
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
@@ -33,6 +34,21 @@ fun SettingsScreenRoot(
     SettingsScreen(
         onBackClick,
         onOpenRadioSettingsClick,
+        onClearDatabaseClick = {
+            viewModel.onAction(
+                SettingsAction.OnDatabaseClearClick
+            )
+        },
+        onClearExportedItemsClick = {
+            viewModel.onAction(
+                SettingsAction.OnDatabaseClearExportedClick
+            )
+        },
+        onDatabaseExportClick = {
+            viewModel.onAction(
+                SettingsAction.OnDatabaseExportClick
+            )
+        },
         viewModel
     )
 }
@@ -42,8 +58,14 @@ fun SettingsScreenRoot(
 fun SettingsScreen(
     onBackClick: () -> Unit,
     onOpenRadioSettingsClick: () -> Unit,
+    onClearDatabaseClick: () -> Unit,
+    onClearExportedItemsClick: () -> Unit,
+    onDatabaseExportClick: () -> Unit,
     viewModel: SettingsScreenViewModel
 ) {
+
+    val state = viewModel.stateFlow.collectAsStateWithLifecycle()
+
     SignalTrackerTheme {
         SignalTrackerScaffold(
             topAppBar = {
@@ -210,6 +232,35 @@ fun SettingsScreen(
                         title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
                         summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
                     )
+                    preferenceCategory(
+                        key = "database_category",
+                        title = { Text(text = stringResource(id = R.string.database)) },
+                    )
+                    preference(
+                        key = "export_database",
+                        title = { Text(text = stringResource(id = R.string.export_database)) },
+                        summary = {
+                            if (state.value.isExportingDatabase) {
+                                Text(text = stringResource(id = R.string.exporting))
+                            } else if (state.value.isExportingDatabaseError) {
+                                Text(text = stringResource(id = R.string.exporting_error))
+                            } else if (state.value.isExportingDatabaseDoneSuccessfully) {
+                                Text(text = stringResource(id = R.string.successfully_exported))
+                            }
+                        },
+                        onClick = onDatabaseExportClick
+                    )
+//                    preference(
+//                        key = "database_clear_exported",
+//                        title = { Text(text = stringResource(id = R.string.remove_exported_items_form_database)) },
+//                        onClick = onClearExportedItemsClick
+//                    )
+//
+//                    preference(
+//                        key = "database_clear",
+//                        title = { Text(text = stringResource(id = R.string.clean_whole_database)) },
+//                        onClick = onClearDatabaseClick
+//                    )
                 }
             }
         }

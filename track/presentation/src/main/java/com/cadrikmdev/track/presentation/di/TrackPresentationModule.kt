@@ -18,6 +18,7 @@ import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.about.AboutScreenViewModel
 import com.cadrikmdev.track.presentation.active_track.ActiveTrackViewModel
+import com.cadrikmdev.track.presentation.settings.SettingsScreenStateManager
 import com.cadrikmdev.track.presentation.settings.SettingsScreenViewModel
 import com.cadrikmdev.track.presentation.track_overview.TrackOverviewViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -68,4 +69,7 @@ val trackPresentationModule = module {
             get(),
         )
     }
+
+    singleOf(::SettingsScreenStateManager)
+
 }

@@ -65,4 +65,11 @@
     <string name="device_radio_settings">Device radio settings</string>
     <string name="open_device_radio_settings">Open device radio settings</string>
     <string name="open_device_radio_settings_error">Unable to open device radio settings</string>
+    <string name="database">Database</string>
+    <string name="remove_exported_items_form_database">Remove exported items</string>
+    <string name="export_database">Export database</string>
+    <string name="clean_whole_database">Clear whole database</string>
+    <string name="exporting">Exporting...</string>
+    <string name="exporting_error">Error during the export</string>
+    <string name="successfully_exported">Successfully exported</string>
 </resources>
