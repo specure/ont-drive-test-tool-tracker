@@ -29,9 +29,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
-class DatabaseExporter(
+class DatabaseManager(
     private val context: Context,
     private val notificationManager: NotificationManager,
+    private val databaseWorkerScheduler: DatabaseWorkerScheduler
 ) {
 
     // TODO: split to notification handler, file saver, track exporter should just provide tracks to export and call others
@@ -47,13 +48,20 @@ class DatabaseExporter(
         createNotificationChannel()
     }
 
-
     sealed class ExportState {
         data object Initial : ExportState()
         data class Exporting(val progress: Int) : ExportState()
         data class Success(val file: File) : ExportState()
         data object NothingToExport : ExportState()
         data object Error : ExportState()
+    }
+
+    suspend fun clearExportedItems() {
+        databaseWorkerScheduler.scheduleWork(WorkType.DeleteExported)
+    }
+
+    suspend fun clearAllItems() {
+        databaseWorkerScheduler.scheduleWork(WorkType.DeleteAll)
     }
 
     suspend fun exportDatabase(

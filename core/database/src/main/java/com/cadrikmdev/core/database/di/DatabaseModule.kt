@@ -10,7 +10,7 @@ import com.cadrikmdev.core.database.RoomLocalTrackDataSource
 import com.cadrikmdev.core.database.Tables
 import com.cadrikmdev.core.database.TrackDatabase
 import com.cadrikmdev.core.database.export.CoreFileProvider
-import com.cadrikmdev.core.database.export.DatabaseExporter
+import com.cadrikmdev.core.database.export.DatabaseManager
 import com.cadrikmdev.core.database.export.DatabaseWorkerScheduler
 import com.cadrikmdev.core.database.export.DeleteAllWorker
 import com.cadrikmdev.core.database.export.DeleteExportedWorker
@@ -68,7 +68,8 @@ val databaseModule = module {
     }
 
     single {
-        DatabaseExporter(
+        DatabaseManager(
+            get(),
             get(),
             get(),
         )

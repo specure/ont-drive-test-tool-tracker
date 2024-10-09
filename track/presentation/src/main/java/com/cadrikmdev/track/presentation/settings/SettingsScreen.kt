@@ -12,6 +12,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.presentation.AppConfig
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
+import com.cadrikmdev.core.presentation.designsystem.components.AppDialog
+import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerActionButton
+import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerToolbar
 import com.cadrikmdev.track.presentation.R
@@ -33,21 +36,13 @@ fun SettingsScreenRoot(
 ) {
     SettingsScreen(
         onBackClick,
-        onOpenRadioSettingsClick,
-        onClearDatabaseClick = {
-            viewModel.onAction(
-                SettingsAction.OnDatabaseClearClick
-            )
-        },
-        onClearExportedItemsClick = {
-            viewModel.onAction(
-                SettingsAction.OnDatabaseClearExportedClick
-            )
-        },
-        onDatabaseExportClick = {
-            viewModel.onAction(
-                SettingsAction.OnDatabaseExportClick
-            )
+        onAction = { action ->
+            when (action) {
+                SettingsAction.OnOpenRadioSettingsClick -> onOpenRadioSettingsClick()
+                else -> {
+                    viewModel.onAction(action)
+                }
+            }
         },
         viewModel
     )
@@ -57,10 +52,7 @@ fun SettingsScreenRoot(
 @Composable
 fun SettingsScreen(
     onBackClick: () -> Unit,
-    onOpenRadioSettingsClick: () -> Unit,
-    onClearDatabaseClick: () -> Unit,
-    onClearExportedItemsClick: () -> Unit,
-    onDatabaseExportClick: () -> Unit,
+    onAction: (SettingsAction) -> Unit,
     viewModel: SettingsScreenViewModel
 ) {
 
@@ -89,7 +81,7 @@ fun SettingsScreen(
                     preference(
                         key = "device_radio_settings",
                         title = { Text(text = stringResource(id = R.string.open_device_radio_settings)) },
-                        onClick = onOpenRadioSettingsClick
+                        onClick = { onAction(SettingsAction.OnOpenRadioSettingsClick) }
                     )
 
                     preferenceCategory(
@@ -248,19 +240,53 @@ fun SettingsScreen(
                                 Text(text = stringResource(id = R.string.successfully_exported))
                             }
                         },
-                        onClick = onDatabaseExportClick
+                        onClick = { onAction(SettingsAction.OnDatabaseExportClick) }
                     )
-//                    preference(
-//                        key = "database_clear_exported",
-//                        title = { Text(text = stringResource(id = R.string.remove_exported_items_form_database)) },
-//                        onClick = onClearExportedItemsClick
-//                    )
-//
-//                    preference(
-//                        key = "database_clear",
-//                        title = { Text(text = stringResource(id = R.string.clean_whole_database)) },
-//                        onClick = onClearDatabaseClick
-//                    )
+                    preference(
+                        key = "database_clear_exported",
+                        title = { Text(text = stringResource(id = R.string.remove_exported_items_form_database)) },
+                        onClick = { onAction(SettingsAction.OnDatabaseClearExportedClick) }
+                    )
+
+                    preference(
+                        key = "database_clear",
+                        title = { Text(text = stringResource(id = R.string.clean_whole_database)) },
+                        onClick = {
+                            onAction(SettingsAction.OnDatabaseClearClick)
+                        }
+                    )
+                }
+
+                if (state.value.isClearDatabaseDialogShown) {
+                    AppDialog(
+                        title = stringResource(
+                            id = R.string.want_clear_database
+                        ),
+                        onDismiss = {
+                            onAction(SettingsAction.OnDatabaseClearCancelClick)
+                        },
+                        description = stringResource(id = R.string.data_will_be_lost),
+                        primaryButton = {
+                            SignalTrackerActionButton(
+                                text = stringResource(id = R.string.cancel),
+                                isLoading = false,
+                                onClick = {
+                                    onAction(SettingsAction.OnDatabaseClearCancelClick)
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                        },
+                        secondaryButton = {
+                            SignalTrackerOutlinedActionButton(
+                                text = stringResource(id = R.string.confirm),
+                                isLoading = false,
+                                onClick = {
+                                    onAction(SettingsAction.OnDatabaseClearConfirmClick)
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    )
                 }
             }
         }

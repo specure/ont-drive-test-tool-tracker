@@ -31,8 +31,8 @@ import androidx.lifecycle.compose.currentStateAsState
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.StartIcon
 import com.cadrikmdev.core.presentation.designsystem.StopIcon
+import com.cadrikmdev.core.presentation.designsystem.components.AppDialog
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerActionButton
-import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerDialog
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerFloatingActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerScaffold
@@ -237,7 +237,7 @@ private fun ActiveTrackScreen(
     }
 
     if (state.isShowingFinishConfirmationDialog && state.hasStartedTracking) {
-        SignalTrackerDialog(
+        AppDialog(
             title = stringResource(
                 id = R.string.want_finish_tracking
         ),

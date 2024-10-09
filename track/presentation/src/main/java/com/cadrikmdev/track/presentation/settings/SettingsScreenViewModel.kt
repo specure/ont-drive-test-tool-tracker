@@ -1,7 +1,7 @@
 package com.cadrikmdev.track.presentation.settings
 
 import androidx.lifecycle.ViewModel
-import com.cadrikmdev.core.database.export.DatabaseExporter
+import com.cadrikmdev.core.database.export.DatabaseManager
 import com.cadrikmdev.core.domain.config.Config
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -10,7 +10,7 @@ class SettingsScreenViewModel(
     val appConfig: Config,
     private val stateManager: SettingsScreenStateManager,
     private val applicationScope: CoroutineScope,
-    private val databaseExporter: DatabaseExporter,
+    private val databaseManager: DatabaseManager,
 ) : ViewModel() {
 
     val stateFlow
@@ -18,29 +18,36 @@ class SettingsScreenViewModel(
 
     fun onAction(action: SettingsAction) {
         when (action) {
-            SettingsAction.OnDatabaseClearClick -> TODO()
-            SettingsAction.OnDatabaseClearExportedClick -> TODO()
+            SettingsAction.OnDatabaseClearClick -> {
+                stateManager.showClearDatabaseDialog()
+            }
+
+            SettingsAction.OnDatabaseClearExportedClick -> {
+                this.applicationScope.launch {
+                    databaseManager.clearExportedItems()
+                }
+            }
             SettingsAction.OnDatabaseExportClick -> {
                 this.applicationScope.launch {
-                    databaseExporter.exportStateFlow.collect { exportState ->
+                    databaseManager.exportStateFlow.collect { exportState ->
                         when (exportState) {
-                            is DatabaseExporter.ExportState.Initial -> {
+                            is DatabaseManager.ExportState.Initial -> {
                                 stateManager.clearDatabaseExportState()
                             }
 
-                            is DatabaseExporter.ExportState.Exporting -> {
+                            is DatabaseManager.ExportState.Exporting -> {
                                 stateManager.inProgressDatabaseExportState()
                             }
 
-                            is DatabaseExporter.ExportState.Success -> {
+                            is DatabaseManager.ExportState.Success -> {
                                 stateManager.setDatabaseExportFinishedSuccessfully()
                             }
 
-                            is DatabaseExporter.ExportState.NothingToExport -> {
+                            is DatabaseManager.ExportState.NothingToExport -> {
                                 stateManager.clearDatabaseExportState()
                             }
 
-                            is DatabaseExporter.ExportState.Error -> {
+                            is DatabaseManager.ExportState.Error -> {
                                 stateManager.setDatabaseExportError()
                             }
                         }
@@ -48,9 +55,22 @@ class SettingsScreenViewModel(
                 }
 
                 applicationScope.launch {
-                    databaseExporter.exportDatabase()
+                    databaseManager.exportDatabase()
                 }
             }
+
+            SettingsAction.OnDatabaseClearCancelClick -> {
+                stateManager.hideClearDatabaseDialog()
+            }
+
+            SettingsAction.OnDatabaseClearConfirmClick -> {
+                applicationScope.launch {
+                    databaseManager.clearAllItems()
+                }
+                stateManager.hideClearDatabaseDialog()
+            }
+
+            SettingsAction.OnOpenRadioSettingsClick -> Unit
         }
     }
 

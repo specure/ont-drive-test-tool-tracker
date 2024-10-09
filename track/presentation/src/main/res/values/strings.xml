@@ -72,4 +72,8 @@
     <string name="exporting">Exporting...</string>
     <string name="exporting_error">Error during the export</string>
     <string name="successfully_exported">Successfully exported</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="want_clear_database">Do you really want to clear whole database?</string>
+    <string name="data_will_be_lost">Data will be lost with no possibility to retrieve them back.</string>
 </resources>

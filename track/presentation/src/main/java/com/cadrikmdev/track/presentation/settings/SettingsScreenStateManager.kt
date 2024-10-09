@@ -19,7 +19,8 @@ class SettingsScreenStateManager {
         return SettingsScreenState(
             isExportingDatabase = false,
             isExportingDatabaseError = false,
-            isExportingDatabaseDoneSuccessfully = false
+            isExportingDatabaseDoneSuccessfully = false,
+            isClearDatabaseDialogShown = false,
         )
     }
 
@@ -59,6 +60,22 @@ class SettingsScreenStateManager {
                 isExportingDatabase = false,
                 isExportingDatabaseError = false,
                 isExportingDatabaseDoneSuccessfully = true
+            )
+        }
+    }
+
+    fun showClearDatabaseDialog() {
+        this.viewModelState.update { state ->
+            state.copy(
+                isClearDatabaseDialogShown = true
+            )
+        }
+    }
+
+    fun hideClearDatabaseDialog() {
+        this.viewModelState.update { state ->
+            state.copy(
+                isClearDatabaseDialogShown = false
             )
         }
     }
