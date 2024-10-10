@@ -1,10 +1,11 @@
 1.2.0-alpha
 ----------------
-Added speeds in Megabits per second to logs to compare them easier
-Added button in settings to device radio settings to restrict technology
-Added possibility to delete whole database
-Added possibility to delete already exported items from database
-Added possibility to export whole database as a .db file (SQLite)
+Added speeds in Megabits per second to logs to compare them easier.
+Added button in settings to device radio settings to restrict technology.
+Added possibility to delete whole database.
+Added possibility to delete already exported items from database.
+Added possibility to export whole database as a .db file (SQLite).
+Added cell band information to database and export file.
 
 1.1.1-alpha
 ----------------

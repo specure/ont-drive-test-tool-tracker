@@ -425,6 +425,11 @@ class MeasurementTracker(
                 mobileNetworkType = mobileNetworkInfo?.networkType.toString(),
                 signalStrength = mobileNetworkInfo?.primarySignalDbm,
                 connectionStatus = if (trackData.internetConnectionConnected) "CONNECTED" else "DISCONNECTED",
+                cellBand = mobileNetworkInfo?.primaryCell?.band?.band.toString(),
+                cellBandFrequencyDownload = mobileNetworkInfo?.primaryCell?.band?.frequencyDL.toString(),
+                cellBandFrequencyUpload = mobileNetworkInfo?.primaryCell?.band?.frequencyUL.toString(),
+                cellBandName = mobileNetworkInfo?.primaryCell?.band?.name,
+                cellBandNameInformal = mobileNetworkInfo?.primaryCell?.band?.informalName,
                 id = null,
             )
             trackRepository.upsertTrack(track)

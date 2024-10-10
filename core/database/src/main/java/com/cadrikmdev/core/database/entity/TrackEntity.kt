@@ -40,6 +40,11 @@ data class TrackEntity(
     val temperatureCelsius: Double?,
     val temperatureTimestamp: String?,
     val temperatureTimestampRaw: Long?,
+    val cellBand: String?,
+    val cellBandFrequencyDownload: String?,
+    val cellBandFrequencyUpload: String?,
+    val cellBandName: String?,
+    val cellBandNameInformal: String?,
     @CsvIgnore
     val exported: Boolean = false,
     @PrimaryKey(autoGenerate = true)

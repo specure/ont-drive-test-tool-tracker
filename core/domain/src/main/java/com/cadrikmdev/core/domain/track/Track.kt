@@ -33,5 +33,10 @@ data class Track(
     val temperatureCelsius: Double?,
     val temperatureTimestamp: String?,
     val temperatureTimestampRaw: Long?,
+    val cellBand: String?,
+    val cellBandFrequencyDownload: String?,
+    val cellBandFrequencyUpload: String?,
+    val cellBandName: String?,
+    val cellBandNameInformal: String?,
     var exported: Boolean = false,
 )

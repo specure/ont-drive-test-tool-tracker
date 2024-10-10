@@ -30,9 +30,20 @@ val databaseModule = module {
     single {
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN downloadSpeedMegaBitsPerSec,  TEXT")
-                database.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN uploadSpeedMegaBitsPerSec,  TEXT")
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN downloadSpeedMegaBitsPerSec TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN uploadSpeedMegaBitsPerSec TEXT")
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN cellBand TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN cellBandName TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN cellBandNameInformal TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN cellBandFrequencyUpload TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN cellBandFrequencyDownload TEXT")
+
             }
         }
 
@@ -41,7 +52,7 @@ val databaseModule = module {
             TrackDatabase::class.java,
             TRACK_DATABASE_NAME
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .fallbackToDestructiveMigration()
             .build()
 

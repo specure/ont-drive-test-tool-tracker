@@ -38,6 +38,11 @@ fun TrackEntity.toTrack(): Track {
         exported = exported,
         uploadSpeedMegaBitsPerSec = uploadSpeedMegaBitsPerSec,
         downloadSpeedMegaBitsPerSec = downloadSpeedMegaBitsPerSec,
+        cellBand = cellBand,
+        cellBandName = cellBandName,
+        cellBandNameInformal = cellBandNameInformal,
+        cellBandFrequencyDownload = cellBandFrequencyDownload,
+        cellBandFrequencyUpload = cellBandFrequencyUpload,
     )
 }
 
@@ -76,5 +81,10 @@ fun Track.toTrackEntity(): TrackEntity {
         exported = exported,
         uploadSpeedMegaBitsPerSec = uploadSpeedMegaBitsPerSec,
         downloadSpeedMegaBitsPerSec = downloadSpeedMegaBitsPerSec,
+        cellBand = cellBand,
+        cellBandName = cellBandName,
+        cellBandNameInformal = cellBandNameInformal,
+        cellBandFrequencyDownload = cellBandFrequencyDownload,
+        cellBandFrequencyUpload = cellBandFrequencyUpload,
     )
 }

@@ -30,8 +30,11 @@ import com.cadrikmdev.connectivity.presentation.mobile_network.util.getCorrectDa
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.mapToMobileNetworkType
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.mccCompat
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.mncCompat
+import com.cadrikmdev.connectivity.presentation.mobile_network.util.mobileNetworkType
+import com.cadrikmdev.connectivity.presentation.mobile_network.util.toCellNetworkInfo
 import com.cadrikmdev.connectivity.presentation.mobile_network.util.toSignalStrengthInfo
 import cz.mroczis.netmonster.core.INetMonster
+import cz.mroczis.netmonster.core.factory.NetMonsterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -329,9 +332,23 @@ class AndroidNetworkTracker(
                     val simCountryIso = subscriptionInfo.countryIso
                     val simDisplayName = subscriptionInfo.displayName?.toString()
 
-                    val primaryCellSignalDbm = netmonster.getCells()
+                    val primaryDataCell = netmonster.getCells()
                         .filterOnlyPrimaryActiveDataCell(dataSubscriptionId = subscriptionInfo.subscriptionId)
-                        .firstOrNull()?.signal?.toSignalStrengthInfo(System.currentTimeMillis())?.value
+                        .firstOrNull()
+
+                    val primaryCellInfo = primaryDataCell?.toCellNetworkInfo(
+                        apn = connectivityManager.activeNetworkInfo?.extraInfo,
+                        dataTelephonyManager = telephonyManager.getCorrectDataTelephonyManagerOrNull()
+                            ?: telephonyManager,
+                        telephonyManagerNetmonster = NetMonsterFactory.getTelephony(
+                            context,
+                            primaryDataCell.subscriptionId
+                        ),
+                        primaryDataCell.mobileNetworkType(netmonster),
+                        subscriptionInfo.subscriptionId,
+                    )
+                    val primaryCellSignalDbm =
+                        primaryDataCell?.signal?.toSignalStrengthInfo(System.currentTimeMillis())?.value
 
 
                     MobileNetworkInfo(
@@ -349,6 +366,7 @@ class AndroidNetworkTracker(
                         simCount = simCount,
                         primarySignalDbm = primaryCellSignalDbm,
                         capabilitiesRaw = networkCapabilitiesRaw,
+                        primaryCell = primaryCellInfo,
                     )
                 }
             mobileNetworkList

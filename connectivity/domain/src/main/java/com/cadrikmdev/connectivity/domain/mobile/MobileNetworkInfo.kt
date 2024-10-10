@@ -32,6 +32,7 @@ data class MobileNetworkInfo(
     val simCount: Int,
 
     val primarySignalDbm: Int?,
+    val primaryCell: CellNetworkInfo?,
     override val capabilitiesRaw: String?
 
 ) : NetworkInfo(

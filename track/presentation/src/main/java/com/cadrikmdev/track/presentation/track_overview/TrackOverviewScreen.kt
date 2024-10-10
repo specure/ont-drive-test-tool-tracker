@@ -36,9 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.currentStateAsState
+import com.cadrikmdev.connectivity.domain.mobile.CellNetworkInfo
+import com.cadrikmdev.connectivity.domain.mobile.CellTechnology
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkInfo
 import com.cadrikmdev.connectivity.domain.mobile.MobileNetworkType
+import com.cadrikmdev.connectivity.domain.mobile.NrConnectionState
 import com.cadrikmdev.connectivity.domain.mobile.PrimaryDataSubscription
+import com.cadrikmdev.connectivity.domain.mobile.band.CellBand
+import com.cadrikmdev.connectivity.domain.mobile.band.CellChannelAttribution
 import com.cadrikmdev.connectivity.domain.wifi.WifiNetworkInfo
 import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.Location
@@ -549,6 +554,34 @@ private fun TrackOverviewScreenPreview() {
                     isPrimaryDataSubscription = PrimaryDataSubscription.TRUE,
                     simCount = 1,
                     primarySignalDbm = -120,
+                    primaryCell = CellNetworkInfo(
+                        providerName = "O2",
+                        band = CellBand(
+                            band = 23,
+                            channelAttribution = CellChannelAttribution.NRARFCN,
+                            channel = 5,
+                            name = "2100",
+                            frequencyDL = 2100.0,
+                            frequencyUL = 2200.0,
+                        ),
+                        networkType = MobileNetworkType.NR_SA,
+                        cellType = CellTechnology.CONNECTION_5G,
+                        mcc = 233,
+                        mnc = 2,
+                        isRoaming = false,
+                        isRegistered = true,
+                        isActive = true,
+                        locationId = null,
+                        areaCode = null,
+                        scramblingCode = null,
+                        apn = null,
+                        signalStrength = null,
+                        dualSimDetectionMethod = null,
+                        nrConnectionState = NrConnectionState.SA,
+                        cellUUID = "celluuid",
+                        isPrimaryDataSubscription = PrimaryDataSubscription.TRUE,
+                        cellState = null,
+                    ),
                     capabilitiesRaw = null,
                 ),
                 currentIperfDownloadInfoRaw = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih ",
