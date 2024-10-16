@@ -1,16 +1,36 @@
 package com.cadrikmdev.track.presentation.settings
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cadrikmdev.core.domain.config.Config
 import com.cadrikmdev.core.presentation.AppConfig
+import com.cadrikmdev.core.presentation.designsystem.ArrowDownIcon
+import com.cadrikmdev.core.presentation.designsystem.ArrowUpIcon
 import com.cadrikmdev.core.presentation.designsystem.SignalTrackerTheme
 import com.cadrikmdev.core.presentation.designsystem.components.AppDialog
 import com.cadrikmdev.core.presentation.designsystem.components.SignalTrackerActionButton
@@ -35,14 +55,17 @@ fun SettingsScreenRoot(
     viewModel: SettingsScreenViewModel = koinViewModel(),
 ) {
     SettingsScreen(
-        onBackClick,
         onAction = { action ->
             when (action) {
                 SettingsAction.OnOpenRadioSettingsClick -> onOpenRadioSettingsClick()
+                SettingsAction.OnBackClick -> onBackClick()
                 else -> {
                     viewModel.onAction(action)
                 }
             }
+        },
+        onEvent = { event ->
+            viewModel.onEvent(event)
         },
         viewModel
     )
@@ -51,10 +74,16 @@ fun SettingsScreenRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onBackClick: () -> Unit,
     onAction: (SettingsAction) -> Unit,
+    onEvent: (SettingsEvent) -> Unit,
     viewModel: SettingsScreenViewModel
 ) {
+
+    LifecycleAwareComposable(
+        onPause = {
+            onEvent(SettingsEvent.OnDestroyed)
+        }
+    )
 
     val state = viewModel.stateFlow.collectAsStateWithLifecycle()
 
@@ -64,7 +93,7 @@ fun SettingsScreen(
                 SignalTrackerToolbar(
                     showBackButton = true,
                     title = stringResource(id = R.string.settings),
-                    onBackClick = onBackClick
+                    onBackClick = { onAction(SettingsAction.OnBackClick) }
                 )
             },
         ) { padding ->
@@ -184,6 +213,74 @@ fun SettingsScreen(
                         summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
                     )
 
+                    item {
+                        Row {
+                            SignalTrackerOutlinedActionButton(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .weight(1f),
+                                text = if (state.value.isIperfDownloadRunning)
+                                    stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                                else
+                                    stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_down),
+                                isLoading = false
+                            ) {
+                                onAction(SettingsAction.OnDownloadTestClick)
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            state.value.currentIperfDownloadSpeed?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Icon(
+                                        imageVector = ArrowDownIcon,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                    Box(
+                                        modifier = Modifier.alignByBaseline()
+                                    ) {
+                                        Text(
+                                            text = it,
+                                            style = MaterialTheme.typography.headlineSmall
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Box(
+                                        modifier = Modifier.alignByBaseline()
+                                    ) {
+                                        Text(
+                                            text = state.value.currentIperfDownloadSpeedUnit.toString(),
+                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    state.value.currentIperfDownloadInfoRaw?.let {
+                                        Box(
+                                            modifier = Modifier.alignByBaseline(),
+                                        ) {
+                                            Text(
+                                                text = it,
+                                                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     preferenceCategory(
                         key = "upload_test_category",
                         title = { Text(text = stringResource(id = R.string.upload_test)) },
@@ -224,6 +321,74 @@ fun SettingsScreen(
                         title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
                         summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
                     )
+
+                    item {
+                        Row {
+                            SignalTrackerOutlinedActionButton(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .weight(1f),
+                                text = if (state.value.isIperfUploadRunning)
+                                    stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
+                                else
+                                    stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_up),
+                                isLoading = false
+                            ) {
+                                onAction(SettingsAction.OnUploadTestClick)
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            state.value.currentIperfUploadSpeed?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Icon(
+                                        imageVector = ArrowUpIcon,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                    Box(
+                                        modifier = Modifier.alignByBaseline()
+                                    ) {
+                                        Text(
+                                            text = it,
+                                            style = MaterialTheme.typography.headlineSmall
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Box(
+                                        modifier = Modifier.alignByBaseline()
+                                    ) {
+                                        Text(
+                                            text = state.value.currentIperfUploadSpeedUnit.toString(),
+                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    state.value.currentIperfUploadInfoRaw?.let {
+                                        Box(
+                                            modifier = Modifier.alignByBaseline(),
+                                        ) {
+                                            Text(
+                                                text = it,
+                                                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     preferenceCategory(
                         key = "database_category",
                         title = { Text(text = stringResource(id = R.string.database)) },
@@ -290,6 +455,26 @@ fun SettingsScreen(
                 }
             }
         }
+    }
+}
 
+@Composable
+fun LifecycleAwareComposable(
+    lifecycleOwner: LifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current).value,
+    onPause: () -> Unit,
+) {
+    val currentOnPause by rememberUpdatedState(onPause)
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                currentOnPause()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 }

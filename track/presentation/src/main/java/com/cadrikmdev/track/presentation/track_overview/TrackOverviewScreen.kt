@@ -1,19 +1,15 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.cadrikmdev.track.presentation.track_overview
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,12 +25,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.currentStateAsState
 import com.cadrikmdev.connectivity.domain.mobile.CellNetworkInfo
 import com.cadrikmdev.connectivity.domain.mobile.CellTechnology
@@ -49,8 +44,6 @@ import com.cadrikmdev.core.domain.Temperature
 import com.cadrikmdev.core.domain.location.Location
 import com.cadrikmdev.core.domain.location.LocationTimestamp
 import com.cadrikmdev.core.domain.location.LocationWithDetails
-import com.cadrikmdev.core.presentation.designsystem.ArrowDownIcon
-import com.cadrikmdev.core.presentation.designsystem.ArrowUpIcon
 import com.cadrikmdev.core.presentation.designsystem.InfoIcon
 import com.cadrikmdev.core.presentation.designsystem.LogoIcon
 import com.cadrikmdev.core.presentation.designsystem.SettingsIcon
@@ -231,14 +224,12 @@ private fun TrackOverviewScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(text = stringResource(id = R.string.permission_required))
-                    if (state.isPermissionRequired) {
-                        SignalTrackerOutlinedActionButton(
-                            modifier = Modifier.padding(start = 16.dp),
-                            text = stringResource(id = com.cadrikmdev.permissions.presentation.R.string.resolve),
-                            isLoading = false
-                        ) {
-                            onAction(TrackOverviewAction.OnResolvePermissionClick)
-                        }
+                    SignalTrackerOutlinedActionButton(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = stringResource(id = com.cadrikmdev.permissions.presentation.R.string.resolve),
+                        isLoading = false
+                    ) {
+                        onAction(TrackOverviewAction.OnResolvePermissionClick)
                     }
                 }
             }
@@ -255,12 +246,12 @@ private fun TrackOverviewScreen(
                 ) {
                     NetworkInfoRow(
                         title = stringResource(id = R.string.temperature),
-                        value = (it.temperatureCelsius ?: "-").toString() + " °C",
+                        value = (it.temperatureCelsius).toString() + " °C",
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.updated_at),
                         value = (it.timestampMillis.toDuration(DurationUnit.MILLISECONDS)
-                            .toLocalTime() ?: "-").toString(),
+                            .toLocalTime()).toString(),
                     )
                 }
             }
@@ -277,43 +268,43 @@ private fun TrackOverviewScreen(
                 if (state.mobileNetworkInfo is MobileNetworkInfo) {
                     NetworkInfoRow(
                         title = stringResource(id = R.string.operator),
-                        value = state.mobileNetworkInfo?.name.toString() ?: "-",
+                        value = state.mobileNetworkInfo.name.toString(),
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.sim_count),
-                        value = state.mobileNetworkInfo?.simCount.toString() ?: "-",
+                        value = state.mobileNetworkInfo.simCount.toString(),
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.network_type),
-                        value = state.mobileNetworkInfo?.networkType.toString() ?: "-",
+                        value = state.mobileNetworkInfo.networkType.toString(),
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.primary_signal),
-                        value = state.mobileNetworkInfo?.primarySignalDbm.toString() ?: "-",
+                        value = state.mobileNetworkInfo.primarySignalDbm.toString(),
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.updated_at),
-                        value = state.mobileNetworkInfo?.timestampMillis?.toDuration(DurationUnit.MILLISECONDS)
-                            ?.toLocalTime().toString() ?: "-",
+                        value = state.mobileNetworkInfo.timestampMillis.toDuration(DurationUnit.MILLISECONDS)
+                            .toLocalTime().toString(),
                     )
                 }
                 if (state.mobileNetworkInfo is WifiNetworkInfo) {
                     NetworkInfoRow(
                         title = stringResource(id = R.string.network_type),
-                        value = state.mobileNetworkInfo?.type.toString() ?: "-",
+                        value = state.mobileNetworkInfo.type.toString(),
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.name),
-                        value = state.mobileNetworkInfo?.name.toString() ?: "-",
+                        value = state.mobileNetworkInfo.name.toString(),
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.primary_signal),
-                        value = state.mobileNetworkInfo?.rssi.toString() ?: "-",
+                        value = state.mobileNetworkInfo.rssi.toString(),
                     )
                     NetworkInfoRow(
                         title = stringResource(id = R.string.updated_at),
-                        value = state.mobileNetworkInfo?.timestampMillis?.toDuration(DurationUnit.MILLISECONDS)
-                            ?.toLocalTime().toString() ?: "-",
+                        value = state.mobileNetworkInfo.timestampMillis.toDuration(DurationUnit.MILLISECONDS)
+                            .toLocalTime().toString(),
                     )
                 }
             }
@@ -384,131 +375,7 @@ private fun TrackOverviewScreen(
                 }
             }
 
-            if (state.isSpeedTestEnabled) {
-                Row {
-                    SignalTrackerOutlinedActionButton(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .weight(1f),
-                        text = if (state.isIperfDownloadRunning)
-                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
-                        else
-                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_down),
-                        isLoading = false
-                    ) {
-                        onAction(TrackOverviewAction.OnDownloadTestClick)
-                    }
-                    Spacer(modifier = Modifier.weight(0.5f))
-                    SignalTrackerOutlinedActionButton(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .weight(1f),
-                        text = if (state.isIperfUploadRunning)
-                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.stop)
-                        else
-                            stringResource(id = com.cadrikmdev.permissions.presentation.R.string.test_up),
-                        isLoading = false
-                    ) {
-                        onAction(TrackOverviewAction.OnUploadTestClick)
-                    }
-                }
 
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    state.currentIperfDownloadSpeed?.let {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                        ) {
-                            Icon(
-                                imageVector = ArrowDownIcon,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(30.dp)
-                            )
-                            Box(
-                                modifier = Modifier.alignByBaseline()
-                            ) {
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier.alignByBaseline()
-                            ) {
-                                Text(
-                                    text = state.currentIperfDownloadSpeedUnit.toString(),
-                                    fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                )
-                            }
-                        }
-                    }
-
-
-                    state.currentIperfUploadSpeed?.let {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                        ) {
-                            Icon(
-                                imageVector = ArrowUpIcon,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(30.dp)
-                            )
-                            Box(
-                                modifier = Modifier.alignByBaseline()
-                            ) {
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier.alignByBaseline()
-                            ) {
-                                Text(
-                                    text = state.currentIperfUploadSpeedUnit.toString(),
-                                    fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Row {
-                    state.currentIperfDownloadInfoRaw?.let {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = it,
-                            fontSize = 8.sp
-                        )
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .width(8.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                    )
-                    state.currentIperfUploadInfoRaw?.let {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = it,
-                            fontSize = 8.sp
-                        )
-                    }
-                }
-            }
         }
     }
 }
@@ -584,9 +451,6 @@ private fun TrackOverviewScreenPreview() {
                     ),
                     capabilitiesRaw = null,
                 ),
-                currentIperfDownloadInfoRaw = "fdsjf rlkt herukjfn ef uheirfu ef ernfhu fieru fheriuferiuheruih ",
-                currentIperfDownloadSpeed = "20",
-                currentIperfUploadSpeed = "2",
                 currentTemperatureCelsius = Temperature(
                     22.3,
                     System.currentTimeMillis(),

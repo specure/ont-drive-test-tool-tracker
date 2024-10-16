@@ -6,6 +6,8 @@ Added possibility to delete whole database.
 Added possibility to delete already exported items from database.
 Added possibility to export whole database as a .db file (SQLite).
 Added cell band information to database and export file.
+Moved testing of speed test upload and download from overview screen to settings screen and added
+states.
 
 1.1.1-alpha
 ----------------

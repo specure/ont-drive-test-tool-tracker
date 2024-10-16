@@ -19,8 +19,8 @@
     <string name="stop">Stop</string>
     <string name="start">Start</string>
     <string name="write_external_storage">Write external storage</string>
-    <string name="test_down">Test Dw</string>
-    <string name="test_up">Test Up</string>
+    <string name="test_down">Test Download Speed configuration</string>
+    <string name="test_up">Test Upload Speed configuration</string>
     <string name="bluetooth_connect">Bluetooth connect</string>
     <string name="bluetooth_advertise">Bluetooth advertise</string>
     <string name="permission_bluetooth_connect_rationale">It seems you permanently declined bluetooth connect permission. You can go to app settings to grant it</string>

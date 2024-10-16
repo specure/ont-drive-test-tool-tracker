@@ -1,14 +1,10 @@
 package com.cadrikmdev.track.presentation.track_overview
 
 import android.Manifest
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.cadrikmdev.connectivity.domain.ConnectivityObserver
 import com.cadrikmdev.connectivity.domain.NetworkTracker
@@ -24,10 +20,6 @@ import com.cadrikmdev.core.presentation.service.ServiceChecker
 import com.cadrikmdev.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.cadrikmdev.intercom.domain.message.TrackerAction
 import com.cadrikmdev.intercom.domain.server.BluetoothServerService
-import com.cadrikmdev.iperf.domain.IperfOutputParser
-import com.cadrikmdev.iperf.domain.IperfTestStatus
-import com.cadrikmdev.iperf.presentation.IperfDownloadRunner
-import com.cadrikmdev.iperf.presentation.IperfUploadRunner
 import com.cadrikmdev.permissions.domain.PermissionHandler
 import com.cadrikmdev.permissions.presentation.appPermissions
 import com.cadrikmdev.track.domain.LocationObserver
@@ -59,8 +51,6 @@ class TrackOverviewViewModel(
     private val locationObserver: LocationObserver,
     private val mobileNetworkObserver: NetworkTracker,
     private val temperatureInfoReceiver: TemperatureInfoReceiver,
-    private val applicationContext: Context,
-    private val iperfParser: IperfOutputParser,
     private val trackExporter: TracksExporter,
     private val appConfig: Config,
     private val intercomService: BluetoothServerService,
@@ -69,38 +59,6 @@ class TrackOverviewViewModel(
 
     var state by mutableStateOf(TrackOverviewState())
         private set
-
-    private val downloadResultBuilder: StringBuilder = StringBuilder()
-    private val uploadResultBuilder: StringBuilder = StringBuilder()
-
-    private val iperfUpload =
-        IperfUploadRunner(applicationContext, applicationScope, iperfParser, appConfig)
-    private val iperfDownload =
-        IperfDownloadRunner(applicationContext, applicationScope, iperfParser, appConfig)
-
-    private val _iPerfDownloadRequestResult: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-    val iPerfDownloadRequestResult: LiveData<String>
-        get() = _iPerfDownloadRequestResult
-
-    private val _iPerfUploadRequestResult: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-    val iPerfUploadRequestResult: LiveData<String>
-        get() = _iPerfUploadRequestResult
-
-    private val _iPerfDownloadTestRunning: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>(false)
-    }
-    val iPerfDownloadTestRunning: LiveData<Boolean>
-        get() = _iPerfDownloadTestRunning
-
-    private val _iPerfUploadTestRunning: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>(false)
-    }
-    val iPerfUploadTestRunning: LiveData<Boolean>
-        get() = _iPerfUploadTestRunning
 
     private val isObservingLocation = MutableStateFlow(false)
 
@@ -127,22 +85,6 @@ class TrackOverviewViewModel(
         viewModelScope.launch {
             temperatureInfoReceiver.observeTemperature().collect { temperature ->
                 updateTemperature(temperature)
-            }
-        }
-
-        viewModelScope.launch {
-            iPerfDownloadRequestResult.asFlow().collect {
-                state = state.copy(
-                    currentIperfDownloadInfoRaw = it
-                )
-            }
-        }
-
-        viewModelScope.launch {
-            iPerfUploadRequestResult.asFlow().collect {
-                state = state.copy(
-                    currentIperfUploadInfoRaw = it
-                )
             }
         }
 
@@ -193,42 +135,6 @@ class TrackOverviewViewModel(
             }
         }.launchIn(viewModelScope)
 
-        iperfUpload.testProgressDetailsFlow.onEach {
-            state = if (it.testProgress.isEmpty()) {
-                state.copy(
-                    currentIperfUploadSpeed = "-",
-                    currentIperfUploadSpeedUnit = "",
-                    isIperfUploadRunning = it.status in setOf(IperfTestStatus.RUNNING, IperfTestStatus.INITIALIZING)
-                )
-            } else {
-                state.copy(
-                    currentIperfUploadSpeed = it.testProgress.last().bandwidth.toString(),
-                    currentIperfUploadSpeedUnit = it.testProgress.last().bandwidthUnit,
-                    isIperfUploadRunning = it.status in setOf(IperfTestStatus.RUNNING, IperfTestStatus.INITIALIZING)
-                )
-            }
-
-        }.launchIn(viewModelScope)
-
-        iperfDownload.testProgressDetailsFlow.onEach {
-            state = if (it.testProgress.isEmpty()) {
-                state.copy(
-                    currentIperfDownloadSpeed = "-",
-                    currentIperfDownloadSpeedUnit = "",
-                    isIperfDownloadRunning = it.status in setOf(IperfTestStatus.RUNNING, IperfTestStatus.INITIALIZING)
-                )
-            } else {
-                state.copy(
-                    currentIperfDownloadSpeed = it.testProgress.last().bandwidth.toString(),
-                    currentIperfDownloadSpeedUnit = it.testProgress.last().bandwidthUnit,
-                    isIperfDownloadRunning = it.status in setOf(IperfTestStatus.RUNNING, IperfTestStatus.INITIALIZING)
-                )
-            }
-        }.launchIn(viewModelScope)
-
-//        viewModelScope.launch {
-//            startIperf()
-//        }
     }
 
     private fun updateTrackSizeForExport(trackCount: Int) {
@@ -246,34 +152,11 @@ class TrackOverviewViewModel(
     fun onAction(action: TrackOverviewAction) {
         when (action) {
             TrackOverviewAction.OnSettingsClick -> logout()
-            TrackOverviewAction.OnDemoStartClick -> {
-                viewModelScope.launch {
-                    startIperf()
-                }
-            }
 
             TrackOverviewAction.OnResolveLocationService -> {
                 gpsLocationService.resolve()
             }
 
-            TrackOverviewAction.OnDownloadTestClick -> {
-                viewModelScope.launch {
-                    if (state.isIperfDownloadRunning) {
-                        iperfDownload.stopTest()
-                    } else {
-                        iperfDownload.startTest()
-                    }
-                }
-            }
-            TrackOverviewAction.OnUploadTestClick -> {
-                viewModelScope.launch {
-                    if (state.isIperfUploadRunning) {
-                        iperfUpload.stopTest()
-                    } else {
-                        iperfUpload.startTest()
-                    }
-                }
-            }
             TrackOverviewAction.OnExportToCsvClick -> {
 
                 this.applicationScope.launch {
@@ -352,10 +235,6 @@ class TrackOverviewViewModel(
         }
     }
 
-    private fun startIperf() {
-        iperfDownload.startTest()
-        iperfUpload.startTest()
-    }
 
     override fun onCleared() {
         super.onCleared()
