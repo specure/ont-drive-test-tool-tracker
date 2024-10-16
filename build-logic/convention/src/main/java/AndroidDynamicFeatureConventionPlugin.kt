@@ -1,9 +1,9 @@
 import com.android.build.api.dsl.DynamicFeatureExtension
-import com.cadrikmdev.convention.ExtensionType
-import com.cadrikmdev.convention.addUiLayerDependencies
-import com.cadrikmdev.convention.configureAndroidCompose
-import com.cadrikmdev.convention.configureBuildTypes
-import com.cadrikmdev.convention.configureKotlinAndroid
+import com.specure.convention.ExtensionType
+import com.specure.convention.addUiLayerDependencies
+import com.specure.convention.configureAndroidCompose
+import com.specure.convention.configureBuildTypes
+import com.specure.convention.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

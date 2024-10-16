@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.permissions.presentation"
+    namespace = "com.specure.permissions.presentation"
 }
 
 dependencies {

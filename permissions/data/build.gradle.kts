@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.permissions.data"
+    namespace = "com.specure.permissions.data"
 }
 
 dependencies {

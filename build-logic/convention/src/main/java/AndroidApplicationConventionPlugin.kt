@@ -1,8 +1,8 @@
 import com.android.build.api.dsl.ApplicationExtension
-import com.cadrikmdev.convention.ExtensionType
-import com.cadrikmdev.convention.configureBuildTypes
-import com.cadrikmdev.convention.configureKotlinAndroid
-import com.cadrikmdev.convention.libs
+import com.specure.convention.ExtensionType
+import com.specure.convention.configureBuildTypes
+import com.specure.convention.configureKotlinAndroid
+import com.specure.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

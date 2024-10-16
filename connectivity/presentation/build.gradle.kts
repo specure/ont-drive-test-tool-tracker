@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.connectivity.presentation"
+    namespace = "com.specure.connectivity.presentation"
 }
 
 dependencies {

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.iperf.presentation"
+    namespace = "com.specure.iperf.presentation"
 }
 
 dependencies {

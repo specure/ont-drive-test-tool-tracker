@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.track.data"
+    namespace = "com.specure.track.data"
 }
 
 dependencies {

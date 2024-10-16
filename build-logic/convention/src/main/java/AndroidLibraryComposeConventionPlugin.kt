@@ -1,5 +1,5 @@
 import com.android.build.api.dsl.LibraryExtension
-import com.cadrikmdev.convention.configureAndroidCompose
+import com.specure.convention.configureAndroidCompose
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType

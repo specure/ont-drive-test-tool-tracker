@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.intercom.presentation"
+    namespace = "com.specure.intercom.presentation"
 }
 
 dependencies {

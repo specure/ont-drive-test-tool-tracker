@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.core.presentation.service"
+    namespace = "com.specure.core.presentation.service"
 }
 
 dependencies {

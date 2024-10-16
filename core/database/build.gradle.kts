@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.core.database"
+    namespace = "com.specure.core.database"
 }
 
 dependencies {

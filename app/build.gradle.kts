@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.signaltracker"
+    namespace = "com.specure.signaltracker"
 
     defaultConfig {
         versionName

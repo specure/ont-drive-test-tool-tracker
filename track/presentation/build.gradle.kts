@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cadrikmdev.track.presentation"
+    namespace = "com.specure.track.presentation"
 }
 
 dependencies {
