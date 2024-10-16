@@ -1,7 +1,7 @@
 [versions]
 activityCompose = "1.9.2"
 agp = "8.5.2"
-androidTools = "31.7.0"
+androidTools = "31.7.1"
 annotation = "1.8.2"
 appcompat = "1.7.0"
 bson = "4.11.1"

@@ -27,6 +27,7 @@ import com.cadrikmdev.track.domain.MeasurementTracker
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportError
 import com.cadrikmdev.track.presentation.track_overview.model.FileExportUi
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
@@ -39,15 +40,16 @@ import timber.log.Timber
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+@ExperimentalCoroutinesApi
 class TrackOverviewViewModel(
     private val trackRepository: TrackRepository,
     private val applicationScope: CoroutineScope,
     private val sessionStorage: SessionStorage,
-    private val connectivityObserver: ConnectivityObserver,
+    connectivityObserver: ConnectivityObserver,
     private val permissionHandler: PermissionHandler,
     private val gpsLocationService: ServiceChecker,
-    private val locationServiceObserver: LocationServiceObserver,
-    private val wifiServiceObserver: WifiServiceObserver,
+    locationServiceObserver: LocationServiceObserver,
+    wifiServiceObserver: WifiServiceObserver,
     private val locationObserver: LocationObserver,
     private val mobileNetworkObserver: NetworkTracker,
     private val temperatureInfoReceiver: TemperatureInfoReceiver,

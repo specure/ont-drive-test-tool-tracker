@@ -42,7 +42,6 @@ fun TrackEntity.toTrack(): Track {
         cellBandName = cellBandName,
         cellBandNameInformal = cellBandNameInformal,
         cellBandFrequencyDownload = cellBandFrequencyDownload,
-        cellBandFrequencyUpload = cellBandFrequencyUpload,
     )
 }
 
@@ -85,6 +84,5 @@ fun Track.toTrackEntity(): TrackEntity {
         cellBandName = cellBandName,
         cellBandNameInformal = cellBandNameInformal,
         cellBandFrequencyDownload = cellBandFrequencyDownload,
-        cellBandFrequencyUpload = cellBandFrequencyUpload,
     )
 }

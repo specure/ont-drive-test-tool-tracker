@@ -47,12 +47,142 @@ val databaseModule = module {
             }
         }
 
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // creating temp table without cellBandFrequencyUpload field
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `track_entity_new` " +
+                            "(`durationMillis` INTEGER NOT NULL, " +
+                            "`timestamp` TEXT NOT NULL, " +
+                            "`timestampRaw` INTEGER NOT NULL, " +
+                            "`downloadSpeed` REAL, " +
+                            "`downloadSpeedUnit` TEXT, " +
+                            "`downloadSpeedMegaBitsPerSec` TEXT, " +
+                            "`downloadSpeedTestState` TEXT, " +
+                            "`downloadSpeedTestError` TEXT, " +
+                            "`downloadSpeedTestTimestamp` TEXT, " +
+                            "`downloadSpeedTestTimestampRaw` INTEGER, " +
+                            "`uploadSpeed` REAL, " +
+                            "`uploadSpeedUnit` TEXT, " +
+                            "`uploadSpeedMegaBitsPerSec` TEXT, " +
+                            "`uploadSpeedTestState` TEXT, " +
+                            "`uploadSpeedTestError` TEXT, " +
+                            "`uploadSpeedTestTimestamp` TEXT, " +
+                            "`uploadSpeedTestTimestampRaw` INTEGER, " +
+                            "`latitude` REAL, `longitude` REAL, " +
+                            "`locationTimestamp` TEXT, " +
+                            "`locationTimestampRaw` INTEGER, " +
+                            "`networkType` TEXT, " +
+                            "`mobileNetworkOperator` TEXT, " +
+                            "`mobileNetworkType` TEXT, " +
+                            "`signalStrength` INTEGER, " +
+                            "`networkInfoTimestamp` TEXT, " +
+                            "`networkInfoTimestampRaw` INTEGER, " +
+                            "`connectionStatus` TEXT, " +
+                            "`temperatureCelsius` REAL, " +
+                            "`temperatureTimestamp` TEXT, " +
+                            "`temperatureTimestampRaw` INTEGER, " +
+                            "`cellBand` TEXT, " +
+                            "`cellBandFrequencyDownload` TEXT, " +
+                            "`cellBandName` TEXT, " +
+                            "`cellBandNameInformal` TEXT, " +
+                            "`exported` INTEGER NOT NULL, " +
+                            "`id` INTEGER PRIMARY KEY AUTOINCREMENT)"
+                                .trimIndent()
+                )
+                db.execSQL(
+                    """
+                        INSERT INTO track_entity_new (
+                           id,
+                           durationMillis,
+                           timestamp,
+                           timestampRaw,
+                           downloadSpeed,
+                           downloadSpeedUnit,
+                           downloadSpeedMegaBitsPerSec,
+                           downloadSpeedTestState,
+                           downloadSpeedTestError,
+                           downloadSpeedTestTimestamp,
+                           downloadSpeedTestTimestampRaw,
+                           uploadSpeed, 
+                           uploadSpeedUnit, 
+                           uploadSpeedMegaBitsPerSec, 
+                           uploadSpeedTestState,
+                           uploadSpeedTestError,
+                           uploadSpeedTestTimestamp,
+                           uploadSpeedTestTimestampRaw,
+                           latitude,
+                           locationTimestamp,
+                           locationTimestampRaw,
+                           networkType,     
+                           mobileNetworkOperator,
+                           mobileNetworkType, 
+                           signalStrength, 
+                           networkInfoTimestamp,
+                           networkInfoTimestampRaw,
+                           connectionStatus,
+                           temperatureCelsius,
+                           temperatureTimestamp,
+                           temperatureTimestampRaw,
+                           cellBand,    
+                           cellBandFrequencyDownload, 
+                           cellBandName, 
+                           cellBandNameInformal,
+                           exported
+                           )
+                        SELECT 
+                            id,
+                           durationMillis,
+                           timestamp,
+                           timestampRaw,
+                           downloadSpeed,
+                           downloadSpeedUnit,
+                           downloadSpeedMegaBitsPerSec,
+                           downloadSpeedTestState,
+                           downloadSpeedTestError,
+                           downloadSpeedTestTimestamp,
+                           downloadSpeedTestTimestampRaw,
+                           uploadSpeed, 
+                           uploadSpeedUnit, 
+                           uploadSpeedMegaBitsPerSec, 
+                           uploadSpeedTestState,
+                           uploadSpeedTestError,
+                           uploadSpeedTestTimestamp,
+                           uploadSpeedTestTimestampRaw,
+                           latitude,
+                           locationTimestamp,
+                           locationTimestampRaw,
+                           networkType,     
+                           mobileNetworkOperator,
+                           mobileNetworkType, 
+                           signalStrength, 
+                           networkInfoTimestamp,
+                           networkInfoTimestampRaw,
+                           connectionStatus,
+                           temperatureCelsius,
+                           temperatureTimestamp,
+                           temperatureTimestampRaw,
+                           cellBand,    
+                           cellBandFrequencyDownload, 
+                           cellBandName, 
+                           cellBandNameInformal,
+                           exported
+                        FROM track_entity
+                    """.trimIndent()
+                )
+                db.execSQL("DROP TABLE track_entity")
+                db.execSQL("ALTER TABLE track_entity_new RENAME TO track_entity")
+            }
+        }
+
+
+
         Room.databaseBuilder(
             androidApplication(),
             TrackDatabase::class.java,
             TRACK_DATABASE_NAME
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .fallbackToDestructiveMigration()
             .build()
 

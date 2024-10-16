@@ -18,8 +18,8 @@ class SettingsScreenViewModel(
     private val stateManager: SettingsScreenStateManager,
     private val applicationScope: CoroutineScope,
     private val databaseManager: DatabaseManager,
-    private val iperfParser: IperfOutputParser,
-    private val applicationContext: Context,
+    iperfParser: IperfOutputParser,
+    applicationContext: Context,
 ) : ViewModel() {
 
     val stateFlow

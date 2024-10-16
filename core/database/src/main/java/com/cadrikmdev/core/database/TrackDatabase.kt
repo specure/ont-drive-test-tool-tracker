@@ -9,7 +9,7 @@ import com.cadrikmdev.core.database.entity.TrackEntity
     entities = [
         TrackEntity::class,
     ],
-    version = 3
+    version = 4
 )
 abstract class TrackDatabase : RoomDatabase() {
 

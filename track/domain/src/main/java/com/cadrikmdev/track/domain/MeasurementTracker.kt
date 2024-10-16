@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.cadrikmdev.track.domain
 
 import com.cadrikmdev.connectivity.domain.ConnectivityObserver
@@ -20,6 +22,7 @@ import com.cadrikmdev.iperf.domain.IperfTest
 import com.cadrikmdev.iperf.domain.IperfTestStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -427,7 +430,6 @@ class MeasurementTracker(
                 connectionStatus = if (trackData.internetConnectionConnected) "CONNECTED" else "DISCONNECTED",
                 cellBand = mobileNetworkInfo?.primaryCell?.band?.band.toString(),
                 cellBandFrequencyDownload = mobileNetworkInfo?.primaryCell?.band?.frequencyDL.toString(),
-                cellBandFrequencyUpload = mobileNetworkInfo?.primaryCell?.band?.frequencyUL.toString(),
                 cellBandName = mobileNetworkInfo?.primaryCell?.band?.name,
                 cellBandNameInformal = mobileNetworkInfo?.primaryCell?.band?.informalName,
                 id = null,

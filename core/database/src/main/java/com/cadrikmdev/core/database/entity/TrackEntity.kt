@@ -42,7 +42,6 @@ data class TrackEntity(
     val temperatureTimestampRaw: Long?,
     val cellBand: String?,
     val cellBandFrequencyDownload: String?,
-    val cellBandFrequencyUpload: String?,
     val cellBandName: String?,
     val cellBandNameInformal: String?,
     @CsvIgnore
