@@ -14,6 +14,14 @@ android {
         }
     }
 
+    buildTypes {
+        release {
+            isMinifyEnabled = true // Disable R8 for release builds
+            isShrinkResources = true
+        }
+    }
+
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

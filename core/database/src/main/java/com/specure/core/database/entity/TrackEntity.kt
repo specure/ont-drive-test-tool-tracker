@@ -1,10 +1,12 @@
 package com.specure.core.database.entity
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.opencsv.bean.CsvIgnore
 import com.specure.core.database.Tables
 
+@Keep
 @Entity(
     tableName = Tables.TRACK_ENTITY
 )

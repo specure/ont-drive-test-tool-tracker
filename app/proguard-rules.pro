@@ -31,51 +31,48 @@
 -keep class org.koin.core.** { *; }
 -keep class org.koin.dsl.** { *; }
 
--keep class com.fasterxml.jackson.** { *; }
--keepnames class com.fasterxml.jackson.** { *; }
--keep class org.codehaus.** { *; }
-
--dontwarn org.koin.**
--dontwarn com.fasterxml.jackson.databind.**
-
-
--keep class com.fasterxml.** { *; }
--keepclassmembers class ** extends com.fasterxml.jackson.databind.ser.std.** {
-   public <init>(...);
-}
-
--keepclassmembers class ** extends com.fasterxml.jackson.databind.deser.std.** {
-   public <init>(...);
-}
- -keepnames class com.fasterxml.jackson.** { *; }
- -dontwarn com.fasterxml.jackson.databind.**
- -keep class org.codehaus.** { *; }
--keep public class your.class.** {
+-keep class com.specure.track.data.di.* {
     *;
 }
--dontwarn com.fasterxml.jackson.databind.*
+# Keep SLF4J Logger
+-keep class org.slf4j.** { *; }
 
--keepattributes com.specure.connectivity.presentation.mobile_network.di.*
--keepattributes com.specure.connectivity.presentation.network.di.*
--keepattributes com.specure.core.data.di.*
--keepattributes com.specure.core.presentation.designsystem.ThemeKt
--keepattributes com.specure.core.presentation.ui.DataFormattersKt
--keepattributes com.specure.intercom.data.di.*
--keepattributes com.specure.permissions.presentation.di.*
--keepattributes com.specure.permissions.presentation.screen.permissions.PermissionsScreenKt
--keepattributes com.specure.permissions.presentation.screen.permissions.PermissionsScreenViewModel
--keepattributes com.specure.permissions.presentation.util.PermissionsExtKt
--keepattributes com.specure.track.data.di.*
--keepattributes com.specure.track.location.di.*
--keepattributes com.specure.track.presentation.about.AboutScreenKt
--keepattributes com.specure.track.presentation.about.AboutScreenNav
--keepattributes com.specure.track.presentation.about.AboutScreenViewModel
--keepattributes com.specure.track.presentation.active_track.ActiveTrackScreenKt
--keepattributes com.specure.track.presentation.active_track.ActiveTrackViewModel
--keepattributes com.specure.track.presentation.active_track.service.*
--keepattributes com.specure.track.presentation.di.*
--keepattributes com.specure.track.presentation.settings.SettingsScreenKt
--keepattributes com.specure.track.presentation.settings.SettingsScreenViewModel
--keepattributes com.specure.track.presentation.settings.navigation.SettingsScreenNav
--keepattributes com.specure.track.presentation.track_overview.TrackOverviewScreenKt
--keepattributes com.specure.track.presentation.track_overview.TrackOverviewViewModel
+# Keep all classes related to Apache Commons Logging
+-keep class org.apache.commons.logging.** { *; }
+-keep class org.apache.log4j.** { *; }
+
+# Keep Apache Commons Logging's ServletContextCleaner
+-keep class org.apache.commons.logging.impl.ServletContextCleaner { *; }
+
+# Keep all Avalon Framework classes
+-keep class org.apache.avalon.framework.** { *; }
+
+# Keep Avalon Logger class
+-keep class org.apache.avalon.framework.logger.Logger { *; }
+
+# Keep all javax.servlet classes
+-keep class javax.servlet.** { *; }
+
+# Keep the Logback implementation if using Logback
+-keep class ch.qos.logback.** { *; }
+
+# Keep the Iperf implementation if using Logback
+-keep class com.cadrikmdev.iperf.** { *; }
+
+-keep class com.synaptictools.iperf.** { *; }
+
+# Keep native method names for JNI
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# Ignore missing javax.servlet classes
+-dontwarn javax.servlet.**
+# Suppress warnings for missing Apache Avalon Logger and LogKit classes
+-dontwarn org.apache.avalon.framework.logger.**
+-dontwarn org.apache.log.**
+-dontwarn org.apache.log4j.**
+-dontwarn ch.qos.logback.**
+-dontwarn com.cadrikmdev.iperf.**
+-dontwarn com.synaptictools.iperf.**
+-dontwarn org.slf4j.**
