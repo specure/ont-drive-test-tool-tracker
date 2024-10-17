@@ -19,3 +19,38 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-dontwarn java.lang.invoke.StringConcatFactory
+-keepattributes Exceptions,InnerClasses,MethodParameters,*Annotation*,EnclosingMethod,Signature
+
+-keepclassmembers class * { public <init>(...); }
+
+-keep class kotlin.Metadata { *; }
+-keep class kotlin.reflect.** { *; }
+
+-keep class org.koin.** { *; }
+-keep class org.koin.core.** { *; }
+-keep class org.koin.dsl.** { *; }
+
+-keep class com.fasterxml.jackson.** { *; }
+-keepnames class com.fasterxml.jackson.** { *; }
+-keep class org.codehaus.** { *; }
+
+-dontwarn org.koin.**
+-dontwarn com.fasterxml.jackson.databind.**
+
+
+-keep class com.fasterxml.** { *; }
+-keepclassmembers class ** extends com.fasterxml.jackson.databind.ser.std.** {
+   public <init>(...);
+}
+
+-keepclassmembers class ** extends com.fasterxml.jackson.databind.deser.std.** {
+   public <init>(...);
+}
+ -keepnames class com.fasterxml.jackson.** { *; }
+ -dontwarn com.fasterxml.jackson.databind.**
+ -keep class org.codehaus.** { *; }
+-keep public class your.class.** {
+    *;
+}
+-dontwarn com.fasterxml.jackson.databind.*

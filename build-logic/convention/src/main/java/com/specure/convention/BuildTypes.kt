@@ -90,7 +90,7 @@ private fun BuildType.configureReleaseBuildType(
 ) {
     buildConfigField("String", "BASE_URL", "\"$hostname\"")
     buildConfigField("boolean", "FEATURE_SPEED_TEST_ENABLED", "$speedTestFeatureEnabled")
-    isMinifyEnabled = true
+    isMinifyEnabled = false
     proguardFiles(
         commonExtension.getDefaultProguardFile("proguard-android-optimize.txt"),
         "proguard-rules.pro"

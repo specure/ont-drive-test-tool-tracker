@@ -12,7 +12,7 @@ this is meant to be build on macOS or linux-based systems.
 
 ## Build:
 
-Create or add values to local.properties file:
+### Create or add values to local.properties file:
 HOSTNAME=<YOUR_IPERF_HOSTNAME>
 FEATURE_SPEED_TEST_ENABLED=<true OR false>
 MAPS_API_KEY=<GOOGLE MAPS API KEY>
@@ -21,6 +21,25 @@ example:
 HOSTNAME=myiperfhostname.com
 FEATURE_SPEED_TEST_ENABLED=true
 MAPS_API_KEY=dfsfdsggfkg-fgsdgljsgn-gfsgs
+
+### Register app in the firebase or remove Firebase integration
+
+Register app in the firebase and put google-services.json in the "app" folder (or remove firebase
+integration by removing from project level build.gradle.kts file
+
+"alias(libs.plugins.google.services) apply false"
+
+and from app build.gradle.kts file:
+
+"implementation(platform(libs.firebase))"
+
+and from AndroidApplicationConventionPlugin file:
+
+"apply("com.google.gms.google-services")"
+
+and sync gradle)
+
+### Get and init submodules with correct branches
 
 in iperf-jni-upload folder
 

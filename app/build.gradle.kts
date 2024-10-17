@@ -84,4 +84,18 @@ dependencies {
     implementation(projects.track.data)
     implementation(projects.track.location)
 
+    implementation(platform(libs.firebase))
+
 }
+
+//
+//tasks.register<Copy>("copyGoogleServices") {
+//    val destinationPath = "${project.projectDir}/src/debug/"
+//    from("${project.rootDir}/private/google-services.json") // Source file in 'private' folder
+//    into("${project.projectDir}") // Destination: app module's debug source set
+//}
+//
+//
+//tasks.named("preBuild") {
+//    dependsOn("copyGoogleServices")
+//}
