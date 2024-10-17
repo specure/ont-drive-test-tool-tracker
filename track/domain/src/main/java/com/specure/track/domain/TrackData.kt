@@ -13,7 +13,6 @@ data class TrackData(
     val locations: List<LocationWithDetails> = emptyList(),
     val temperature: Temperature? = null,
     val networkInfo: NetworkInfo? = null,
-    val connected: Boolean = false,
     val iperfTestUpload: IperfTest? = null,
     val iperfTestDownload: IperfTest? = null,
     val internetConnectionConnected: Boolean = false,

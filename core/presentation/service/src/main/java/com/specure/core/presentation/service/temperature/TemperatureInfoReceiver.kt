@@ -49,6 +49,7 @@ class TemperatureInfoReceiver(
             this,
             IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         )
+        _temperatureFlow.tryEmit(temp)
     }
 
     override fun unregister() {

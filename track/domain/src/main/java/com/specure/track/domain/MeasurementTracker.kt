@@ -287,6 +287,7 @@ class MeasurementTracker(
             intercomService.receivedActionFlow.onEach { action ->
                 when (action) {
                     is TrackerAction.StartTest -> {
+                        stopObserving()
                         clearData()
                         startObserving()
                         _isTracking.emit(true)
