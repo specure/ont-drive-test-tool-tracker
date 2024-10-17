@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -98,6 +99,11 @@ private fun ActiveTrackScreen(
     onAction: (ActiveTrackAction) -> Unit,
     onEvent: (ActiveTrackEvent) -> Unit
 ) {
+    BackHandler {
+        onAction(ActiveTrackAction.OnBackClick)
+    }
+
+
     val context = LocalContext.current
 
     val lifecycleOwner = LocalLifecycleOwner.current

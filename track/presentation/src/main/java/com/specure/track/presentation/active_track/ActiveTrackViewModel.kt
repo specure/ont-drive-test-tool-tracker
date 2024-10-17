@@ -132,9 +132,15 @@ class ActiveTrackViewModel(
             }
 
             ActiveTrackAction.OnBackClick -> {
-                state = state.copy(
-                    shouldTrack = false
-                )
+                if (state.hasStartedTracking) {
+                    state = state.copy(
+                        hasStartedTracking = true,
+                        isShowingFinishConfirmationDialog = !state.isShowingFinishConfirmationDialog,
+                    )
+                } else {
+                    state = state.stopTracking()
+                    finishTrackAndLeave()
+                }
             }
 
             ActiveTrackAction.OnToggleTrackClick -> {
