@@ -10,7 +10,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
 internal fun Project.configureBuildTypes(
-    commonExtension: CommonExtension<*,*,*,*,*,*>,
+    commonExtension: CommonExtension<*, *, *, *, *, *>,
     extensionType: ExtensionType
 ) {
     commonExtension.run {
@@ -23,34 +23,53 @@ internal fun Project.configureBuildTypes(
         val speedTestFeatureEnabled =
             gradleLocalProperties(rootDir, providers).getProperty("FEATURE_SPEED_TEST_ENABLED")
                 .toBoolean()
-        when(extensionType) {
+        val githubRepoApiUrl =
+            gradleLocalProperties(rootDir, providers).getProperty("GITHUB_API_REPO_URL")
+        val githubAccessToken =
+            gradleLocalProperties(rootDir, providers).getProperty("GITHUB_API_TOKEN")
+        when (extensionType) {
             ExtensionType.APPLICATION -> {
                 extensions.configure<ApplicationExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(hostname, speedTestFeatureEnabled)
+                            configureDebugBuildType(
+                                hostname,
+                                speedTestFeatureEnabled,
+                                githubRepoApiUrl,
+                                githubAccessToken
+                            )
                         }
                         release {
                             configureReleaseBuildType(
                                 commonExtension,
                                 hostname,
-                                speedTestFeatureEnabled
+                                speedTestFeatureEnabled,
+                                githubRepoApiUrl,
+                                githubAccessToken
                             )
                         }
                     }
                 }
             }
+
             ExtensionType.LIBRARY -> {
                 extensions.configure<LibraryExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(hostname, speedTestFeatureEnabled)
+                            configureDebugBuildType(
+                                hostname,
+                                speedTestFeatureEnabled,
+                                githubRepoApiUrl,
+                                githubAccessToken
+                            )
                         }
                         release {
                             configureReleaseBuildType(
                                 commonExtension,
                                 hostname,
-                                speedTestFeatureEnabled
+                                speedTestFeatureEnabled,
+                                githubRepoApiUrl,
+                                githubAccessToken
                             )
                         }
                     }
@@ -61,13 +80,20 @@ internal fun Project.configureBuildTypes(
                 extensions.configure<DynamicFeatureExtension> {
                     buildTypes {
                         debug {
-                            configureDebugBuildType(hostname, speedTestFeatureEnabled)
+                            configureDebugBuildType(
+                                hostname,
+                                speedTestFeatureEnabled,
+                                githubRepoApiUrl,
+                                githubAccessToken
+                            )
                         }
                         release {
                             configureReleaseBuildType(
                                 commonExtension,
                                 hostname,
-                                speedTestFeatureEnabled
+                                speedTestFeatureEnabled,
+                                githubRepoApiUrl,
+                                githubAccessToken
                             )
                             isMinifyEnabled = false
                         }
@@ -78,18 +104,28 @@ internal fun Project.configureBuildTypes(
     }
 }
 
-private fun BuildType.configureDebugBuildType(hostname: String, speedTestFeatureEnabled: Boolean) {
+private fun BuildType.configureDebugBuildType(
+    hostname: String,
+    speedTestFeatureEnabled: Boolean,
+    githubRepoApiUrl: String,
+    githubAccessToken: String
+) {
     buildConfigField("String", "BASE_URL", "\"$hostname\"")
     buildConfigField("boolean", "FEATURE_SPEED_TEST_ENABLED", "$speedTestFeatureEnabled")
+    buildConfigField("String", "GITHUB_API_REPO_URL", "\"$githubRepoApiUrl\"")
+    buildConfigField("String", "GITHUB_API_TOKEN", "\"$githubAccessToken\"")
 }
 
 private fun BuildType.configureReleaseBuildType(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
     hostname: String,
     speedTestFeatureEnabled: Boolean,
+    githubRepoApiUrl: String, githubAccessToken: String
 ) {
     buildConfigField("String", "BASE_URL", "\"$hostname\"")
     buildConfigField("boolean", "FEATURE_SPEED_TEST_ENABLED", "$speedTestFeatureEnabled")
+    buildConfigField("String", "GITHUB_API_REPO_URL", "\"$githubRepoApiUrl\"")
+    buildConfigField("String", "GITHUB_API_TOKEN", "\"$githubAccessToken\"")
     isMinifyEnabled = false
     proguardFiles(
         commonExtension.getDefaultProguardFile("proguard-android-optimize.txt"),
