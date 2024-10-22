@@ -16,14 +16,14 @@ this is meant to be build on macOS or linux-based systems.
 HOSTNAME=<YOUR_IPERF_HOSTNAME>
 FEATURE_SPEED_TEST_ENABLED=<true OR false>
 MAPS_API_KEY=<GOOGLE MAPS API KEY>
-GITHUB_API_URL=<https://api.github.com/repos/{owner}/{repo-name}/releases/latest>
+GITHUB_API_URL=<https://api.github.com/repos/{owner}/{repo-name}>
 GITHUB_API_TOKEN=<TOKEN TO ACCESS REPOSITORY>
 
 example:
 HOSTNAME=myiperfhostname.com
 FEATURE_SPEED_TEST_ENABLED=true
 MAPS_API_KEY=dfsfdsggfkg-fgsdgljsgn-gfsgs
-GITHUB_API_URL=https://api.github.com/repos/my-account/my-awsome-app/releases/latest
+GITHUB_API_URL=https://api.github.com/repos/my-account/my-awsome-app
 GITHUB_API_TOKEN=github_pat_sdkjbsfkjdsifjlsdlkf
 
 ### Register app in the firebase or remove Firebase integration

@@ -92,6 +92,7 @@ class AndroidBluetoothServerService(
                         }
                     } catch (e: IOException) {
                         Timber.e("Socket's accept() method failed", e)
+                        Thread.sleep(1000L)
                         shouldLoop = true // todo change to false
                     }
                 }

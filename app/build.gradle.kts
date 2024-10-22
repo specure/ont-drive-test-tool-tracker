@@ -92,6 +92,8 @@ dependencies {
     implementation(projects.track.data)
     implementation(projects.track.location)
 
+    implementation(projects.updater.data)
+
     implementation(platform(libs.firebase))
 
 }

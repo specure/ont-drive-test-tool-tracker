@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,9 +30,14 @@ import androidx.compose.ui.unit.dp
 import com.specure.core.presentation.designsystem.ArrowRightIcon
 import com.specure.core.presentation.designsystem.SignalTrackerBlue
 import com.specure.core.presentation.designsystem.SignalTrackerTheme
+import com.specure.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.specure.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.specure.core.presentation.designsystem.components.SignalTrackerToolbar
 import com.specure.track.presentation.R
+import com.specure.track.presentation.mappers.toUiString
+import com.specure.track.presentation.track_overview.NetworkInfoRow
+import com.specure.updater.domain.UpdatingStatus
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -39,18 +47,24 @@ fun AboutScreenRoot(
 ) {
     AboutScreen(
         onBackClick,
-        viewModel
+        viewModel,
+        updaterState = viewModel.updateState.collectAsState(),
+        onAction = viewModel::onAction
     )
 }
 
 @Composable
 fun AboutScreen(
     onBackClick: () -> Unit,
-    viewModel: AboutScreenViewModel
+    viewModel: AboutScreenViewModel,
+    updaterState: State<UpdatingStatus>,
+    onAction: (AboutScreenAction) -> Unit
 ) {
     AboutScreenContent(
         onBackClick = onBackClick,
-        version = viewModel.versionName
+        version = viewModel.versionName,
+        updaterState = updaterState,
+        onAction = onAction
     )
 }
 
@@ -58,6 +72,8 @@ fun AboutScreen(
 fun AboutScreenContent(
     onBackClick: () -> Unit,
     version: String,
+    updaterState: State<UpdatingStatus>,
+    onAction: (AboutScreenAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SignalTrackerTheme {
@@ -76,6 +92,12 @@ fun AboutScreenContent(
                     .padding(padding)
             ) {
                 HorizontalDivider()
+                InfoItemUpdater(
+                    updaterState,
+                    { onAction(AboutScreenAction.OnCheckUpdateClick) },
+                    { onAction(AboutScreenAction.OnInstallUpdateClick) }
+                )
+                HorizontalDivider()
                 InfoItem(
                     title = stringResource(R.string.version),
                     text = version,
@@ -88,6 +110,59 @@ fun AboutScreenContent(
             }
         }
 
+    }
+}
+
+@Composable
+fun InfoItemUpdater(
+    updaterState: State<UpdatingStatus>,
+    actionCheck: () -> Unit,
+    actionInstall: () -> Unit
+) {
+    SignalTrackerOutlinedActionButton(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
+        text = when (updaterState.value) {
+            UpdatingStatus.Checking,
+            UpdatingStatus.Downloading,
+            is UpdatingStatus.Error,
+            UpdatingStatus.Idle,
+            UpdatingStatus.Installing,
+            UpdatingStatus.NoNewVersion -> stringResource(id = R.string.check_for_updates)
+
+            UpdatingStatus.DownloadFailed,
+            is UpdatingStatus.NewVersionFound -> stringResource(id = R.string.install_update)
+        },
+        isLoading = updaterState.value in listOf(
+            UpdatingStatus.Downloading,
+            UpdatingStatus.Checking,
+            UpdatingStatus.Installing
+        )
+    ) {
+        when (updaterState.value) {
+            UpdatingStatus.Checking,
+            UpdatingStatus.Downloading,
+            is UpdatingStatus.Error,
+            UpdatingStatus.Idle,
+            UpdatingStatus.Installing,
+            UpdatingStatus.NoNewVersion -> actionCheck()
+
+            UpdatingStatus.DownloadFailed,
+            is UpdatingStatus.NewVersionFound -> actionInstall()
+        }
+    }
+    if (updaterState.value != UpdatingStatus.Idle) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            NetworkInfoRow(
+                title = stringResource(id = R.string.update_status),
+                value = updaterState.value.toUiString().asString(),
+            )
+        }
     }
 }
 
@@ -156,6 +231,8 @@ fun InfoItem(title: String?, text: String?, modifier: Modifier = Modifier) {
 fun InfoScreenPreview() {
     AboutScreenContent(
         onBackClick = {},
-        version = "1.1.1 - alpha"
+        version = "1.1.1 - alpha",
+        updaterState = MutableStateFlow<UpdatingStatus>(UpdatingStatus.Idle).collectAsState(),
+        onAction = {}
     )
 }

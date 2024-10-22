@@ -11,6 +11,7 @@ import com.specure.signaltracker.di.appModule
 import com.specure.track.data.di.trackDataModule
 import com.specure.track.location.di.locationModule
 import com.specure.track.presentation.di.trackPresentationModule
+import com.specure.updater.data.di.updaterDataModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
@@ -45,6 +46,7 @@ class SignalTrackerApp : Application() {
                 trackDataModule,
                 trackPresentationModule,
                 locationModule,
+                updaterDataModule,
             )
         }
     }

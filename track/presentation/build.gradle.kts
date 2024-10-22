@@ -26,4 +26,5 @@ dependencies {
     implementation(projects.iperf.domain)
     implementation(projects.iperf.presentation)
     implementation(projects.core.database)
+    implementation(projects.updater.domain)
 }
