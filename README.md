@@ -81,6 +81,8 @@ to get all source files
 8. check if you are able to see network info, position on map, temperature on the track screen
 9. tap play button on the bottom to start logging values
 10. tap stop and confirm it to stop logging values
+11. Allow install from unknown source of the app in settings (allow from signal tracker source) -
+    for interactive update it should ask automatically for the first time update
 
 
 ## TODO:
