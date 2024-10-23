@@ -128,16 +128,18 @@ fun InfoItemUpdater(
             UpdatingStatus.Downloading,
             is UpdatingStatus.Error,
             UpdatingStatus.Idle,
-            UpdatingStatus.Installing,
+            is UpdatingStatus.ErrorCheckingUpdate,
             UpdatingStatus.NoNewVersion -> stringResource(id = R.string.check_for_updates)
 
-            UpdatingStatus.DownloadFailed,
+            is UpdatingStatus.ErrorDownloading,
+            UpdatingStatus.InstallingInteractive,
+            UpdatingStatus.InstallingSilently,
             is UpdatingStatus.NewVersionFound -> stringResource(id = R.string.install_update)
         },
         isLoading = updaterState.value in listOf(
             UpdatingStatus.Downloading,
             UpdatingStatus.Checking,
-            UpdatingStatus.Installing
+            UpdatingStatus.InstallingSilently,
         )
     ) {
         when (updaterState.value) {
@@ -145,10 +147,12 @@ fun InfoItemUpdater(
             UpdatingStatus.Downloading,
             is UpdatingStatus.Error,
             UpdatingStatus.Idle,
-            UpdatingStatus.Installing,
+            is UpdatingStatus.ErrorCheckingUpdate,
             UpdatingStatus.NoNewVersion -> actionCheck()
 
-            UpdatingStatus.DownloadFailed,
+            is UpdatingStatus.ErrorDownloading,
+            UpdatingStatus.InstallingInteractive,
+            UpdatingStatus.InstallingSilently,
             is UpdatingStatus.NewVersionFound -> actionInstall()
         }
     }

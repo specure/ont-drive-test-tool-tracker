@@ -9,11 +9,13 @@ import com.specure.updater.domain.UpdatingStatus
 fun UpdatingStatus.toUiString(): UiText {
     return when (this) {
         UpdatingStatus.Checking -> UiText.StringResource(R.string.checking)
-        UpdatingStatus.DownloadFailed -> UiText.StringResource(R.string.download_failed)
+        is UpdatingStatus.ErrorCheckingUpdate -> UiText.StringResource(R.string.checking_failed)
+        is UpdatingStatus.ErrorDownloading -> UiText.StringResource(R.string.download_failed)
         UpdatingStatus.Downloading -> UiText.StringResource(R.string.downloading)
         is UpdatingStatus.Error -> UiText.StringResource(R.string.error)
         UpdatingStatus.Idle -> UiText.StringResource(R.string.idle)
-        UpdatingStatus.Installing -> UiText.StringResource(R.string.installing)
+        UpdatingStatus.InstallingSilently,
+        UpdatingStatus.InstallingInteractive -> UiText.StringResource(R.string.installing)
         is UpdatingStatus.NewVersionFound -> UiText.StringResource(
             R.string.new_version_found,
             arrayOf(this.version)

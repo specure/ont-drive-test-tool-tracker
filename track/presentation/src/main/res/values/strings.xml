@@ -87,4 +87,5 @@
     <string name="new_version_found">New version found %1$s</string>
     <string name="no_new_version">No new version</string>
     <string name="install_update">Install update</string>
+    <string name="checking_failed">Checking failed</string>
 </resources>

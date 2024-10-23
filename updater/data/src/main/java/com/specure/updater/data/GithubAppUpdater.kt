@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.specure.updater.data.data.Release
-import com.specure.updater.data.test.IGithubApi
 import com.specure.updater.domain.Updater
 import com.specure.updater.domain.UpdatingStatus
 import io.ktor.client.HttpClient
@@ -15,23 +14,14 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.contentType
-import io.ktor.util.InternalAPI
-import io.ktor.util.toByteArray
 import io.ktor.utils.io.ByteReadChannel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
 
 class GithubAppUpdater(
     private val downloadClient: HttpClient,
@@ -45,22 +35,6 @@ class GithubAppUpdater(
     private var updateFile: File? = null
     private var versionName: String? = null
     private var downloadUrl: String? = null
-
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY // Set the desired log level
-    }
-
-    val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
-        .build()
-
-    private val retrofit =
-        Retrofit.Builder()
-            .baseUrl("${BuildConfig.GITHUB_API_REPO_URL}/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-    private val api = retrofit.create(IGithubApi::class.java)
 
     override suspend fun checkForUpdate() {
         clearState()
@@ -89,25 +63,25 @@ class GithubAppUpdater(
 
     override suspend fun installUpdate() {
         if (downloadUrl.isNullOrEmpty() || updateFile == null) {
-            _progressState.emit(UpdatingStatus.DownloadFailed)
+            _progressState.emit(UpdatingStatus.ErrorDownloading("No file"))
         }
         downloadUrl?.let { fileDownloadUrl ->
             updateFile?.let { file ->
-//                downloadApk(fileDownloadUrl, file)
-                downloadNewRelease(fileDownloadUrl, file)
-//                downloadApk2(fileDownloadUrl, file)
+                downloadApk(fileDownloadUrl, file)
                 installApk(appContext, file)
                 return
             }
         }
-        _progressState.emit(UpdatingStatus.DownloadFailed)
+        _progressState.emit(UpdatingStatus.ErrorDownloading("Error during downloading"))
     }
 
     private suspend fun fetchLatestRelease(): Release? {
         return try {
             jsonClient.get("${BuildConfig.GITHUB_API_REPO_URL}/releases/latest").body<Release>()
         } catch (e: Exception) {
+            yield()
             e.printStackTrace()
+            _progressState.emit(UpdatingStatus.ErrorCheckingUpdate(e.message))
             null
         }
     }
@@ -118,68 +92,38 @@ class GithubAppUpdater(
         downloadUrl = null
     }
 
-    private suspend fun downloadNewRelease(
-        url: String,
-        file: File?
-    ): File? {
-        val body = api.downloadFile(url).body() ?: return null
-        Timber.d("RETURNED BODY: $body")
-        var input: InputStream? = null
-        try {
-            input = body.byteStream()
-            val download = file
-            val fos = withContext(Dispatchers.IO) { FileOutputStream(download) }
-            fos.use { output ->
-                val buffer = ByteArray(16 * 1024)
-                var readBytes: Int
-                while (input.read(buffer).also { readBytes = it } != -1) {
-                    output.write(buffer, 0, readBytes)
-                }
-                output.flush()
-            }
-            println("Downloading file finished successfully")
-            return download
-        } catch (e: Exception) {
-            yield()
-            e.printStackTrace()
-            return null
-        } finally {
-            withContext(Dispatchers.IO) { input?.close() }
-            println("Downloading file finished")
-        }
-    }
-
     suspend fun downloadApk(downloadUrl: String, outputFile: File) {
         _progressState.emit(UpdatingStatus.Downloading)
+        try {
+            val response = downloadClient.get(downloadUrl) {
+                headers.remove(HttpHeaders.ContentType)
+                headers.remove(HttpHeaders.Accept)
+                header(HttpHeaders.Accept, ContentType.Application.OctetStream)
+                header(HttpHeaders.ContentType, ContentType.Application.OctetStream)
+            }
 
-//        val response: HttpResponse = client.get(downloadUrl)
-//        response.content.copyTo(outputFile.outputStream())
-        val response = downloadClient.get(downloadUrl) {
-
-            // Remove Content-Type if set globally
-            headers.remove(HttpHeaders.ContentType)
-            headers.remove(HttpHeaders.Accept)
-
-            // Optionally set the Accept header to expect binary data
-            header(HttpHeaders.Accept, ContentType.Application.OctetStream)
-            header(HttpHeaders.ContentType, ContentType.Application.OctetStream)
-        }
-
-        outputFile.outputStream().use { fileStream ->
-            val byteChannel: ByteReadChannel = response.bodyAsChannel()
-//            val byteChannel: ByteReadChannel = response.content
-            val buffer = ByteArray(1024)
-            while (!byteChannel.isClosedForRead) {
-                val bytesRead = byteChannel.readAvailable(buffer, 0, buffer.size)
-                if (bytesRead > 0) {
-                    fileStream.write(buffer, 0, bytesRead)
+            outputFile.outputStream().use { fileStream ->
+                currentCoroutineContext().ensureActive()
+                val byteChannel: ByteReadChannel = response.bodyAsChannel()
+                val buffer = ByteArray(1024)
+                while (!byteChannel.isClosedForRead) {
+                    val bytesRead = byteChannel.readAvailable(buffer, 0, buffer.size)
+                    currentCoroutineContext().ensureActive()
+                    if (bytesRead > 0) {
+                        fileStream.write(buffer, 0, bytesRead)
+                    }
                 }
             }
+        } catch (e: Exception) {
+            yield()
+            _progressState.emit(UpdatingStatus.ErrorDownloading(e.message))
+            e.printStackTrace()
         }
+
     }
 
     private suspend fun installApk(context: Context, apkFile: File) {
-        _progressState.emit(UpdatingStatus.Installing)
+        _progressState.emit(UpdatingStatus.InstallingInteractive)
         val apkUri: Uri =
             FileProvider.getUriForFile(context, "${context.packageName}.updater.provider", apkFile)
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -209,84 +153,4 @@ class GithubAppUpdater(
         return null
     }
 
-    @OptIn(InternalAPI::class)
-    suspend fun downloadApk2(url: String, file: File?) {
-        try {
-            val response: ByteArray = downloadClient.get(url) {
-                header("X-GitHub-Api-Version", "2022-11-28")
-                header(HttpHeaders.Accept, "application/octet-stream")
-                contentType(ContentType("application", "octet-stream"))
-//                headers {
-//                    append(HttpHeaders.Accept, "application/octet-stream")
-//                    append("X-GitHub-Api-Version", "2022-11-28")
-//                }
-            }.content.toByteArray()
-            // Save the response as an APK file
-            file?.writeBytes(response)
-            println("APK downloaded successfully!")
-
-        } catch (e: Exception) {
-            println("Error downloading APK: ${e.message}")
-        }
-    }
-
-
-//    fun installApk(context: Context, apkFile: File) {
-//        val intent = Intent(Intent.ACTION_VIEW)
-//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//        val apkUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//            FileProvider.getUriForFile(context, "${context.packageName}.updater.provider", apkFile)
-//        } else {
-//            Uri.fromFile(apkFile)
-//        }
-//        intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
-//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//        context.startActivity(intent)
-//    }
-
-//    fun downloadNewApk(context: Context, url: String, token: String) {
-//        val request = DownloadManager.Request(Uri.parse(url))
-//            .setTitle("Downloading new version")
-//            .setDescription("Downloading update...")
-//            .addRequestHeader("Authorization", "token $token")  // Add the authentication token
-//            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "new_version.apk")
-//            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-//            .setAllowedOverMetered(true)
-//            .setAllowedOverRoaming(false)
-//
-//        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-//        manager.enqueue(request)
-//    }
-
-//    fun checkForUpdate(currentVersion: String, onUpdateAvailable: (downloadUrl: String) -> Unit) {
-//        val request = Request.Builder()
-//            .url("https://api.github.com/repos/{owner}/{repo}/releases/latest")
-//            .addHeader("Authorization", "token $token")  // Add the authentication header
-//            .build()
-//
-//        client.newCall(request).execute().use { response ->
-//            if (response.isSuccessful) {
-//                val json = JSONObject(response.body?.string() ?: "")
-//                val latestVersion = json.getString("tag_name")
-//                val downloadUrl = json.getJSONArray("assets")
-//                    .getJSONObject(0)
-//                    .getString("browser_download_url")
-//
-//                if (currentVersion != latestVersion) {
-//                    onUpdateAvailable(downloadUrl)
-//                }
-//            }
-//        }
-//    }
 }
-
-/*
-{
-    "tag_name": "v1.1",
-    "assets": [
-    {
-        "browser_download_url": "https://github.com/{owner}/{repo}/releases/download/v1.1/app-release.apk"
-    }
-    ]
-}
-*/
