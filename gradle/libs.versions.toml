@@ -40,6 +40,7 @@ org-jetbrains-kotlin-jvm = "1.9.22"
 playServicesMaps = "19.0.0"
 preferenceKtx = "1.2.1"
 preferenceLib = "1.1.1"
+process-phoenix = "3.0.0"
 room = "2.6.1"
 secretsPlugin = "2.0.1"
 securityCryptoKtx = "1.1.0-alpha06"
@@ -59,7 +60,7 @@ coroutines-test = "1.8.1"
 
 # Project versions
 projectApplicationId = "com.specure.signaltracker"
-projectVersionName = "1.1.0"
+projectVersionName = "1.3.0"
 projectMinSdkVersion = "28"
 projectTargetSdkVersion = "34"
 projectCompileSdkVersion = "34"
@@ -120,6 +121,7 @@ netmonster-core = { module = "app.netmonster:core", version.ref = "netmonsterCor
 org-mongodb-bson = { module = "org.mongodb:bson", version.ref = "bson" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 preference-library = { group = "me.zhanghai.compose.preference", name = "library", version.ref = "preferenceLib" }
+process-phoenix = { group = "com.jakewharton", name = "process-phoenix", version.ref = "process-phoenix" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }

@@ -1,8 +1,11 @@
 package com.specure.updater.data
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInstaller
 import android.net.Uri
+import android.os.Build
 import androidx.core.content.FileProvider
 import com.specure.updater.data.data.Release
 import com.specure.updater.domain.Updater
@@ -15,10 +18,14 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.utils.io.ByteReadChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import timber.log.Timber
 import java.io.File
@@ -29,12 +36,28 @@ class GithubAppUpdater(
     private val appContext: Context,
 ) : Updater {
 
-    private val _progressState = MutableSharedFlow<UpdatingStatus>()
+    private val _progressState = MutableSharedFlow<UpdatingStatus>(replay = 1)
     override val updateStatus: SharedFlow<UpdatingStatus> = _progressState
 
     private var updateFile: File? = null
     private var versionName: String? = null
     private var downloadUrl: String? = null
+
+    override suspend fun checkAndInstall() {
+        checkForUpdate()
+        updateStatus.first { status ->
+            if (status is UpdatingStatus.NewVersionFound) {
+                Timber.d("New version found and installing")
+                CoroutineScope(Dispatchers.IO).launch {
+                    downloadAndUpdateSilently()
+                }
+                Timber.d("Collected state: $status")
+                true
+            } else {
+                false
+            }
+        }
+    }
 
     override suspend fun checkForUpdate() {
         clearState()
@@ -52,8 +75,8 @@ class GithubAppUpdater(
                     versionName = latestVersion
                     downloadUrl = apk.url
                     Timber.d("Latest release version to update to: ${release.tag_name}")
-                    _progressState.emit(UpdatingStatus.NewVersionFound(latestVersion))
                     updateFile = File(appContext.getExternalFilesDir(null), apk.name)
+                    _progressState.emit(UpdatingStatus.NewVersionFound(latestVersion))
                     return
                 }
             }
@@ -61,7 +84,7 @@ class GithubAppUpdater(
         _progressState.emit(UpdatingStatus.NoNewVersion)
     }
 
-    override suspend fun installUpdate() {
+    override suspend fun downloadAndInstallUpdate() {
         if (downloadUrl.isNullOrEmpty() || updateFile == null) {
             _progressState.emit(UpdatingStatus.ErrorDownloading("No file"))
         }
@@ -83,6 +106,63 @@ class GithubAppUpdater(
             e.printStackTrace()
             _progressState.emit(UpdatingStatus.ErrorCheckingUpdate(e.message))
             null
+        }
+    }
+
+    private suspend fun downloadAndUpdateSilently() {
+        if (downloadUrl.isNullOrEmpty() || updateFile == null) {
+            _progressState.emit(UpdatingStatus.ErrorDownloading("No file"))
+        }
+        downloadUrl?.let { fileDownloadUrl ->
+            updateFile?.let { file ->
+                downloadApk(fileDownloadUrl, file)
+                installUpdateSilently()
+            }
+        }
+    }
+
+    /**
+     * This still needs user interaction as system asks for user to confirm the installation process
+     */
+    private suspend fun installUpdateSilently() {
+        _progressState.emit(UpdatingStatus.InstallingSilently)
+        try {
+            val sessionParams =
+                PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+            val packageInstaller = appContext.packageManager.packageInstaller
+            updateFile?.let { file ->
+                val sessionId = packageInstaller.createSession(sessionParams)
+                val session = packageInstaller.openSession(sessionId)
+                val apkUri = FileProvider.getUriForFile(
+                    appContext,
+                    "${appContext.packageName}.updater.provider",
+                    file
+                )
+                appContext.contentResolver.openInputStream(apkUri).use { apkInput ->
+                    requireNotNull(apkInput) { "$apkUri: InputStream was null" }
+                    val sessionStream = session.openWrite("temp.apk", 0, -1)
+                    sessionStream.buffered().use { bufferedStream ->
+                        apkInput.copyTo(bufferedStream)
+                        bufferedStream.flush()
+                        session.fsync(sessionStream)
+                    }
+                }
+                val receiverIntent = Intent(appContext, GithubAppUpdateReloader::class.java)
+                val flags =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    } else {
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    }
+
+                val receiverPendingIntent =
+                    PendingIntent.getBroadcast(appContext, 0, receiverIntent, flags)
+                session.commit(receiverPendingIntent.intentSender)
+                session.close()
+            }
+        } catch (e: Exception) {
+            yield()
+            e.printStackTrace()
         }
     }
 
@@ -130,6 +210,7 @@ class GithubAppUpdater(
             setDataAndType(apkUri, "application/vnd.android.package-archive")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
+        _progressState.emit(UpdatingStatus.Idle)
         context.startActivity(intent)
     }
 

@@ -1,3 +1,8 @@
+1.3.0
+----------------
+Added check of new released version from github for release builds in about screen
+
+
 1.2.0-alpha
 ----------------
 Added speeds in Megabits per second to logs to compare them easier.

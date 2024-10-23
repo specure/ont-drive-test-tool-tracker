@@ -143,16 +143,18 @@ fun InfoItemUpdater(
         )
     ) {
         when (updaterState.value) {
+            UpdatingStatus.InstallingInteractive,
+            UpdatingStatus.InstallingSilently,
             UpdatingStatus.Checking,
-            UpdatingStatus.Downloading,
+            UpdatingStatus.Downloading -> {
+            }
+
             is UpdatingStatus.Error,
             UpdatingStatus.Idle,
             is UpdatingStatus.ErrorCheckingUpdate,
             UpdatingStatus.NoNewVersion -> actionCheck()
 
             is UpdatingStatus.ErrorDownloading,
-            UpdatingStatus.InstallingInteractive,
-            UpdatingStatus.InstallingSilently,
             is UpdatingStatus.NewVersionFound -> actionInstall()
         }
     }

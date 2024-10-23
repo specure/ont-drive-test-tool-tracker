@@ -8,5 +8,7 @@ interface Updater {
 
     suspend fun checkForUpdate()
 
-    suspend fun installUpdate()
+    suspend fun downloadAndInstallUpdate()
+
+    suspend fun checkAndInstall()
 }

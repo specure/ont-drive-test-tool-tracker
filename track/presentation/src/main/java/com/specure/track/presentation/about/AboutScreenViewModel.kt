@@ -35,7 +35,7 @@ class AboutScreenViewModel(
 
             AboutScreenAction.OnInstallUpdateClick -> {
                 viewModelScope.launch {
-                    updater.installUpdate()
+                    updater.downloadAndInstallUpdate()
                 }
             }
         }
