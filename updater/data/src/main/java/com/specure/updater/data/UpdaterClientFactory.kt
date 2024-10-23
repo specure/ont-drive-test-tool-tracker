@@ -19,28 +19,28 @@ import timber.log.Timber
 class UpdaterClientFactory(
     private val accessToken: String
 ) {
-//    fun buildBasicClient(): HttpClient {
-//        return HttpClient(CIO) {
-//            install(Auth) {
-//                bearer {
-//                    loadTokens {
-//                        BearerTokens(
-//                            accessToken = accessToken,
-//                            refreshToken = "" // Not needed for PAT
-//                        )
-//                    }
-//                }
-//            }
-//            install(Logging) {
-//                logger = object : Logger {
-//                    override fun log(message: String) {
-//                        Timber.d(message)
-//                    }
-//                }
-//                level = LogLevel.ALL
-//            }
-//        }
-//    }
+    fun buildDownloadClient(): HttpClient {
+        return HttpClient(CIO) {
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(
+                            accessToken = accessToken,
+                            refreshToken = "" // Not needed for PAT
+                        )
+                    }
+                }
+            }
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Timber.d(message)
+                    }
+                }
+                level = LogLevel.ALL
+            }
+        }
+    }
 
     fun build(): HttpClient {
         return HttpClient(CIO) {

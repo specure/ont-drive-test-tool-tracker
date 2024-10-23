@@ -4,14 +4,24 @@ import com.specure.updater.data.BuildConfig
 import com.specure.updater.data.GithubAppUpdater
 import com.specure.updater.data.UpdaterClientFactory
 import com.specure.updater.domain.Updater
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
+import io.ktor.client.HttpClient
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val updaterDataModule = module {
-    single {
+    single<HttpClient>(named("jsonClient")) {
         UpdaterClientFactory(BuildConfig.GITHUB_API_TOKEN).build()
     }
 
-    singleOf(::GithubAppUpdater).bind<Updater>()
+    single<HttpClient>(named("downloadClient")) {
+        UpdaterClientFactory(BuildConfig.GITHUB_API_TOKEN).buildDownloadClient()
+    }
+
+    single<Updater> {
+        GithubAppUpdater(
+            get(named("downloadClient")),
+            get(named("jsonClient")),
+            get()
+        )
+    }
 }

@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Asset(
     val name: String,
-    val browser_download_url: String
+    val url: String
 )
