@@ -9,6 +9,7 @@ import com.specure.connectivity.domain.mobile.MobileNetworkInfo
 import com.specure.core.domain.Timer
 import com.specure.core.domain.config.Config
 import com.specure.core.domain.location.LocationTimestamp
+import com.specure.core.domain.package_info.PackageInfoProvider
 import com.specure.core.domain.track.TemperatureInfoObserver
 import com.specure.core.domain.track.Track
 import com.specure.core.domain.track.TrackRepository
@@ -60,6 +61,7 @@ class MeasurementTracker(
     private val trackRepository: TrackRepository,
     private val connectivityObserver: ConnectivityObserver,
     private val intercomService: BluetoothServerService,
+    private val packageInfoProvider: PackageInfoProvider,
     private val appConfig: Config,
 ) {
     private var latestSavedValueTimestamp: Long = 0
@@ -433,6 +435,7 @@ class MeasurementTracker(
                 cellBandFrequencyDownload = mobileNetworkInfo?.primaryCell?.band?.frequencyDL.toString(),
                 cellBandName = mobileNetworkInfo?.primaryCell?.band?.name,
                 cellBandNameInformal = mobileNetworkInfo?.primaryCell?.band?.informalName,
+                appVersion = packageInfoProvider.versionName,
                 id = null,
             )
             trackRepository.upsertTrack(track)

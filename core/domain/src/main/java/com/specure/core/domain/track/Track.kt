@@ -38,4 +38,5 @@ data class Track(
     val cellBandName: String?,
     val cellBandNameInformal: String?,
     var exported: Boolean = false,
+    val appVersion: String?,
 )

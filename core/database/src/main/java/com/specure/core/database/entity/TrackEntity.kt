@@ -46,6 +46,7 @@ data class TrackEntity(
     val cellBandFrequencyDownload: String?,
     val cellBandName: String?,
     val cellBandNameInformal: String?,
+    val appVersion: String?,
     @CsvIgnore
     val exported: Boolean = false,
     @PrimaryKey(autoGenerate = true)
