@@ -7,5 +7,6 @@ data class DeviceNode(
     val displayName: String,
     val connected: Boolean = false,
     val status: MeasurementState = MeasurementState.UNKNOWN,
+    val deviceAppVersion: String = "",
     val lastUpdatedTimestamp: Long = System.currentTimeMillis(),
 )

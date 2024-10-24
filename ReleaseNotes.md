@@ -1,7 +1,11 @@
+1.3.1
+----------------
+Added app version to database and exported file
+Sending version with status update to manager app via bluetooth
+
 1.3.0
 ----------------
 Added check of new released version from github for release builds in about screen
-
 
 1.2.0-alpha
 ----------------

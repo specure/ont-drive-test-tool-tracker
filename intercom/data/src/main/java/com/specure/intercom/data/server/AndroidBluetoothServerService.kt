@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
+import com.specure.core.domain.package_info.PackageInfoProvider
 import com.specure.intercom.domain.ManagerControlServiceProtocol
 import com.specure.intercom.domain.data.MeasurementProgress
 import com.specure.intercom.domain.data.MeasurementState
@@ -31,6 +32,7 @@ import java.util.UUID
 class AndroidBluetoothServerService(
     private val context: Context,
     private val messageProcessor: MessageProcessor,
+    private val packageInfoProvider: PackageInfoProvider
 ) : BluetoothServerService {
 
     private val serviceUUID: UUID = ManagerControlServiceProtocol.customServiceUUID
@@ -44,6 +46,7 @@ class AndroidBluetoothServerService(
         MeasurementProgress(
             state = MeasurementState.NOT_ACTIVATED,
             error = null,
+            appVersion = null,
             timestamp = System.currentTimeMillis()
         )
     }

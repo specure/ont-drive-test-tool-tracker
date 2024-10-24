@@ -375,7 +375,8 @@ class AndroidBluetoothClientService(
     private fun updateStatus(address: String, updateProgress: TrackerAction.UpdateProgress) {
         val updatedDevice = trackingDevices.value[address]?.copy(
             status = updateProgress.progress.state.toString(),
-            updateTimestamp = updateProgress.progress.timestamp
+            updateTimestamp = updateProgress.progress.timestamp,
+            deviceAppVersion = updateProgress.progress.appVersion ?: "",
         )
         updatedDevice?.let {
             val tmpTrackingDevices = trackingDevices.value.toMutableMap()

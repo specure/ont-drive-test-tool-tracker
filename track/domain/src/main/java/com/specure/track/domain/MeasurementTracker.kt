@@ -283,7 +283,8 @@ class MeasurementTracker(
                     } else {
                         null
                     },
-                    timestamp = System.currentTimeMillis()
+                    timestamp = System.currentTimeMillis(),
+                    appVersion = packageInfoProvider.versionName
                 )
             }
             intercomService.receivedActionFlow.onEach { action ->

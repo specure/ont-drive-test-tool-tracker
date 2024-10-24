@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class MeasurementProgress(
     val state: MeasurementState,
     val error: String?,
+    val appVersion: String?,
     val timestamp: Long,
 )
