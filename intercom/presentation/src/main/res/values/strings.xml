@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unknown">Unknown</string>
+    <string name="not_activated">Not activated</string>
+    <string name="idle">Idle</string>
+    <string name="started">Started</string>
+    <string name="running">Running</string>
+    <string name="error">Error</string>
+</resources>

@@ -1,9 +1,11 @@
 package com.specure.intercom.domain.client
 
+import com.specure.intercom.domain.data.MeasurementState
+
 data class TrackingDevice(
     val name: String,
     val address: String,
-    val status: String,
+    val status: MeasurementState,
     val connected: Boolean,
     val deviceAppVersion: String,
     val updateTimestamp: Long,
@@ -17,7 +19,7 @@ data class TrackingDevice(
     }
 
     fun isErrorState(): Boolean {
-        return this.status.contains("error", true)
+        return this.status in listOf(MeasurementState.ERROR)
     }
 
     fun isTheSameStatus(otherDevice: TrackingDevice): Boolean {

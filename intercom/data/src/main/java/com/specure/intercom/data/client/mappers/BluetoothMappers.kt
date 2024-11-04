@@ -25,7 +25,7 @@ fun BluetoothDevice.toTrackingDevice(): TrackingDevice? {
             name = this.name,
             address = this.address,
             connected = false,
-            status = MeasurementState.UNKNOWN.toString(),
+            status = MeasurementState.UNKNOWN,
             deviceAppVersion = "",
             updateTimestamp = System.currentTimeMillis()
         )

@@ -374,7 +374,7 @@ class AndroidBluetoothClientService(
 
     private fun updateStatus(address: String, updateProgress: TrackerAction.UpdateProgress) {
         val updatedDevice = trackingDevices.value[address]?.copy(
-            status = updateProgress.progress.state.toString(),
+            status = updateProgress.progress.state,
             updateTimestamp = updateProgress.progress.timestamp,
             deviceAppVersion = updateProgress.progress.appVersion ?: "",
         )
@@ -391,7 +391,7 @@ class AndroidBluetoothClientService(
     private fun markDeviceDisconnected(address: String) {
         val connectedDevice = trackingDevices.value[address]?.copy(
             connected = false,
-            status = MeasurementState.UNKNOWN.toString(),
+            status = MeasurementState.UNKNOWN,
             updateTimestamp = System.currentTimeMillis()
         )
         connectedDevice?.let {
