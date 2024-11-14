@@ -45,7 +45,7 @@ class AndroidBluetoothServerService(
     var getStatusUpdate: () -> MeasurementProgress? = {
         MeasurementProgress(
             state = MeasurementState.NOT_ACTIVATED,
-            error = null,
+            errors = null,
             appVersion = null,
             timestamp = System.currentTimeMillis()
         )

@@ -14,6 +14,8 @@ fun MeasurementState.toUiString(): String {
         MeasurementState.STARTED -> UiText.StringResource(R.string.started).asString()
         MeasurementState.RUNNING -> UiText.StringResource(R.string.running).asString()
         MeasurementState.ERROR -> UiText.StringResource(R.string.error).asString()
+        MeasurementState.SPEEDTEST_ERROR -> UiText.StringResource(R.string.speedtest_error)
+            .asString()
         else -> this.toString()
     }
 }

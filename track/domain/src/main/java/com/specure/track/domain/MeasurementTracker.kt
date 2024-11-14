@@ -259,30 +259,8 @@ class MeasurementTracker(
             intercomService.startGattServer()
             intercomService.setMeasurementProgressCallback {
                 MeasurementProgress(
-                    state = if (isPreparedForRemoteController) {
-                        if (trackData.value.isError()) {
-                            MeasurementState.ERROR
-                        } else {
-                            if (isTracking.value) {
-                                MeasurementState.RUNNING
-                            } else {
-                                MeasurementState.IDLE
-                            }
-                        }
-                    } else {
-                        MeasurementState.NOT_ACTIVATED
-                    },
-                    error = if (trackData.value.isError()) {
-                        if (trackData.value.isUploadTestError()) {
-                            TestError.UPLOAD_TEST_ERROR.toString()
-                        } else if (trackData.value.isDownloadTestError()) {
-                            TestError.DOWNLOAD_TEST_ERROR.toString()
-                        } else {
-                            TestError.UNKNOWN_ERROR.toString()
-                        }
-                    } else {
-                        null
-                    },
+                    state = extractState(trackData.value),
+                    errors = extractErrors(trackData.value),
                     timestamp = System.currentTimeMillis(),
                     appVersion = packageInfoProvider.versionName
                 )
@@ -312,6 +290,44 @@ class MeasurementTracker(
         }
     }
 
+
+    private fun extractState(trackData: TrackData): MeasurementState {
+        return if (isPreparedForRemoteController) {
+            if (trackData.isSpeedTestError()) {
+                MeasurementState.SPEEDTEST_ERROR
+                // TODO: handle also other type of errors
+//                    MeasurementState.ERROR
+            } else {
+                if (isTracking.value) {
+                    MeasurementState.RUNNING
+                } else {
+                    MeasurementState.IDLE
+                }
+            }
+        } else {
+            MeasurementState.NOT_ACTIVATED
+        }
+    }
+
+    private fun extractErrors(trackData: TrackData): List<TestError>? {
+        return if (isPreparedForRemoteController) {
+            if (trackData.isSpeedTestError()) {
+                val errors = mutableListOf<TestError>()
+                if (trackData.isUploadSpeedTestError()) {
+                    errors += TestError.UPLOAD_TEST_ERROR
+                }
+                if (trackData.isDownloadSpeedTestError()) {
+                    errors += TestError.DOWNLOAD_TEST_ERROR
+                }
+//                errors += TestError.UNKNOWN_ERROR
+                errors
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+    }
 
     private fun startObservingLocation() {
         isObservingLocation.value = true

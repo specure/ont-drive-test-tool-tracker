@@ -22,6 +22,10 @@ data class TrackingDevice(
         return this.status in listOf(MeasurementState.ERROR)
     }
 
+    fun isSpeedTestErrorState(): Boolean {
+        return this.status in listOf(MeasurementState.SPEEDTEST_ERROR)
+    }
+
     fun isTheSameStatus(otherDevice: TrackingDevice): Boolean {
         return this.status == otherDevice.status
     }

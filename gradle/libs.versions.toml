@@ -60,11 +60,11 @@ coroutines-test = "1.8.1"
 
 # Project versions
 projectApplicationId = "com.specure.signaltracker"
-projectVersionName = "1.3.0"
+projectVersionName = "1.3.1"
 projectMinSdkVersion = "28"
 projectTargetSdkVersion = "34"
 projectCompileSdkVersion = "34"
-projectVersionCode = "3"
+projectVersionCode = "4"
 material3Android = "1.3.0"
 
 [libraries]

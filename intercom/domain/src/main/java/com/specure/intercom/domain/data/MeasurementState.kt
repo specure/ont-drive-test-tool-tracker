@@ -6,5 +6,6 @@ enum class MeasurementState {
     IDLE,
     STARTED,
     RUNNING,
-    ERROR
+    ERROR,
+    SPEEDTEST_ERROR,
 }

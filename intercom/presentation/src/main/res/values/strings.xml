@@ -6,4 +6,5 @@
     <string name="started">Started</string>
     <string name="running">Running</string>
     <string name="error">Error</string>
+    <string name="speedtest_error">Speedtest error</string>
 </resources>
