@@ -1,3 +1,9 @@
+1.3.2
+----------------
+Update to Kotlin 2.0
+Targeting Android SDK 35
+Displaying "error" in case there is an error in the speedtests
+
 1.3.1
 ----------------
 Added app version to database and exported file

@@ -11,4 +11,5 @@ plugins {
     alias(libs.plugins.mapsplatform.secrets.plugin) apply false
     alias(libs.plugins.junit5) apply false
     alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }

@@ -10,7 +10,7 @@ class AndroidPackageInfoProvider(
     private val packageInfo: PackageInfo =
         appContext.packageManager.getPackageInfo(appContext.packageName, 0)
 
-    override val versionName: String = packageInfo.versionName
+    override val versionName: String = packageInfo.versionName.toString()
 
     override val versionCode = packageInfo.longVersionCode
 }

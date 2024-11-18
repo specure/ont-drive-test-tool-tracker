@@ -304,7 +304,7 @@ class AndroidNetworkTracker(
             val simCount = subscriptionManager.activeSubscriptionInfoCount
 
             val mobileNetworkList =
-                subscriptionManager.activeSubscriptionInfoList.map { subscriptionInfo ->
+                subscriptionManager.activeSubscriptionInfoList?.map { subscriptionInfo ->
                     val netmonsterNetworkType =
                         netmonster.getNetworkType(subscriptionInfo.subscriptionId)
                     val mobileNetworkType = netmonsterNetworkType.mapToMobileNetworkType()
@@ -369,7 +369,7 @@ class AndroidNetworkTracker(
                         primaryCell = primaryCellInfo,
                     )
                 }
-            mobileNetworkList
+            mobileNetworkList ?: emptyList()
         }
     }
 
