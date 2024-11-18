@@ -95,13 +95,23 @@ fun TrackDataCard(
             ) {
                 TrackDataItem(
                     title = stringResource(id = R.string.download),
-                    value = "${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}",
+                    value = if (trackData.isDownloadSpeedTestError()) {
+                        stringResource(R.string.error)
+                    } else {
+                        "${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}"
+                    },
+                    isError = trackData.isDownloadSpeedTestError(),
                     modifier = Modifier
                         .defaultMinSize(minWidth = 75.dp)
                 )
                 TrackDataItem(
                     title = stringResource(id = R.string.upload),
-                    value = "${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}",
+                    value = if (trackData.isUploadSpeedTestError()) {
+                        stringResource(R.string.error)
+                    } else {
+                        "${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}"
+                    },
+                    isError = trackData.isUploadSpeedTestError(),
                     modifier = Modifier
                         .defaultMinSize(minWidth = 75.dp)
                 )
@@ -117,7 +127,8 @@ private fun TrackDataItem(
     title: String,
     value: String,
     modifier: Modifier = Modifier,
-    valueFontSize: TextUnit = 16.sp
+    valueFontSize: TextUnit = 16.sp,
+    isError: Boolean = false,
 ) {
     Column(
         modifier = modifier,
@@ -131,7 +142,11 @@ private fun TrackDataItem(
             )
         Text(
             text = value,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = if (isError) {
+                MaterialTheme.colorScheme.onError
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
             fontSize = valueFontSize
         )
     }

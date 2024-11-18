@@ -305,7 +305,9 @@ private fun ActivityResultLauncher<Array<String>>.requestSignalTrackerPermission
 private fun ActiveTrackScreenPreview() {
     SignalTrackerTheme {
         ActiveTrackScreen(
-            state = ActiveTrackState(),
+            state = ActiveTrackState(
+                isSpeedTestEnabled = true
+            ),
             onServiceToggle = {},
             onAction = {},
             onEvent = {},
