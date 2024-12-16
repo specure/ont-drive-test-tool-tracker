@@ -256,7 +256,7 @@ class MeasurementTracker(
 
     fun startIntercomServices() {
         applicationScope.launch {
-            intercomService.startGattServer()
+            intercomService.startServer()
             intercomService.setMeasurementProgressCallback {
                 MeasurementProgress(
                     state = extractState(trackData.value),

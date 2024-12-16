@@ -8,19 +8,22 @@ import io.ktor.client.HttpClient
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
+const val DI_HTTP_JSON_CLIENT = "httpJsonClient"
+const val DI_HTTP_DATA_CLIENT = "httpDataClient"
+
 val updaterDataModule = module {
-    single<HttpClient>(named("jsonClient")) {
+    single<HttpClient>(named(DI_HTTP_JSON_CLIENT)) {
         UpdaterClientFactory(BuildConfig.GITHUB_API_TOKEN).build()
     }
 
-    single<HttpClient>(named("downloadClient")) {
+    single<HttpClient>(named(DI_HTTP_DATA_CLIENT)) {
         UpdaterClientFactory(BuildConfig.GITHUB_API_TOKEN).buildDownloadClient()
     }
 
     single<Updater> {
         GithubAppUpdater(
-            get(named("downloadClient")),
-            get(named("jsonClient")),
+            get(named(DI_HTTP_DATA_CLIENT)),
+            get(named(DI_HTTP_JSON_CLIENT)),
             get()
         )
     }

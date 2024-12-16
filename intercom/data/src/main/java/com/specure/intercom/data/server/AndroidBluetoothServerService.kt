@@ -1,16 +1,13 @@
 package com.specure.intercom.data.server
 
-import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGattServer
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.core.app.ActivityCompat
 import com.specure.core.domain.package_info.PackageInfoProvider
+import com.specure.intercom.data.util.isBluetoothConnectPermissionGranted
 import com.specure.intercom.domain.ManagerControlServiceProtocol
 import com.specure.intercom.domain.data.MeasurementProgress
 import com.specure.intercom.domain.data.MeasurementState
@@ -58,18 +55,18 @@ class AndroidBluetoothServerService(
         this.getStatusUpdate = statusUpdate
     }
 
-    override fun startGattServer() {
+    override fun startServer() {
         val bluetoothManager =
             context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
 
         // Ensure Bluetooth is supported and enabled on the device
-        if (!isBluetoothConnectPermissionGranted() || bluetoothAdapter == null || bluetoothAdapter?.isEnabled != true) {
+        if (!context.isBluetoothConnectPermissionGranted() || bluetoothAdapter == null || bluetoothAdapter?.isEnabled != true) {
             // Bluetooth is not supported or not enabled
             return
         }
 
-        Timber.d("starting listenning for connections with service uuid = ${serviceUUID}")
+        Timber.d("starting listening for connections with service uuid = ${serviceUUID}")
         // You can set up Bluetooth classic (RFCOMM) or use BLE advertising for discovery
         // For RFCOMM, you would use something like the following:
         bluetoothAdapter?.let {
@@ -175,17 +172,7 @@ class AndroidBluetoothServerService(
         }
     }
 
-    private fun isBluetoothConnectPermissionGranted() =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true
-        }
-
-    override fun stopGattServer() {
+    override fun stopServer() {
         try {
             bluetoothSocket?.close()
         } catch (e: IOException) {

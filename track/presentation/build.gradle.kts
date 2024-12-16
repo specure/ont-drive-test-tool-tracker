@@ -27,4 +27,5 @@ dependencies {
     implementation(projects.iperf.presentation)
     implementation(projects.core.database)
     implementation(projects.updater.domain)
+    implementation(projects.intercom.data)
 }

@@ -13,4 +13,5 @@ dependencies {
 
     implementation(projects.core.domain)
     implementation(projects.intercom.domain)
+    implementation(libs.androidx.core)
 }

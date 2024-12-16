@@ -285,7 +285,7 @@ class TrackOverviewViewModel(
         )
 
         if (!state.isPermissionRequired) {
-            intercomService.startGattServer()
+            intercomService.startServer()
             intercomService.receivedActionFlow.onEach { action ->
                 if (action is TrackerAction.StartTest) {
                     Timber.d("Received start tracking request in overview screen")

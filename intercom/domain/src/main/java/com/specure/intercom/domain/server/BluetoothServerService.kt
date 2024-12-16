@@ -8,9 +8,9 @@ interface BluetoothServerService {
 
     val receivedActionFlow: SharedFlow<TrackerAction?>
 
-    fun startGattServer()
+    fun startServer()
 
-    fun stopGattServer()
+    fun stopServer()
 
     fun setMeasurementProgressCallback(statusUpdate: () -> MeasurementProgress?)
 }

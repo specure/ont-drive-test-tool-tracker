@@ -10,6 +10,8 @@ import com.specure.core.presentation.service.location.AndroidLocationServiceObse
 import com.specure.core.presentation.service.location.GpsLocationServiceChecker
 import com.specure.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.specure.core.presentation.service.wifi.AndroidWifiServiceObserver
+import com.specure.intercom.data.di.DI_BLUETOOTH_SERVER_SERVICE_CLASSIC
+import com.specure.intercom.domain.server.BluetoothServerService
 import com.specure.iperf.domain.IperfOutputParser
 import com.specure.iperf.domain.IperfRunner
 import com.specure.iperf.presentation.IperfAndroidParser
@@ -21,17 +23,43 @@ import com.specure.track.presentation.active_track.ActiveTrackViewModel
 import com.specure.track.presentation.settings.SettingsScreenStateManager
 import com.specure.track.presentation.settings.SettingsScreenViewModel
 import com.specure.track.presentation.track_overview.TrackOverviewViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+const val DI_IPERF_DOWNLOAD_RUNNER = "iperfDownloadRunner"
+const val DI_IPERF_UPLOAD_RUNNER = "iperfUploadRunner"
+
 val trackPresentationModule = module {
     viewModelOf(::AboutScreenViewModel)
     viewModelOf(::ActiveTrackViewModel)
     viewModelOf(::SettingsScreenViewModel)
-    viewModelOf(::TrackOverviewViewModel)
+    viewModel {
+
+        val bluetoothServerService =
+            get<BluetoothServerService>(named(DI_BLUETOOTH_SERVER_SERVICE_CLASSIC))
+
+        TrackOverviewViewModel(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            bluetoothServerService,
+            get(),
+        )
+    }
 
     singleOf(::GpsLocationServiceChecker).bind<ServiceChecker>()
     singleOf(::AndroidLocationServiceObserver).bind<LocationServiceObserver>()
@@ -39,7 +67,7 @@ val trackPresentationModule = module {
     singleOf(::AndroidWifiServiceObserver).bind<WifiServiceObserver>()
     singleOf(::IperfAndroidParser).bind<IperfOutputParser>()
     singleOf(::AppConfig).bind<Config>()
-    single<IperfRunner>(named("iperfDownloadRunner")) {
+    single<IperfRunner>(named(DI_IPERF_DOWNLOAD_RUNNER)) {
         IperfDownloadRunner(
             get(),
             get(),
@@ -47,7 +75,7 @@ val trackPresentationModule = module {
             get(),
         )
     }
-    single<IperfRunner>(named("iperfUploadRunner")) {
+    single<IperfRunner>(named(DI_IPERF_UPLOAD_RUNNER)) {
         IperfUploadRunner(
             get(),
             get(),
@@ -61,11 +89,11 @@ val trackPresentationModule = module {
             get(),
             get(),
             get(),
-            get(named("iperfDownloadRunner")),
-            get(named("iperfUploadRunner")),
+            get(named(DI_IPERF_DOWNLOAD_RUNNER)),
+            get(named(DI_IPERF_UPLOAD_RUNNER)),
             get(),
             get(),
-            get(),
+            get(named(DI_BLUETOOTH_SERVER_SERVICE_CLASSIC)),
             get(),
             get(),
         )
