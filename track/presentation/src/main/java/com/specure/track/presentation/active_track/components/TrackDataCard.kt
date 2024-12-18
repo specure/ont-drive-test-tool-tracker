@@ -143,7 +143,7 @@ private fun TrackDataItem(
         Text(
             text = value,
             color = if (isError) {
-                MaterialTheme.colorScheme.onError
+                MaterialTheme.colorScheme.error
             } else {
                 MaterialTheme.colorScheme.onSurface
             },

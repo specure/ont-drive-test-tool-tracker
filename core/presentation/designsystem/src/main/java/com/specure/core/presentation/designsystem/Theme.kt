@@ -19,7 +19,7 @@ val DarkColorScheme = darkColorScheme(
     onBackground = SignalTrackerWhite,
     onSurface = SignalTrackerWhite,
     onSurfaceVariant = SignalTrackerGray,
-    error = SignalTrackerDarkRed,
+    error = SignalTrackerRed,
     errorContainer = SignalTrackerDarkRed5,
 )
 
