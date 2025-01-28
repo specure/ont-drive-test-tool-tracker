@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="signaltracker">SignalTracker</string>
+    <string name="signaltracker">Signal Tracker</string>
     <string name="logout">Logout</string>
     <string name="active_track">Active track</string>
     <string name="pause_track">Pause track</string>
