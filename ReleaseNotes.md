@@ -1,3 +1,9 @@
+1.3.3
+----------------
+Displaying "error" in case there is an error in the speedtests changed red color for better
+visibility
+App name split
+
 1.3.2
 ----------------
 Update to Kotlin 2.0
