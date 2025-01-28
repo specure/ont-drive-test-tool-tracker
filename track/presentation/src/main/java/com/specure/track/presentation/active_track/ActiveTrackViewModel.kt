@@ -188,7 +188,8 @@ class ActiveTrackViewModel(
             state = state.copy(
                 shouldTrack = false,
                 isSavingTrack = false,
-                isShowingFinishConfirmationDialog = false
+                isShowingFinishConfirmationDialog = false,
+                hasStartedTracking = false,
             )
         }
     }
@@ -200,7 +201,8 @@ class ActiveTrackViewModel(
             state = state.copy(
                 shouldTrack = false,
                 isSavingTrack = false,
-                isShowingFinishConfirmationDialog = false
+                isShowingFinishConfirmationDialog = false,
+                hasStartedTracking = false,
             )
         }
     }
