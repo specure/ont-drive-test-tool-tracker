@@ -146,7 +146,7 @@ class AndroidBluetoothClientService(
 
     override suspend fun connectToDevice(deviceAddress: String): Result<Boolean, BluetoothError> {
         // Ensure the location permission is granted (required for Bluetooth discovery from Android M+)
-        if (context.isFineLocationPermissionGranted()) return Result.Error(BluetoothError.NO_FINE_LOCATION_PERMISSIONS)
+        if (!context.isFineLocationPermissionGranted()) return Result.Error(BluetoothError.NO_FINE_LOCATION_PERMISSIONS)
         if (!context.isBluetoothConnectPermissionGranted()) {
             return Result.Error(BluetoothError.MISSING_BLUETOOTH_CONNECT_PERMISSION)
         }
