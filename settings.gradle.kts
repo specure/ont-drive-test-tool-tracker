@@ -38,9 +38,6 @@ include(":track:location")
 include(":track:presentation")
 include(":iperf-jni-upload:iperf")
 include(":iperf-jni-download:iperf")
-
-
-
 include(":permissions:data")
 include(":permissions:domain")
 include(":permissions:presentation")
@@ -51,6 +48,8 @@ include(":connectivity:domain")
 include(":connectivity:presentation")
 include(":intercom:data")
 include(":intercom:domain")
-include(":intercom:presentation")
 include(":updater:data")
 include(":updater:domain")
+
+project(":intercom:data").projectDir = file("bluetoothIntercom/intercom/data")
+project(":intercom:domain").projectDir = file("bluetoothIntercom/intercom/domain")
