@@ -5,8 +5,8 @@ import com.specure.connectivity.presentation.mobile_network.di.mobileNetworkModu
 import com.specure.connectivity.presentation.network.di.connectivityModule
 import com.specure.core.data.di.coreDataModule
 import com.specure.core.database.di.databaseModule
-import com.specure.intercom.data.di.intercomDataModule
 import com.specure.permissions.presentation.di.permissionsModule
+import com.specure.signaltracker.di.appIntercomModule
 import com.specure.signaltracker.di.appModule
 import com.specure.track.data.di.trackDataModule
 import com.specure.track.location.di.locationModule
@@ -40,7 +40,7 @@ class SignalTrackerApp : Application() {
                 connectivityModule,
                 coreDataModule,
                 databaseModule,
-                intercomDataModule,
+                appIntercomModule,
                 mobileNetworkModule,
                 permissionsModule,
                 trackDataModule,

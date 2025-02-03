@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import com.specure.connectivity.domain.ConnectivityObserver
 import com.specure.connectivity.domain.NetworkTracker
 import com.specure.core.database.export.TracksExporter
@@ -18,8 +19,6 @@ import com.specure.core.domain.track.TrackRepository
 import com.specure.core.domain.wifi.WifiServiceObserver
 import com.specure.core.presentation.service.ServiceChecker
 import com.specure.core.presentation.service.temperature.TemperatureInfoReceiver
-import com.specure.intercom.domain.message.TrackerAction
-import com.specure.intercom.domain.server.BluetoothServerService
 import com.specure.permissions.domain.PermissionHandler
 import com.specure.permissions.presentation.appPermissions
 import com.specure.track.domain.LocationObserver
@@ -286,12 +285,12 @@ class TrackOverviewViewModel(
 
         if (!state.isPermissionRequired) {
             intercomService.startServer()
-            intercomService.receivedActionFlow.onEach { action ->
-                if (action is TrackerAction.StartTest) {
-                    Timber.d("Received start tracking request in overview screen")
-                    // TODO: start tracking screen with automated start
-                }
-            }.launchIn(viewModelScope)
+//            intercomService.receivedActionFlow.onEach { action ->
+//                if (action is TrackerAction.StartTest) {
+//                    Timber.d("Received start tracking request in overview screen")
+//                    // TODO: start tracking screen with automated start
+//                }
+//            }.launchIn(viewModelScope)
         }
         startObservingData(state.isLocationTrackable)
     }

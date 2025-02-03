@@ -2,6 +2,8 @@
 
 package com.specure.track.domain
 
+import com.cadrikmdev.intercom.domain.data.MessageContent
+import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import com.specure.connectivity.domain.ConnectivityObserver
 import com.specure.connectivity.domain.NetworkTracker
 import com.specure.connectivity.domain.TransportType
@@ -13,14 +15,13 @@ import com.specure.core.domain.package_info.PackageInfoProvider
 import com.specure.core.domain.track.TemperatureInfoObserver
 import com.specure.core.domain.track.Track
 import com.specure.core.domain.track.TrackRepository
-import com.specure.intercom.domain.data.MeasurementProgress
-import com.specure.intercom.domain.data.MeasurementState
-import com.specure.intercom.domain.data.TestError
-import com.specure.intercom.domain.message.TrackerAction
-import com.specure.intercom.domain.server.BluetoothServerService
 import com.specure.iperf.domain.IperfRunner
 import com.specure.iperf.domain.IperfTest
 import com.specure.iperf.domain.IperfTestStatus
+import com.specure.track.domain.intercom.data.MeasurementProgressContent
+import com.specure.track.domain.intercom.data.MeasurementState
+import com.specure.track.domain.intercom.data.TestError
+import com.specure.track.domain.intercom.domain.TrackerAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -258,35 +259,39 @@ class MeasurementTracker(
         applicationScope.launch {
             intercomService.startServer()
             intercomService.setMeasurementProgressCallback {
-                MeasurementProgress(
-                    state = extractState(trackData.value),
-                    errors = extractErrors(trackData.value),
-                    timestamp = System.currentTimeMillis(),
-                    appVersion = packageInfoProvider.versionName
+                MessageContent(
+                    content = MeasurementProgressContent(
+                        state = extractState(trackData.value),
+                        errors = extractErrors(trackData.value),
+                        timestamp = System.currentTimeMillis(),
+                        appVersion = packageInfoProvider.versionName
+                    ),
+                    timestamp = System.currentTimeMillis()
                 )
             }
-            intercomService.receivedActionFlow.onEach { action ->
-                when (action) {
-                    is TrackerAction.StartTest -> {
-                        stopObserving()
-                        clearData()
-                        startObserving()
-                        _isTracking.emit(true)
-                        _trackActions.emit(TrackerAction.StartTest(""))
-                        println("Emitting start action in Tracker")
-                    }
-
-                    is TrackerAction.StopTest -> {
-                        _isTracking.emit(false)
-                        _trackActions.emit(TrackerAction.StopTest(""))
-                        // we can clear all data, because they are already in DB
-                        clearData()
-                        println("Emitting stop action in Tracker")
-                    }
-
-                    else -> Unit
-                }
-            }.launchIn(applicationScope)
+//            TODO: implement processor to process incoming messages
+//            intercomService.receivedActionFlow.onEach { action ->
+//                when (action) {
+//                    is TrackerAction.StartTest -> {
+//                        stopObserving()
+//                        clearData()
+//                        startObserving()
+//                        _isTracking.emit(true)
+//                        _trackActions.emit(TrackerAction.StartTest(""))
+//                        println("Emitting start action in Tracker")
+//                    }
+//
+//                    is TrackerAction.StopTest -> {
+//                        _isTracking.emit(false)
+//                        _trackActions.emit(TrackerAction.StopTest(""))
+//                        // we can clear all data, because they are already in DB
+//                        clearData()
+//                        println("Emitting stop action in Tracker")
+//                    }
+//
+//                    else -> Unit
+//                }
+//            }.launchIn(applicationScope)
         }
     }
 
