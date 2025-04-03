@@ -6,4 +6,4 @@
 	url = https://github.com/cadrikmdev/iperf-jni.git
 [submodule "shared-intercom"]
 	path = bluetoothIntercom
-	url = git@github.com:cadrikmdev/bluetoothIntercom.git
+	url = https://github.com/cadrikmdev/bluetoothIntercom.git
