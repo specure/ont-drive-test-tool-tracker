@@ -1,3 +1,9 @@
+1.4.0
+----------------
+Shared module for intercom between manager and tracker app (change of the communication protocol)
+Updated libs
+Updated AGP to 8.9.1
+
 1.3.3
 ----------------
 Displaying "error" in case there is an error in the speedtests changed red color for better
