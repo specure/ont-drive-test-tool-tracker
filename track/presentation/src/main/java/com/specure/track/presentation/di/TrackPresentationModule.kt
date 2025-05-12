@@ -92,6 +92,7 @@ val trackPresentationModule = module {
             get(named(DI_BLUETOOTH_SERVER_SERVICE_CLASSIC)),
             get(),
             get(),
+            get(),
         )
     }
 

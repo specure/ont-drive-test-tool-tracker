@@ -20,6 +20,8 @@ import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import com.cadrikmdev.intercom.domain.service.BluetoothService
 import com.specure.signaltracker.intercom.AppBluetoothServiceSpecification
 import com.specure.track.domain.intercom.data.MeasurementProgressContent
+import com.specure.track.domain.intercom.data.StartTestContent
+import com.specure.track.domain.intercom.data.StopTestContent
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.android.ext.koin.androidApplication
@@ -82,6 +84,14 @@ val appIntercomModule = module {
                     subclass(
                         MeasurementProgressContent::class,
                         MeasurementProgressContent.serializer()
+                    )
+                    subclass(
+                        StartTestContent::class,
+                        StartTestContent.serializer()
+                    )
+                    subclass(
+                        StopTestContent::class,
+                        StopTestContent.serializer()
                     )
                 }
             }

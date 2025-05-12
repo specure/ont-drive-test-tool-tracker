@@ -3,6 +3,8 @@
 package com.specure.track.domain
 
 import com.cadrikmdev.intercom.domain.data.MessageContent
+import com.cadrikmdev.intercom.domain.message.MessageProcessor
+import com.cadrikmdev.intercom.domain.message.MessageWrapper
 import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import com.specure.connectivity.domain.ConnectivityObserver
 import com.specure.connectivity.domain.NetworkTracker
@@ -20,6 +22,8 @@ import com.specure.iperf.domain.IperfTest
 import com.specure.iperf.domain.IperfTestStatus
 import com.specure.track.domain.intercom.data.MeasurementProgressContent
 import com.specure.track.domain.intercom.data.MeasurementState
+import com.specure.track.domain.intercom.data.StartTestContent
+import com.specure.track.domain.intercom.data.StopTestContent
 import com.specure.track.domain.intercom.data.TestError
 import com.specure.track.domain.intercom.domain.TrackerAction
 import kotlinx.coroutines.CoroutineScope
@@ -62,6 +66,7 @@ class MeasurementTracker(
     private val trackRepository: TrackRepository,
     private val connectivityObserver: ConnectivityObserver,
     private val intercomService: BluetoothServerService,
+    private val messageProcessor: MessageProcessor,
     private val packageInfoProvider: PackageInfoProvider,
     private val appConfig: Config,
 ) {
@@ -269,29 +274,32 @@ class MeasurementTracker(
                     timestamp = System.currentTimeMillis()
                 )
             }
-//            TODO: implement processor to process incoming messages
-//            intercomService.receivedActionFlow.onEach { action ->
-//                when (action) {
-//                    is TrackerAction.StartTest -> {
-//                        stopObserving()
-//                        clearData()
-//                        startObserving()
-//                        _isTracking.emit(true)
-//                        _trackActions.emit(TrackerAction.StartTest(""))
-//                        println("Emitting start action in Tracker")
-//                    }
-//
-//                    is TrackerAction.StopTest -> {
-//                        _isTracking.emit(false)
-//                        _trackActions.emit(TrackerAction.StopTest(""))
-//                        // we can clear all data, because they are already in DB
-//                        clearData()
-//                        println("Emitting stop action in Tracker")
-//                    }
-//
-//                    else -> Unit
-//                }
-//            }.launchIn(applicationScope)
+
+            messageProcessor.receivedMessageFlow.onEach { message ->
+                val receivedMessage = message as MessageWrapper.SendMessage
+                when (receivedMessage.content.content) {
+                    is StartTestContent -> {
+                        stopObserving()
+                        clearData()
+                        startObserving()
+                        _isTracking.emit(true)
+                        _trackActions.emit(TrackerAction.StartTest(""))
+                        println("Emitting start action in Tracker")
+                    }
+
+                    is StopTestContent -> {
+                        _isTracking.emit(false)
+                        _trackActions.emit(TrackerAction.StopTest(""))
+                        // we can clear all data, because they are already in DB
+                        clearData()
+                        println("Emitting stop action in Tracker")
+                    }
+
+                    else -> {
+                        println("Unable to process received action")
+                    }
+                }
+            }.launchIn(applicationScope)
         }
     }
 

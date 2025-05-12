@@ -11,5 +11,4 @@ dependencies {
     implementation(projects.intercom.domain)
     implementation(projects.iperf.domain)
     implementation(projects.connectivity.domain)
-
 }

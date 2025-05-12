@@ -10,3 +10,9 @@ data class MeasurementProgressContent(
     val appVersion: String?,
     val timestamp: Long,
 ) : SerializableContent()
+
+@Serializable
+data object StartTestContent : SerializableContent()
+
+@Serializable
+data object StopTestContent : SerializableContent()
