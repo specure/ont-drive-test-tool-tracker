@@ -160,6 +160,7 @@ class TrackOverviewViewModel(
 
             TrackOverviewAction.OnExportToCsvClick -> {
 
+                trackExporter.initializeState()
                 this.applicationScope.launch {
                     trackExporter.exportStateFlow.collect { exportState ->
                         when (exportState) {
