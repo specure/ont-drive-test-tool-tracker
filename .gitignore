@@ -11,3 +11,4 @@ local.properties
 private/google-services.json
 docs/*
 /bluetoothIntercom/intercom/build/*
+/app/release/
