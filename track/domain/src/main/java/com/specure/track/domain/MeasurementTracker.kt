@@ -2,6 +2,10 @@
 
 package com.specure.track.domain
 
+import com.cadrikmdev.intercom.domain.data.MessageContent
+import com.cadrikmdev.intercom.domain.message.MessageProcessor
+import com.cadrikmdev.intercom.domain.message.MessageWrapper
+import com.cadrikmdev.intercom.domain.server.BluetoothServerService
 import com.specure.connectivity.domain.ConnectivityObserver
 import com.specure.connectivity.domain.NetworkTracker
 import com.specure.connectivity.domain.TransportType
@@ -13,14 +17,15 @@ import com.specure.core.domain.package_info.PackageInfoProvider
 import com.specure.core.domain.track.TemperatureInfoObserver
 import com.specure.core.domain.track.Track
 import com.specure.core.domain.track.TrackRepository
-import com.specure.intercom.domain.data.MeasurementProgress
-import com.specure.intercom.domain.data.MeasurementState
-import com.specure.intercom.domain.data.TestError
-import com.specure.intercom.domain.message.TrackerAction
-import com.specure.intercom.domain.server.BluetoothServerService
 import com.specure.iperf.domain.IperfRunner
 import com.specure.iperf.domain.IperfTest
 import com.specure.iperf.domain.IperfTestStatus
+import com.specure.track.domain.intercom.data.MeasurementProgressContent
+import com.specure.track.domain.intercom.data.MeasurementState
+import com.specure.track.domain.intercom.data.StartTestContent
+import com.specure.track.domain.intercom.data.StopTestContent
+import com.specure.track.domain.intercom.data.TestError
+import com.specure.track.domain.intercom.domain.TrackerAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,6 +66,7 @@ class MeasurementTracker(
     private val trackRepository: TrackRepository,
     private val connectivityObserver: ConnectivityObserver,
     private val intercomService: BluetoothServerService,
+    private val messageProcessor: MessageProcessor,
     private val packageInfoProvider: PackageInfoProvider,
     private val appConfig: Config,
 ) {
@@ -258,16 +264,21 @@ class MeasurementTracker(
         applicationScope.launch {
             intercomService.startServer()
             intercomService.setMeasurementProgressCallback {
-                MeasurementProgress(
-                    state = extractState(trackData.value),
-                    errors = extractErrors(trackData.value),
-                    timestamp = System.currentTimeMillis(),
-                    appVersion = packageInfoProvider.versionName
+                MessageContent(
+                    content = MeasurementProgressContent(
+                        state = extractState(trackData.value),
+                        errors = extractErrors(trackData.value),
+                        timestamp = System.currentTimeMillis(),
+                        appVersion = packageInfoProvider.versionName
+                    ),
+                    timestamp = System.currentTimeMillis()
                 )
             }
-            intercomService.receivedActionFlow.onEach { action ->
-                when (action) {
-                    is TrackerAction.StartTest -> {
+
+            messageProcessor.receivedMessageFlow.onEach { message ->
+                val receivedMessage = message as MessageWrapper.SendMessage
+                when (receivedMessage.content.content) {
+                    is StartTestContent -> {
                         stopObserving()
                         clearData()
                         startObserving()
@@ -276,7 +287,7 @@ class MeasurementTracker(
                         println("Emitting start action in Tracker")
                     }
 
-                    is TrackerAction.StopTest -> {
+                    is StopTestContent -> {
                         _isTracking.emit(false)
                         _trackActions.emit(TrackerAction.StopTest(""))
                         // we can clear all data, because they are already in DB
@@ -284,7 +295,9 @@ class MeasurementTracker(
                         println("Emitting stop action in Tracker")
                     }
 
-                    else -> Unit
+                    else -> {
+                        println("Unable to process received action")
+                    }
                 }
             }.launchIn(applicationScope)
         }

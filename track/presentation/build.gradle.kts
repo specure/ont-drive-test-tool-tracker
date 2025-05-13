@@ -23,9 +23,9 @@ dependencies {
     implementation(projects.connectivity.domain)
     implementation(projects.connectivity.presentation)
     implementation(projects.intercom.domain)
+    implementation(projects.intercom.data)
     implementation(projects.iperf.domain)
     implementation(projects.iperf.presentation)
     implementation(projects.core.database)
     implementation(projects.updater.domain)
-    implementation(projects.intercom.data)
 }

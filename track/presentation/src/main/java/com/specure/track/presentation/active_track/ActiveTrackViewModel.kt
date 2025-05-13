@@ -10,9 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.specure.core.domain.config.Config
 import com.specure.core.domain.location.service.LocationServiceObserver
 import com.specure.core.presentation.service.ServiceChecker
-import com.specure.intercom.domain.message.TrackerAction
 import com.specure.permissions.domain.PermissionHandler
 import com.specure.track.domain.MeasurementTracker
+import com.specure.track.domain.intercom.domain.TrackerAction
 import com.specure.track.presentation.active_track.service.ActiveTrackService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,7 +84,6 @@ class ActiveTrackViewModel(
             when (action) {
                 is TrackerAction.StartTest -> onAction(ActiveTrackAction.OnStartTrackClick)
                 is TrackerAction.StopTest -> onAction(ActiveTrackAction.OnStopTrackClick)
-                is TrackerAction.UpdateProgress -> Unit
                 null -> Unit
             }
         }.launchIn(viewModelScope)

@@ -1,5 +1,6 @@
 package com.specure.track.presentation.di
 
+import com.cadrikmdev.intercom.data.di.DI_BLUETOOTH_SERVER_SERVICE_CLASSIC
 import com.specure.core.domain.config.Config
 import com.specure.core.domain.location.service.LocationServiceObserver
 import com.specure.core.domain.track.TemperatureInfoObserver
@@ -10,8 +11,6 @@ import com.specure.core.presentation.service.location.AndroidLocationServiceObse
 import com.specure.core.presentation.service.location.GpsLocationServiceChecker
 import com.specure.core.presentation.service.temperature.TemperatureInfoReceiver
 import com.specure.core.presentation.service.wifi.AndroidWifiServiceObserver
-import com.specure.intercom.data.di.DI_BLUETOOTH_SERVER_SERVICE_CLASSIC
-import com.specure.intercom.domain.server.BluetoothServerService
 import com.specure.iperf.domain.IperfOutputParser
 import com.specure.iperf.domain.IperfRunner
 import com.specure.iperf.presentation.IperfAndroidParser
@@ -39,9 +38,6 @@ val trackPresentationModule = module {
     viewModelOf(::SettingsScreenViewModel)
     viewModel {
 
-        val bluetoothServerService =
-            get<BluetoothServerService>(named(DI_BLUETOOTH_SERVER_SERVICE_CLASSIC))
-
         TrackOverviewViewModel(
             get(),
             get(),
@@ -56,7 +52,7 @@ val trackPresentationModule = module {
             get(),
             get(),
             get(),
-            bluetoothServerService,
+            get(named(DI_BLUETOOTH_SERVER_SERVICE_CLASSIC)),
             get(),
         )
     }
@@ -94,6 +90,7 @@ val trackPresentationModule = module {
             get(),
             get(),
             get(named(DI_BLUETOOTH_SERVER_SERVICE_CLASSIC)),
+            get(),
             get(),
             get(),
         )

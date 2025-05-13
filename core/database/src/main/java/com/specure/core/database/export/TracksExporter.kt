@@ -64,6 +64,10 @@ class TracksExporter(
         data object Error : ExportState()
     }
 
+    fun initializeState() {
+        _exportStateFlow.value = ExportState.Exporting(1)
+    }
+
     suspend fun exportFile(
         format: String? = "csv",
         fileName: String? = null

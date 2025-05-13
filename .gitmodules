@@ -4,3 +4,6 @@
 [submodule "iperf-jni-upload"]
 	path = iperf-jni-upload
 	url = https://github.com/cadrikmdev/iperf-jni.git
+[submodule "shared-intercom"]
+	path = bluetoothIntercom
+	url = https://github.com/cadrikmdev/bluetoothIntercom.git
