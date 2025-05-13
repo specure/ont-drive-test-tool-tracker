@@ -81,7 +81,7 @@ fun PermissionResolver(
 
 @Preview
 @Composable
-fun previewPermissionResolver() {
+fun PreviewPermissionResolver() {
     PermissionResolver(
         permission = AndroidPermission(
             Manifest.permission.READ_PHONE_STATE,

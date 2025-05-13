@@ -65,7 +65,7 @@ fun PermissionRationale(
 
 @Preview
 @Composable
-fun previewPermissionRationale() {
+fun PreviewPermissionRationale() {
     PermissionRationale(
         permission = AndroidPermission(
             Manifest.permission.READ_PHONE_STATE,

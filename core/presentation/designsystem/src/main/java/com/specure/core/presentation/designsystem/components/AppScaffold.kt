@@ -11,8 +11,8 @@ import com.specure.core.presentation.designsystem.SignalTrackerTheme
 
 @Composable
 fun SignalTrackerScaffold(
-    withGradient: Boolean = true,
     modifier: Modifier = Modifier,
+    withGradient: Boolean = true,
     topAppBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
