@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.signaltracker.android.application.compose)
     alias(libs.plugins.signaltracker.jvm.ktor)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -96,6 +97,8 @@ dependencies {
 
     implementation(platform(libs.firebase))
 
+    implementation(libs.google.analytics)
+    implementation(libs.google.crashlytics)
 }
 
 //
