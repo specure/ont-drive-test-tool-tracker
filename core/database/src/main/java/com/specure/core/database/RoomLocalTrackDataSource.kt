@@ -64,6 +64,13 @@ class RoomLocalTrackDataSource(
             }
     }
 
+    override suspend fun getLatestNTracksForExportPageable(offset: Int, limit: Int): List<Track> {
+        return trackDao.getTracksForExportPageable(offset = offset, limit = limit)
+            .map { trackEntity ->
+                trackEntity.toTrack()
+            }
+    }
+
     override suspend fun deleteExportedTracks() {
         trackDao.deleteExportedTracks()
     }

@@ -22,6 +22,19 @@ interface TrackDao {
     @Query("SELECT * FROM track_entity WHERE exported=0  ORDER BY timestamp DESC")
     fun getTracksForExport(): Flow<List<TrackEntity>>
 
+    @Query(
+        """
+        SELECT * FROM track_entity
+        WHERE exported = 0
+        ORDER BY timestamp DESC
+        LIMIT :limit OFFSET :offset
+    """
+    )
+    fun getTracksForExportPageable(offset: Int, limit: Int): List<TrackEntity>
+
+
+
+
     @Query("SELECT * FROM track_entity WHERE exported=0 ORDER BY timestamp DESC LIMIT :limit")
     fun getLastNTracksForExport(limit: Int): Flow<List<TrackEntity>>
 

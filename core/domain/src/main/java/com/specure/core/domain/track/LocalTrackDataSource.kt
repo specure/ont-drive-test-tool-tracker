@@ -15,6 +15,8 @@ interface LocalTrackDataSource {
 
     suspend fun getTracksForExport(): Flow<List<Track>>
 
+    suspend fun getLatestNTracksForExportPageable(offset: Int, limit: Int): List<Track>
+
     suspend fun getLatestNTracksForExport(limit: Int): Flow<List<Track>>
 
     suspend fun deleteExportedTracks()
