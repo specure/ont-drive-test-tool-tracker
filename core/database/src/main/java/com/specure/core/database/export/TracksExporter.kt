@@ -28,7 +28,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileWriter
-import java.io.Writer
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -73,33 +72,23 @@ class TracksExporter(
         fileName: String? = null
     ) {
         withContext(Dispatchers.IO) {
-            var writer: Writer? = null
+            var outputFile: File? = null
+
             try {
                 _exportStateFlow.value = ExportState.Exporting(1)
                 updateNotificationProgress(1)
-                val name = if (fileName != null) {
-                    "$fileName.$format"
-                } else {
-                    "track_export_${System.currentTimeMillis().formatMillisToDateString()}.$format"
-                }
-                val outputFile = if (Build.VERSION_CODES.Q >= Build.VERSION.SDK_INT) {
-                    File(
-                        context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                        name
-                    )
-                } else {
-                    File(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                        name
-                    )
-                }
+
+                val outputFile = createOutputFile(fileName, format)
+
                 val trackList = trackDataSource.getTracksForExport().first()
+
                 if (trackList.isEmpty()) {
                     _exportStateFlow.value = ExportState.NothingToExport
                     showNothingToExportNotification()
-//                        return@collect
-                } else {
-                    writer = FileWriter(outputFile)
+                    return@withContext
+                }
+
+                FileWriter(outputFile).use { writer ->
                     val beanToCsv: StatefulBeanToCsv<TrackEntity> =
                         StatefulBeanToCsvBuilder<TrackEntity>(writer).build()
 
@@ -113,10 +102,13 @@ class TracksExporter(
                         _exportStateFlow.value = ExportState.Exporting(progress)
                         updateProgressNotificationCorrectly(progress)
                     }
-                    _exportStateFlow.value = ExportState.Success(outputFile)
-                    showExportCompleteNotification(outputFile)
-                    databaseWorkerScheduler.scheduleWork(WorkType.MarkAsExported)
                 }
+
+                _exportStateFlow.value = ExportState.Success(outputFile)
+
+                showExportCompleteNotification(outputFile)
+                databaseWorkerScheduler.scheduleWork(WorkType.MarkAsExported)
+
 //                }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -125,8 +117,6 @@ class TracksExporter(
                 if (e is CancellationException) {
                     throw e
                 }
-            } finally {
-                writer?.close()
             }
         }
     }
@@ -156,6 +146,26 @@ class TracksExporter(
                 onError(e)
             }
         }
+    }
+
+    private fun createOutputFile(fileName: String?, format: String?): File {
+        val name = if (fileName != null) {
+            "$fileName.$format"
+        } else {
+            "track_export_${System.currentTimeMillis().formatMillisToDateString()}.$format"
+        }
+        val outputFile = if (Build.VERSION_CODES.Q >= Build.VERSION.SDK_INT) {
+            File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
+                name
+            )
+        } else {
+            File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                name
+            )
+        }
+        return outputFile
     }
 
     private fun createOpenFileIntent(fileUri: Uri): Intent {
