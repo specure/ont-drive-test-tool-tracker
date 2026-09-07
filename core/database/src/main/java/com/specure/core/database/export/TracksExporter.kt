@@ -81,9 +81,9 @@ class TracksExporter(
                 val outputFile = createOutputFile(fileName, format)
 
                 // TODO: change to count how many not exported are and return only a number
-                val trackList = trackDataSource.getTracksForExport().first()
+                val totalSize = trackDataSource.getTracksForExportCount().first()
 
-                if (trackList.isEmpty()) {
+                if (totalSize == 0) {
                     _exportStateFlow.value = ExportState.NothingToExport
                     showNothingToExportNotification()
                     return@withContext
@@ -93,22 +93,20 @@ class TracksExporter(
                     val beanToCsv: StatefulBeanToCsv<TrackEntity> =
                         StatefulBeanToCsvBuilder<TrackEntity>(writer).build()
 
-                    val totalSize = trackList.size
                     Timber.d("Exporting $totalSize items")
 
                     var offset = 0
                     val batchSize = 500
 
                     while (true) {
-                        val tracks = trackDataSource.getLatestNTracksForExportPageable(batchSize, offset)
+                        val tracks = trackDataSource.getLatestNTracksForExportPageable(offset = offset, limit = batchSize)
 
                         if (tracks.isEmpty()) break
 
                         tracks.forEachIndexed { index, track ->
                             beanToCsv.write(track.toTrackEntity())
                             val progress =
-                                (((batchSize + index) * 100) / totalSize).coerceAtLeast(1).coerceAtMost(100)
-                            Timber.d("Exporting progress: $progress")
+                                (((offset + index) * 100) / totalSize).coerceAtLeast(1).coerceAtMost(100)
                             _exportStateFlow.value = ExportState.Exporting(progress)
                             updateProgressNotificationCorrectly(progress)
                         }

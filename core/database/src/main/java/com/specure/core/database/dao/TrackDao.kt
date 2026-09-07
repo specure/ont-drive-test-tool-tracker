@@ -32,8 +32,8 @@ interface TrackDao {
     )
     fun getTracksForExportPageable(offset: Int, limit: Int): List<TrackEntity>
 
-
-
+    @Query("SELECT COUNT(*) FROM track_entity WHERE exported = 0")
+    fun getTracksForExportCount(): Flow<Int>
 
     @Query("SELECT * FROM track_entity WHERE exported=0 ORDER BY timestamp DESC LIMIT :limit")
     fun getLastNTracksForExport(limit: Int): Flow<List<TrackEntity>>

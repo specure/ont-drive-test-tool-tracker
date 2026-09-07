@@ -78,8 +78,8 @@ class TrackOverviewViewModel(
     init {
 
         viewModelScope.launch {
-            trackRepository.getTracksForExport().collect { tracks ->
-                updateTrackSizeForExport(tracks.size)
+            trackRepository.getTracksForExportCount().collect { tracksCount ->
+                updateTrackSizeForExport(tracksCount)
             }
         }
 

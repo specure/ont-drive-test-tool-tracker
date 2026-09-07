@@ -6,13 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface TrackRepository {
 
-    fun getTracks(): Flow<List<Track>>
-
     suspend fun upsertTrack(track: Track): EmptyResult<DataError>
 
     suspend fun deleteTrack(id: TrackId)
 
-    suspend fun getTracksForExport(): Flow<List<Track>>
+    suspend fun getTracksForExportCount(): Flow<Int>
 
     suspend fun deleteExportedTracks()
 

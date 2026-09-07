@@ -16,9 +16,6 @@ import kotlinx.coroutines.withContext
 class OfflineFirstTrackRepository(
     private val localTrackDataSource: LocalTrackDataSource,
 ) : TrackRepository {
-    override fun getTracks(): Flow<List<Track>> {
-        return localTrackDataSource.getTracks()
-    }
 
     override suspend fun upsertTrack(track: Track): EmptyResult<DataError> {
         val localResult = localTrackDataSource.upsertTrack(track)
@@ -32,8 +29,8 @@ class OfflineFirstTrackRepository(
         localTrackDataSource.deleteTrack(id)
     }
 
-    override suspend fun getTracksForExport(): Flow<List<Track>> {
-        return localTrackDataSource.getTracksForExport()
+    override suspend fun getTracksForExportCount(): Flow<Int> {
+        return localTrackDataSource.getTracksForExportCount()
     }
 
     override suspend fun deleteExportedTracks() {

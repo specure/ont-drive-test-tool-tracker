@@ -55,6 +55,10 @@ class RoomLocalTrackDataSource(
             }
     }
 
+    override suspend fun getTracksForExportCount(): Flow<Int> {
+        return trackDao.getTracksForExportCount()
+    }
+
     override suspend fun getLatestNTracksForExport(limit: Int): Flow<List<Track>> {
         return trackDao.getLastNTracksForExport(limit)
             .map { trackEntities ->
