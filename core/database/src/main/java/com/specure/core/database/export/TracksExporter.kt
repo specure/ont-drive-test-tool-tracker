@@ -73,12 +73,13 @@ class TracksExporter(
     ) {
         withContext(Dispatchers.IO) {
             var outputFile: File? = null
+            var successfullyExported = true
 
             try {
                 _exportStateFlow.value = ExportState.Exporting(1)
                 updateNotificationProgress(1)
 
-                val outputFile = createOutputFile(fileName, format)
+                outputFile = createOutputFile(fileName, format)
 
                 // TODO: change to count how many not exported are and return only a number
                 val totalSize = trackDataSource.getTracksForExportCount().first()
@@ -117,17 +118,32 @@ class TracksExporter(
 
                 _exportStateFlow.value = ExportState.Success(outputFile)
 
-                showExportCompleteNotification(outputFile)
-                databaseWorkerScheduler.scheduleWork(WorkType.MarkAsExported)
-
 //                }
+            } catch (e: CancellationException) {
+                deleteFile(outputFile)
+                Timber.e(e, "Export cancelled")
+                throw e
             } catch (e: Exception) {
-                e.printStackTrace()
+                successfullyExported = false
+                deleteFile(outputFile)
+                Timber.e(e, "Export failed")
                 _exportStateFlow.value = ExportState.Error
                 notificationManager.cancel(notificationId)
-                if (e is CancellationException) {
-                    throw e
+            }
+
+            try {
+                if (successfullyExported) {
+                    databaseWorkerScheduler.scheduleWork(WorkType.MarkAsExported)
+                    outputFile?.let { file ->
+                        showExportCompleteNotification(file)
+                    }
+                } else {
+
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Post-export operation failed")
             }
         }
     }
@@ -140,6 +156,18 @@ class TracksExporter(
         if (isFinished || isTimeToUpdate) {
             updateNotificationProgress(progressPercentage)
             latestUpdateTime = currentTime
+        }
+    }
+
+    fun deleteFile(fileToDelete: File?) {
+        try {
+            fileToDelete?.let { file ->
+                if (file.exists() && !file.delete()) {
+                    Timber.w("Failed to delete incomplete export: ${file.absolutePath}")
+                }
+            }
+        } catch (e: SecurityException) {
+            e.printStackTrace()
         }
     }
 
