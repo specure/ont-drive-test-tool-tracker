@@ -1,3 +1,9 @@
+1.4.1
+----------------
+
+- improved exporting measurement data CSV process
+- added crashlytics
+
 1.4.0
 ----------------
 Shared module for intercom between manager and tracker app (change of the communication protocol)
