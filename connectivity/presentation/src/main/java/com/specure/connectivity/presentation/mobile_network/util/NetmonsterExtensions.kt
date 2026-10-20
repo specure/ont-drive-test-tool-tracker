@@ -11,6 +11,8 @@ import com.specure.connectivity.domain.SignalStrengthInfo.Companion.LTE_RSRP_SIG
 import com.specure.connectivity.domain.SignalStrengthInfo.Companion.LTE_RSRP_SIGNAL_MIN
 import com.specure.connectivity.domain.SignalStrengthInfo.Companion.NR_RSRP_SIGNAL_MAX
 import com.specure.connectivity.domain.SignalStrengthInfo.Companion.NR_RSRP_SIGNAL_MIN
+import com.specure.connectivity.domain.SignalStrengthInfo.Companion.NR_RSRP_VALID_MAX
+import com.specure.connectivity.domain.SignalStrengthInfo.Companion.NR_RSRP_VALID_MIN
 import com.specure.connectivity.domain.SignalStrengthInfo.Companion.TDSCDMA_RSRP_SIGNAL_MAX
 import com.specure.connectivity.domain.SignalStrengthInfo.Companion.TDSCDMA_RSRP_SIGNAL_MIN
 import com.specure.connectivity.domain.SignalStrengthInfo.Companion.WCDMA_RSRP_SIGNAL_MAX
@@ -24,6 +26,7 @@ import com.specure.connectivity.domain.mobile.CellTechnology
 import com.specure.connectivity.domain.mobile.MobileNetworkType
 import com.specure.connectivity.domain.mobile.NrConnectionState
 import com.specure.connectivity.domain.mobile.PrimaryDataSubscription
+import com.specure.connectivity.domain.mobile.band.BandCalculationUtil
 import com.specure.connectivity.domain.mobile.band.CellBand
 import com.specure.connectivity.domain.mobile.band.CellBand.Companion.fromChannelNumber
 import com.specure.connectivity.domain.mobile.band.CellChannelAttribution
@@ -38,9 +41,7 @@ import cz.mroczis.netmonster.core.db.NetworkTypeTable
 import cz.mroczis.netmonster.core.db.model.IBandEntity
 import cz.mroczis.netmonster.core.db.model.NetworkType
 import cz.mroczis.netmonster.core.feature.detect.DetectorAosp
-import cz.mroczis.netmonster.core.feature.detect.DetectorLteAdvancedCellInfo
 import cz.mroczis.netmonster.core.feature.detect.DetectorLteAdvancedNrServiceState
-import cz.mroczis.netmonster.core.feature.detect.DetectorLteAdvancedPhysicalChannel
 import cz.mroczis.netmonster.core.model.band.BandGsm
 import cz.mroczis.netmonster.core.model.band.BandLte
 import cz.mroczis.netmonster.core.model.band.BandNr
@@ -205,7 +206,6 @@ fun ISignal.toSignalEntity(
             nrSsRsrq = this.ssRsrq
             nrSsSinr = this.ssSinr
         }
-
         is SignalLte -> {
             signal = null
             lteRsrp = this.rsrp?.toInt()
@@ -214,7 +214,6 @@ fun ISignal.toSignalEntity(
             lteCqi = this.cqi
             timingAdvance = this.timingAdvance
         }
-
         is SignalGsm -> {
             bitErrorRate = this.bitErrorRate
             timingAdvance = this.timingAdvance
@@ -260,27 +259,21 @@ fun ISignal.toSignalStrengthInfo(timestampNanos: Long): SignalStrengthInfo? {
         is SignalNr -> {
             this.toSignalStrengthInfo(timestampNanos)
         }
-
         is SignalLte -> {
             this.toSignalStrengthInfo(timestampNanos)
         }
-
         is SignalGsm -> {
             this.toSignalStrengthInfo(timestampNanos)
         }
-
         is SignalCdma -> {
             this.toSignalStrengthInfo(timestampNanos)
         }
-
         is SignalWcdma -> {
             this.toSignalStrengthInfo(timestampNanos)
         }
-
         is SignalTdscdma -> {
             this.toSignalStrengthInfo(timestampNanos)
         }
-
         else -> null
     }
 }
@@ -354,12 +347,16 @@ fun SignalLte.toSignalStrengthInfo(timestampNanos: Long): SignalStrengthInfo {
 }
 
 fun SignalNr.toSignalStrengthInfo(timestampNanos: Long): SignalStrengthInfo? {
-    return if (this.ssRsrp != null && this.ssRsrp!! < NR_RSRP_SIGNAL_MAX && this.ssRsrp!! >= NR_RSRP_SIGNAL_MIN) {
+    // Prefer SS-RSRP, but fall back to CSI-RSRP: some 5G SA modems report only CSI-RSRP for the
+    // serving cell. Validate against the full 3GPP measurement range (NR_RSRP_VALID_*), not the
+    // narrower display range, so strong signals (better than the display max of -70 dBm) are kept.
+    val rsrp = this.ssRsrp ?: this.csiRsrp
+    return if (rsrp != null && rsrp in NR_RSRP_VALID_MIN..NR_RSRP_VALID_MAX) {
         SignalStrengthInfoNr(
             transport = TransportType.CELLULAR,
-            value = this.ssRsrp,
+            value = rsrp,
             rsrq = null,
-            signalLevel = calculateNRSignalLevel(this.ssRsrp),
+            signalLevel = calculateNRSignalLevel(rsrp),
             min = NR_RSRP_SIGNAL_MIN,
             max = NR_RSRP_SIGNAL_MAX,
             timestampNanos = timestampNanos,
@@ -407,17 +404,12 @@ fun ICell.toCellNetworkInfo(
         isRoaming = dataTelephonyManager?.isNetworkRoaming ?: false,
         signalStrength = this.toSignalStrengthInfo(System.nanoTime()),
         nrConnectionState = if (dataTelephonyManager != null) {
-            com.specure.connectivity.presentation.mobile_network.util.NrConnectionStateResolver.getNRConnectionState(
-                dataTelephonyManager
-            )
+            NrConnectionStateResolver.getNRConnectionState(dataTelephonyManager)
         } else NrConnectionState.NOT_AVAILABLE,
         dualSimDetectionMethod = null,
         cellUUID = this.uuid(),
-        isPrimaryDataSubscription = PrimaryDataSubscription.resolvePrimaryDataSubscriptionID(
-            dataSubscriptionId,
-            this.subscriptionId
-        ),
-        cellState = resolveConnectionState()
+        isPrimaryDataSubscription = PrimaryDataSubscription.resolvePrimaryDataSubscriptionID(dataSubscriptionId, this.subscriptionId),
+        cellState = resolveConnectionState(),
     )
 }
 
@@ -505,13 +497,7 @@ fun BandGsm.toCellBand(): CellBand {
     )
 }
 
-fun ICell.toCellLocation(
-    testUUID: String?,
-    signalChunkId: String?,
-    timestampMillis: Long,
-    timestampNanos: Long,
-    startTimeNanos: Long
-): CellLocationEntity? {
+fun ICell.toCellLocation(testUUID: String?, signalChunkId: String?, timestampMillis: Long, timestampNanos: Long, startTimeNanos: Long): CellLocationEntity? {
     primaryScramblingCode()?.let {
         return CellLocationEntity(
             testUUID = testUUID,
@@ -540,10 +526,8 @@ fun ICell.isInformationCorrect(cellTechnology: CellTechnology): Boolean {
         is CellGsm -> cellTechnology == CellTechnology.CONNECTION_2G
         else -> false
     }
-    Timber.d("Saving ICell: $this and  technology: ${cellTechnology?.name} is Correct: $isCorrect")
     return isCorrect
 }
-
 
 fun ICell.resolveConnectionState(): String? {
     return when (this.connectionStatus) {
@@ -560,7 +544,6 @@ fun ICell.channelNumber(): Int? {
         is BandLte,
         is BandTdscdma,
         is BandWcdma -> band?.channelNumber
-
         is BandNr -> band?.let { (band as BandNr).getEuBand()?.channelNumber }
         else -> null
     }
@@ -569,21 +552,10 @@ fun ICell.channelNumber(): Int? {
 fun ICell.frequency(): Double? {
     return when (band) {
         is BandNr -> (band as BandNr).getEuBand()?.downlinkFrequency?.toDouble()
-        is BandGsm -> com.specure.connectivity.domain.mobile.band.BandCalculationUtil.getBandFromArfcn(
-            (band as BandGsm).arfcn
-        )?.frequencyDL
-
-        is BandLte -> com.specure.connectivity.domain.mobile.band.BandCalculationUtil.getBandFromEarfcn(
-            (band as BandLte).downlinkEarfcn
-        )?.frequencyDL
-
-        is BandTdscdma -> com.specure.connectivity.domain.mobile.band.BandCalculationUtil.getBandFromUarfcn(
-            (band as BandTdscdma).downlinkUarfcn
-        )?.frequencyDL
-
-        is BandWcdma -> com.specure.connectivity.domain.mobile.band.BandCalculationUtil.getBandFromUarfcn(
-            (band as BandWcdma).downlinkUarfcn
-        )?.frequencyDL
+        is BandGsm -> BandCalculationUtil.getBandFromArfcn((band as BandGsm).arfcn)?.frequencyDL
+        is BandLte -> BandCalculationUtil.getBandFromEarfcn((band as BandLte).downlinkEarfcn)?.frequencyDL
+        is BandTdscdma -> BandCalculationUtil.getBandFromUarfcn((band as BandTdscdma).downlinkUarfcn)?.frequencyDL
+        is BandWcdma -> BandCalculationUtil.getBandFromUarfcn((band as BandWcdma).downlinkUarfcn)?.frequencyDL
         else -> null
     }
 }
@@ -594,11 +566,11 @@ fun ICell.mobileNetworkType(netMonster: INetMonster): MobileNetworkType {
         networkTypeFromNM = netMonster.getNetworkType(
             this.subscriptionId,
             DetectorLteAdvancedNrServiceState(),
-            DetectorLteAdvancedPhysicalChannel(),
-            DetectorLteAdvancedCellInfo(),
+            // These detectors must be disabled until NM lib resolves problem with dual sim NR and LTE mixing
+            // DetectorLteAdvancedPhysicalChannel(),
+            // DetectorLteAdvancedCellInfo(),
             DetectorAosp() // best to keep last when all other strategies fail
         ) ?: NetworkTypeTable.get(NetworkType.UNKNOWN)
-//        Timber.d("NM network type direct: ${networkTypeFromNM.technology}")
     } catch (e: SecurityException) {
         Timber.e("SecurityException: Not able to read network type")
     } catch (e: IllegalStateException) {
@@ -626,7 +598,6 @@ fun NetworkType.mapToMobileNetworkType(): MobileNetworkType {
         is NetworkType.Lte,
         is NetworkType.Tdscdma,
         is NetworkType.Wcdma -> MobileNetworkType.fromValue(this.technology)
-
         is NetworkType.Nr -> {
             return when (this) {
                 is NetworkType.Nr.Nsa -> {
@@ -642,15 +613,12 @@ fun NetworkType.mapToMobileNetworkType(): MobileNetworkType {
                         MobileNetworkType.NR_NSA
                     }
                 }
-
                 is NetworkType.Nr.Sa -> {
                     MobileNetworkType.NR_SA
                 }
-
                 else -> MobileNetworkType.NR_SA // default to NR SA if neither NSA nor SA are detected
             }
         }
-
         else -> MobileNetworkType.UNKNOWN
     }
 }
@@ -692,53 +660,61 @@ fun ICell.locationId(): Long? {
 }
 
 fun ICell.uuid(): String {
+    return UUID.randomUUID().toString()
+}
+
+fun ICell.internalUuidForComparison(): String {
     return when (this) {
-        is CellNr -> this.uuid()
-        is CellTdscdma -> this.uuid()
-        is CellLte -> this.uuid()
-        is CellCdma -> this.uuid()
-        is CellWcdma -> this.uuid()
-        is CellGsm -> this.uuid()
+        is CellNr -> this.internalUuidForComparison()
+        is CellTdscdma -> this.internalUuidForComparison()
+        is CellLte -> this.internalUuidForComparison()
+        is CellCdma -> this.internalUuidForComparison()
+        is CellWcdma -> this.internalUuidForComparison()
+        is CellGsm -> this.internalUuidForComparison()
         else -> ""
     }
 }
 
-fun CellNr.uuid(): String {
+fun CellNr.internalUuidForComparison(): String {
     val id = buildString {
         append("nr")
         append(nci)
         append(pci)
+        append(band?.number)
     }.toByteArray()
     return UUID.nameUUIDFromBytes(id).toString()
 }
 
-fun CellTdscdma.uuid(): String {
+fun CellTdscdma.internalUuidForComparison(): String {
     val id = buildString {
         append("tdscdma")
         append(cid)
         append(cpid)
+        append(band?.number)
     }.toByteArray()
     return UUID.nameUUIDFromBytes(id).toString()
 }
 
-fun CellLte.uuid(): String {
+fun CellLte.internalUuidForComparison(): String {
     val id = buildString {
         append("lte")
         append(eci)
         append(pci)
+        append(band?.number)
     }.toByteArray()
     return UUID.nameUUIDFromBytes(id).toString()
 }
 
-fun CellWcdma.uuid(): String {
+fun CellWcdma.internalUuidForComparison(): String {
     val id = buildString {
         append("wcdma")
         append(cid)
+        append(band?.number)
     }.toByteArray()
     return UUID.nameUUIDFromBytes(id).toString()
 }
 
-fun CellGsm.uuid(): String {
+fun CellGsm.internalUuidForComparison(): String {
     val id = buildString {
         append("gsm")
         append(cid)
@@ -746,7 +722,7 @@ fun CellGsm.uuid(): String {
     return UUID.nameUUIDFromBytes(id).toString()
 }
 
-fun CellCdma.uuid(): String {
+fun CellCdma.internalUuidForComparison(): String {
     val id = buildString {
         append("cdma")
         append(bid)
