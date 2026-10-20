@@ -1,6 +1,10 @@
-1.4.1
+1.4.2
 ----------------
 
+- Fixed 5G signal boundaries which are considered as correct to not filter out relevant signals
+
+1.4.1
+----------------
 - improved exporting measurement data CSV process
 - added crashlytics
 
