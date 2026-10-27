@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -29,6 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.currentStateAsState
+import com.specure.core.presentation.designsystem.EyeClosedIcon
+import com.specure.core.presentation.designsystem.EyeOpenedIcon
 import com.specure.core.presentation.designsystem.SignalTrackerTheme
 import com.specure.core.presentation.designsystem.StartIcon
 import com.specure.core.presentation.designsystem.StopIcon
@@ -38,6 +41,7 @@ import com.specure.core.presentation.designsystem.components.SignalTrackerFloati
 import com.specure.core.presentation.designsystem.components.SignalTrackerOutlinedActionButton
 import com.specure.core.presentation.designsystem.components.SignalTrackerScaffold
 import com.specure.core.presentation.designsystem.components.SignalTrackerToolbar
+import com.specure.core.presentation.designsystem.components.util.DropDownItem
 import com.specure.core.presentation.ui.ObserveAsEvents
 import com.specure.track.presentation.R
 import com.specure.track.presentation.active_track.components.TrackDataCard
@@ -197,6 +201,27 @@ private fun ActiveTrackScreen(
                 onBackClick = {
                     onAction(ActiveTrackAction.OnBackClick)
                 },
+                menuItems = listOf(
+                    DropDownItem(
+                        title = stringResource(
+                            id = if (state.minimalUI) {
+                                R.string.full_ui
+                            } else {
+                                R.string.minimal_ui
+                            }
+                        ),
+                        icon = if (state.minimalUI) {
+                            EyeOpenedIcon
+                        } else {
+                            EyeClosedIcon
+                        }
+                    ),
+                ),
+                onMenuItemClick = { position ->
+                    when (position) {
+                        0 -> onAction(ActiveTrackAction.OnToggleUIClick)
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -221,19 +246,30 @@ private fun ActiveTrackScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(
+                    if (state.minimalUI == false) {
+                        MaterialTheme.colorScheme.surface
+                    } else {
+                        Color.Black
+                    }
+                )
         ) {
-            TrackerMap(
-                isTrackFinished = false,
-                currentLocation = state.currentLocation,
-                locations = state.trackData.locations,
-                onSnapshot = { },
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+            if (state.minimalUI) {
+
+            } else {
+                TrackerMap(
+                    isTrackFinished = false,
+                    currentLocation = state.currentLocation,
+                    locations = state.trackData.locations,
+                    onSnapshot = { },
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
             TrackDataCard(
                 elapsedTime = state.elapsedTime,
                 trackData = state.trackData,
+                transparent = state.minimalUI,
                 modifier = Modifier
                     .padding(16.dp)
                     .padding(padding)

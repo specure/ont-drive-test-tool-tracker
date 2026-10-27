@@ -2,6 +2,7 @@ package com.specure.track.presentation.active_track
 
 sealed interface ActiveTrackAction {
     data object OnToggleTrackClick : ActiveTrackAction
+    data object OnToggleUIClick : ActiveTrackAction
     data object OnFinishTrackClick : ActiveTrackAction
     data object OnResumeTrackClick : ActiveTrackAction
     data object OnBackClick : ActiveTrackAction

@@ -26,6 +26,7 @@ data class ActiveTrackState(
      *  only mirror of what is produced in @see MeasurementTracker
      */
     val trackData: TrackData = TrackData(),
+    val minimalUI: Boolean = false,
 ) {
 
     fun stopTracking(): ActiveTrackState {
@@ -33,6 +34,12 @@ data class ActiveTrackState(
             isSavingTrack = false,
             shouldTrack = false,
             isTrackFinished = true,
+        )
+    }
+
+    fun toggleUI(): ActiveTrackState {
+        return this.copy(
+            minimalUI = !minimalUI
         )
     }
 }

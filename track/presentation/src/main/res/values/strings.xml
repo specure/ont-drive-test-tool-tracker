@@ -3,6 +3,8 @@
     <string name="signaltracker">Signal Tracker</string>
     <string name="logout">Logout</string>
     <string name="active_track">Active track</string>
+    <string name="minimal_ui">Minimal UI</string>
+    <string name="full_ui">Full UI</string>
     <string name="pause_track">Pause track</string>
     <string name="start_track">Start track</string>
     <string name="duration">Duration</string>

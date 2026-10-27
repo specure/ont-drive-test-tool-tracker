@@ -177,6 +177,10 @@ class ActiveTrackViewModel(
                 finishTrackAndLeave()
             }
 
+            is ActiveTrackAction.OnToggleUIClick -> {
+                state = state.toggleUI()
+            }
+
             else -> Unit
         }
     }
