@@ -51,5 +51,6 @@ include(":intercom:domain")
 include(":updater:data")
 include(":updater:domain")
 
+project(":intercom").projectDir = file("bluetoothIntercom/intercom")
 project(":intercom:data").projectDir = file("bluetoothIntercom/intercom/data")
 project(":intercom:domain").projectDir = file("bluetoothIntercom/intercom/domain")
