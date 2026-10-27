@@ -1,6 +1,10 @@
-1.4.2
+1.4.3
 ----------------
 
+- added possibility to switch tracking screen to minimal UI to save power for OLED screens
+
+1.4.2
+----------------
 - Fixed 5G signal boundaries which are considered as correct to not filter out relevant signals
 
 1.4.1
