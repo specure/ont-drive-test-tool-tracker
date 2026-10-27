@@ -87,6 +87,10 @@ to get all source files
 
 ## TODO:
 
+Add minimal UI for tracking to reduce heat and power consumption (OLED displays - something black with few lines of text)
+
+When all permissions are solved there should be some text that everything is done you can leave the screen.
+
 Handle when user do not give bluetooth permission or add settings to enable manager app for
 bluetooth
 
