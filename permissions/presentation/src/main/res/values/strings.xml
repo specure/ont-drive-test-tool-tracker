@@ -27,4 +27,5 @@
     <string name="permission_bluetooth_connect_description">We need bluetooth connect permission to connect to managing app, where you can remotely control tracking app and see its status.</string>
     <string name="permission_bluetooth_advertise_rationale">It seems you permanently declined bluetooth advertising permission. You can go to app settings to grant it</string>
     <string name="permission_bluetooth_advertise_description">We need bluetooth advertising permission to advertise bluetooth managing option to managing app, where you can remotely control tracking app and see its status.</string>
+    <string name="no_permissions_needed">All required permissions are enabled</string>
 </resources>
