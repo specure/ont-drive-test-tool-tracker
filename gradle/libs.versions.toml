@@ -21,6 +21,7 @@ firebaseBom = "34.18.0"
 foundationLayoutAndroid = "1.8.1"
 gmsLocation = "21.3.0"
 google-services = "4.4.2"
+icmp4a = "1.0.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 koin = "3.5.3"
@@ -103,6 +104,7 @@ google-analytics = { group = "com.google.firebase", name = "firebase-analytics" 
 google-maps-android-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps" }
 google-maps-android-utils-ktx = { module = "com.google.maps.android:maps-utils-ktx", version.ref = "mapsUtils" }
 google-android-gms-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "gmsLocation" }
+icmp4a = { group = "com.marsounjan", name = "icmp4a", version.ref = "icmp4a" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 koin-android-workmanager = { group = "io.insert-koin", name = "koin-androidx-workmanager", version.ref = "koin" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }

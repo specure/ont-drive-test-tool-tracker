@@ -1,6 +1,10 @@
-1.4.3
+1.4.4
 ----------------
 
+- Improved UI for permissions - added text when there is no more permissions to resolve
+
+1.4.3
+----------------
 - added possibility to switch tracking screen to minimal UI to save power for OLED screens
 
 1.4.2
