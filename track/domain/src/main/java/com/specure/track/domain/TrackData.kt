@@ -5,6 +5,9 @@ import com.specure.core.domain.Temperature
 import com.specure.core.domain.location.LocationWithDetails
 import com.specure.iperf.domain.IperfTest
 import com.specure.iperf.domain.IperfTestStatus
+import com.specure.track.domain.ping.PingRunnerState
+import com.specure.track.domain.ping.PingRunnerStatus
+import io.ktor.util.reflect.instanceOf
 import kotlin.time.Duration
 
 data class TrackData(
@@ -15,8 +18,10 @@ data class TrackData(
     val networkInfo: NetworkInfo? = null,
     val iperfTestUpload: IperfTest? = null,
     val iperfTestDownload: IperfTest? = null,
+    val pingTestData: PingRunnerState? = null,
     val internetConnectionConnected: Boolean = false,
     val isSpeedTestEnabled: Boolean = false,
+    val isPingTestEnabled: Boolean = false,
 ) {
     fun isSpeedTestError(): Boolean {
         return isDownloadSpeedTestError() || isUploadSpeedTestError()
@@ -52,6 +57,10 @@ data class TrackData(
             return null
         }
         return transformToMbitsPerSec(unit, speed)
+    }
+
+    fun isPingTestError(): Boolean {
+        return (isPingTestEnabled && (pingTestData?.pingRunnerStatus?.instanceOf(PingRunnerStatus.Error::class) == true))
     }
 
     private fun transformToMbitsPerSec(unit: String, speed: Double) = when (unit) {

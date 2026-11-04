@@ -93,7 +93,7 @@ fun TrackDataCard(
                 )
             }
         }
-        if (trackData.isSpeedTestEnabled) {
+        if (trackData.isSpeedTestEnabled || trackData.isPingTestEnabled) {
             Spacer(modifier = Modifier.height(24.dp))
             Row(
                 modifier = Modifier
@@ -101,28 +101,45 @@ fun TrackDataCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                TrackDataItem(
-                    title = stringResource(id = R.string.download),
-                    value = if (trackData.isDownloadSpeedTestError()) {
-                        stringResource(R.string.error)
-                    } else {
-                        "${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}"
-                    },
-                    isError = trackData.isDownloadSpeedTestError(),
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = 75.dp)
-                )
-                TrackDataItem(
-                    title = stringResource(id = R.string.upload),
-                    value = if (trackData.isUploadSpeedTestError()) {
-                        stringResource(R.string.error)
-                    } else {
-                        "${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}"
-                    },
-                    isError = trackData.isUploadSpeedTestError(),
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = 75.dp)
-                )
+                if (trackData.isSpeedTestEnabled) {
+                    TrackDataItem(
+                        title = stringResource(id = R.string.download),
+                        value = if (trackData.isDownloadSpeedTestError()) {
+                            stringResource(R.string.error)
+                        } else {
+                            "${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestDownload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}"
+                        },
+                        isError = trackData.isDownloadSpeedTestError(),
+                        modifier = Modifier
+                            .defaultMinSize(minWidth = 75.dp)
+                    )
+                }
+                if (trackData.isPingTestEnabled) {
+                    TrackDataItem(
+                        title = stringResource(id = R.string.ping),
+                        value = if (trackData.isPingTestError()) {
+                            stringResource(R.string.error)
+                        } else {
+                            "${trackData.pingTestData?.pingStats?.result?.ms ?: "-"} ${stringResource(R.string.miliseconds_unit)}"
+                        },
+                        isError = trackData.isPingTestError(),
+                        modifier = Modifier
+                            .defaultMinSize(minWidth = 75.dp)
+                    )
+                }
+                if (trackData.isSpeedTestEnabled) {
+                    TrackDataItem(
+                        title = stringResource(id = R.string.upload),
+                        value = if (trackData.isUploadSpeedTestError()) {
+                            stringResource(R.string.error)
+                        } else {
+                            "${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidth ?: "-"} ${trackData.iperfTestUpload?.testProgress?.lastOrNull()?.bandwidthUnit ?: ""}"
+                        },
+                        isError = trackData.isUploadSpeedTestError(),
+                        modifier = Modifier
+                            .defaultMinSize(minWidth = 75.dp)
+                    )
+                }
             }
         }
 
@@ -169,6 +186,7 @@ private fun TrackDataCardPreview() {
             elapsedTime = 35818.seconds,
             trackData = TrackData(
                 isSpeedTestEnabled = true,
+                isPingTestEnabled = true,
                iperfTestDownload =  IperfTest(
                     testProgress = listOf(
                         IperfTestProgressDownload(

@@ -43,6 +43,9 @@ import com.specure.core.presentation.designsystem.components.SignalTrackerScaffo
 import com.specure.core.presentation.designsystem.components.SignalTrackerToolbar
 import com.specure.core.presentation.designsystem.components.util.DropDownItem
 import com.specure.core.presentation.ui.ObserveAsEvents
+import com.specure.iperf.domain.IperfTest
+import com.specure.iperf.domain.IperfTestStatus
+import com.specure.track.domain.TrackData
 import com.specure.track.presentation.R
 import com.specure.track.presentation.active_track.components.TrackDataCard
 import com.specure.track.presentation.active_track.maps.TrackerMap
@@ -342,7 +345,18 @@ private fun ActiveTrackScreenPreview() {
     SignalTrackerTheme {
         ActiveTrackScreen(
             state = ActiveTrackState(
-                isSpeedTestEnabled = true
+                shouldTrack = true,
+                hasStartedTracking = true,
+                isSpeedTestEnabled = true,
+                trackData = TrackData(
+                    locations = emptyList(),
+                    iperfTestUpload = IperfTest(
+                        status = IperfTestStatus.RUNNING,
+                    ),
+                    iperfTestDownload = IperfTest(
+                        status = IperfTestStatus.ENDED
+                    )
+                )
             ),
             onServiceToggle = {},
             onAction = {},
