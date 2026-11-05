@@ -398,7 +398,8 @@ class MeasurementTracker(
     private fun updateConfiguration() {
         _trackData.update {
             it.copy(
-                isSpeedTestEnabled = appConfig.isSpeedTestEnabled()
+                isSpeedTestEnabled = appConfig.isSpeedTestEnabled(),
+                isPingTestEnabled = appConfig.isPingTestEnabled()
             )
         }
     }

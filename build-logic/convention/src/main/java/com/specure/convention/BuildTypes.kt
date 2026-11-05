@@ -51,6 +51,9 @@ private fun Project.configureBuildTypesCommon(
     val speedTestFeatureEnabled =
         gradleLocalProperties(rootDir, providers).getProperty("FEATURE_SPEED_TEST_ENABLED")
             .toBoolean()
+    val pingTestFeatureEnabled =
+        gradleLocalProperties(rootDir, providers).getProperty("FEATURE_PING_TEST_ENABLED")
+            .toBoolean()
     val githubRepoApiUrl =
         gradleLocalProperties(rootDir, providers).getProperty("GITHUB_API_REPO_URL")
     val githubAccessToken =
@@ -63,6 +66,7 @@ private fun Project.configureBuildTypesCommon(
                         configureDebugBuildType(
                             hostname,
                             speedTestFeatureEnabled,
+                            pingTestFeatureEnabled,
                             githubRepoApiUrl,
                             githubAccessToken
                         )
@@ -71,6 +75,7 @@ private fun Project.configureBuildTypesCommon(
                         configureReleaseBuildType(
                             hostname,
                             speedTestFeatureEnabled,
+                            pingTestFeatureEnabled,
                             githubRepoApiUrl,
                             githubAccessToken
                         )
@@ -86,6 +91,7 @@ private fun Project.configureBuildTypesCommon(
                         configureDebugBuildType(
                             hostname,
                             speedTestFeatureEnabled,
+                            pingTestFeatureEnabled,
                             githubRepoApiUrl,
                             githubAccessToken
                         )
@@ -94,6 +100,7 @@ private fun Project.configureBuildTypesCommon(
                         configureReleaseBuildType(
                             hostname,
                             speedTestFeatureEnabled,
+                            pingTestFeatureEnabled,
                             githubRepoApiUrl,
                             githubAccessToken
                         )
@@ -109,6 +116,7 @@ private fun Project.configureBuildTypesCommon(
                         configureDebugBuildType(
                             hostname,
                             speedTestFeatureEnabled,
+                            pingTestFeatureEnabled,
                             githubRepoApiUrl,
                             githubAccessToken
                         )
@@ -117,6 +125,7 @@ private fun Project.configureBuildTypesCommon(
                         configureReleaseBuildType(
                             hostname,
                             speedTestFeatureEnabled,
+                            pingTestFeatureEnabled,
                             githubRepoApiUrl,
                             githubAccessToken
                         )
@@ -131,11 +140,13 @@ private fun Project.configureBuildTypesCommon(
 private fun BuildType.configureDebugBuildType(
     hostname: String,
     speedTestFeatureEnabled: Boolean,
+    pingTestFeatureEnabled: Boolean,
     githubRepoApiUrl: String,
     githubAccessToken: String
 ) {
     buildConfigField("String", "BASE_URL", "\"$hostname\"")
     buildConfigField("boolean", "FEATURE_SPEED_TEST_ENABLED", "$speedTestFeatureEnabled")
+    buildConfigField("boolean", "FEATURE_PING_TEST_ENABLED", "$pingTestFeatureEnabled")
     buildConfigField("String", "GITHUB_API_REPO_URL", "\"$githubRepoApiUrl\"")
     buildConfigField("String", "GITHUB_API_TOKEN", "\"$githubAccessToken\"")
 }
@@ -143,11 +154,13 @@ private fun BuildType.configureDebugBuildType(
 private fun BuildType.configureReleaseBuildType(
     hostname: String,
     speedTestFeatureEnabled: Boolean,
+    pingTestFeatureEnabled: Boolean,
     githubRepoApiUrl: String,
     githubAccessToken: String
 ) {
     buildConfigField("String", "BASE_URL", "\"$hostname\"")
     buildConfigField("boolean", "FEATURE_SPEED_TEST_ENABLED", "$speedTestFeatureEnabled")
+    buildConfigField("boolean", "FEATURE_PING_TEST_ENABLED", "$pingTestFeatureEnabled")
     buildConfigField("String", "GITHUB_API_REPO_URL", "\"$githubRepoApiUrl\"")
     buildConfigField("String", "GITHUB_API_TOKEN", "\"$githubAccessToken\"")
     isMinifyEnabled = false

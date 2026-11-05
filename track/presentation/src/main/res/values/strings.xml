@@ -49,6 +49,7 @@
     <string name="tracks_count_for_export">Tracks for export:</string>
     <string name="name">Name:</string>
     <string name="settings">Settings</string>
+    <string name="ping_test">Ping test</string>
     <string name="speed_test">Speed test</string>
     <string name="disabled">Disabled</string>
     <string name="enabled">Enabled</string>

@@ -19,6 +19,7 @@ data class TrackData(
     val iperfTestUpload: IperfTest? = null,
     val iperfTestDownload: IperfTest? = null,
     val pingTestData: PingRunnerState? = null,
+
     val internetConnectionConnected: Boolean = false,
     val isSpeedTestEnabled: Boolean = false,
     val isPingTestEnabled: Boolean = false,
@@ -61,6 +62,10 @@ data class TrackData(
 
     fun isPingTestError(): Boolean {
         return (isPingTestEnabled && (pingTestData?.pingRunnerStatus?.instanceOf(PingRunnerStatus.Error::class) == true))
+    }
+
+    fun getPingTestLatencyMs(): Long? {
+        return if (isPingTestEnabled) pingTestData?.pingStats?.result?.ms else null
     }
 
     private fun transformToMbitsPerSec(unit: String, speed: Double) = when (unit) {

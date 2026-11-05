@@ -26,6 +26,10 @@ class AppConfig(
         const val UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_DEFAULT = 2000000
 
         const val TRACKING_LOG_INTERVAL_SECONDS = 1
+
+        const val FEATURE_PING_TEST_ENABLED =
+            com.specure.core.presentation.service.BuildConfig.FEATURE_PING_TEST_ENABLED
+        const val IS_PING_TEST_ENABLED_BY_DEFAULT = true
     }
 
     override fun isSpeedTestEnabled(): Boolean {
@@ -214,5 +218,20 @@ class AppConfig(
 
     override fun getTrackingLogIntervalSecondsDefault(): Int {
         return TRACKING_LOG_INTERVAL_SECONDS
+    }
+
+    override fun isPingTestEnabled(): Boolean {
+        return preferences.getBoolean(
+            Config.PING_TEST_ENABLED_CONFIG_KEY,
+            getIsPingTestEnabledDefault()
+        ) && FEATURE_PING_TEST_ENABLED
+    }
+
+    override fun setIsPingTestEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(Config.PING_TEST_ENABLED_CONFIG_KEY, enabled).apply()
+    }
+
+    override fun getIsPingTestEnabledDefault(): Boolean {
+        return IS_PING_TEST_ENABLED_BY_DEFAULT
     }
 }

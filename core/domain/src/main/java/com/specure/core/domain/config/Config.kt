@@ -22,6 +22,8 @@ interface Config {
         const val TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY =
             "TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY"
 
+        const val PING_TEST_ENABLED_CONFIG_KEY = "PING_TEST_ENABLED_CONFIG_KEY"
+
         const val UNKNOWN_VALUE = Integer.MIN_VALUE
     }
 
@@ -84,4 +86,10 @@ interface Config {
     fun getTrackingLogIntervalSeconds(): Int
 
     fun getTrackingLogIntervalSecondsDefault(): Int
+
+    fun isPingTestEnabled(): Boolean
+
+    fun setIsPingTestEnabled(enabled: Boolean)
+
+    fun getIsPingTestEnabledDefault(): Boolean
 }

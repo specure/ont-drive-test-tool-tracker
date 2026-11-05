@@ -135,7 +135,30 @@ fun SettingsScreen(
                         },
                         title = { Text(text = stringResource(id = R.string.tracking_log_interval_seconds)) },
                     )
+                    if (AppConfig.FEATURE_PING_TEST_ENABLED) {
+                        preferenceCategory(
+                            key = "ping_test_category",
+                            title = { Text(text = stringResource(id = R.string.ping_test)) },
+                        )
+                        switchPreference(
+                            key = Config.PING_TEST_ENABLED_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getIsPingTestEnabledDefault(),
+                            title = { Text(text = stringResource(id = R.string.ping_test)) },
+                            summary = {
+                                Text(
+                                    text = if (it) stringResource(id = R.string.enabled) else stringResource(
+                                        id = R.string.disabled
+                                    )
+                                )
+                            },
+                        )
+                    }
+
                     if (AppConfig.FEATURE_SPEED_TEST_ENABLED) {
+                        preferenceCategory(
+                            key = "speed_test_category",
+                            title = { Text(text = stringResource(id = R.string.speed_test)) },
+                        )
                         switchPreference(
                             key = Config.SPEED_TEST_ENABLED_CONFIG_KEY,
                             defaultValue = viewModel.appConfig.getIsSpeedTestEnabledDefault(),
@@ -148,240 +171,240 @@ fun SettingsScreen(
                                 )
                             },
                         )
-                    }
 
-                    textFieldPreference(
-                        key = Config.SPEED_TEST_DURATION_SECONDS_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getSpeedTestDurationSecondsDefault(),
-                        title = { Text(text = stringResource(id = R.string.duration_seconds)) },
-                        textToValue = {
-                            try {
-                                val value = it.toInt()
-                                if (value > 0) {
-                                    value
-                                } else {
-                                    viewModel.appConfig.getSpeedTestDurationSecondsDefault()
+                        textFieldPreference(
+                            key = Config.SPEED_TEST_DURATION_SECONDS_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getSpeedTestDurationSecondsDefault(),
+                            title = { Text(text = stringResource(id = R.string.duration_seconds)) },
+                            textToValue = {
+                                try {
+                                    val value = it.toInt()
+                                    if (value > 0) {
+                                        value
+                                    } else {
+                                        viewModel.appConfig.getSpeedTestDurationSecondsDefault()
+                                    }
+                                } catch (e: Exception) {
+                                    Timber.e(e.localizedMessage)
+                                    viewModel.appConfig.getDownloadSpeedTestServerPortDefault()
                                 }
-                            } catch (e: Exception) {
-                                Timber.e(e.localizedMessage)
-                                viewModel.appConfig.getDownloadSpeedTestServerPortDefault()
-                            }
-                        },
-                        summary = { Text(text = it.toString()) }
-                    )
+                            },
+                            summary = { Text(text = it.toString()) }
+                        )
 
-                    preferenceCategory(
-                        key = "download_test_category",
-                        title = { Text(text = stringResource(id = R.string.download_test)) },
-                    )
-                    textFieldPreference(
-                        key = Config.DOWNLOAD_SPEED_TEST_SERVER_ADDRESS_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getDownloadSpeedTestServerAddressDefault(),
-                        title = { Text(text = stringResource(id = R.string.server_url)) },
-                        textToValue = { it },
-                        summary = { Text(text = it) }
-                    )
-                    textFieldPreference(
-                        key = Config.DOWNLOAD_SPEED_TEST_SERVER_PORT_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getDownloadSpeedTestServerPortDefault(),
-                        title = { Text(text = stringResource(id = R.string.server_port)) },
-                        textToValue = {
-                            try {
-                                it.toInt()
-                            } catch (e: Exception) {
-                                Timber.e(e.localizedMessage)
-                                viewModel.appConfig.getDownloadSpeedTestServerPortDefault()
-                            }
-                        },
-                        summary = { Text(text = it.toString()) }
-                    )
-                    val downloadMaxBandwidthBitsPerSecondValue = 100000000f
-                    val downloadMaxBandwidthBitsPerSecondValueStep = 10000000
-                    val megaBitsToBitsRatio = 1000000
-                    sliderPreference(
-                        key = Config.DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getDownloadSpeedTestMaxBandwidthBitsPerSecondsDefault()
-                            .toFloat(),
-                        valueRange = 0f..downloadMaxBandwidthBitsPerSecondValue,
-                        valueSteps = (downloadMaxBandwidthBitsPerSecondValue / downloadMaxBandwidthBitsPerSecondValueStep - 1).toInt(),
-                        valueText = {
-                            Text(
-                                text = round(it / megaBitsToBitsRatio).toInt().toString()
-                            )
-                        },
-                        title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
-                        summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
-                    )
+                        preferenceCategory(
+                            key = "download_test_category",
+                            title = { Text(text = stringResource(id = R.string.download_test)) },
+                        )
+                        textFieldPreference(
+                            key = Config.DOWNLOAD_SPEED_TEST_SERVER_ADDRESS_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getDownloadSpeedTestServerAddressDefault(),
+                            title = { Text(text = stringResource(id = R.string.server_url)) },
+                            textToValue = { it },
+                            summary = { Text(text = it) }
+                        )
+                        textFieldPreference(
+                            key = Config.DOWNLOAD_SPEED_TEST_SERVER_PORT_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getDownloadSpeedTestServerPortDefault(),
+                            title = { Text(text = stringResource(id = R.string.server_port)) },
+                            textToValue = {
+                                try {
+                                    it.toInt()
+                                } catch (e: Exception) {
+                                    Timber.e(e.localizedMessage)
+                                    viewModel.appConfig.getDownloadSpeedTestServerPortDefault()
+                                }
+                            },
+                            summary = { Text(text = it.toString()) }
+                        )
+                        val downloadMaxBandwidthBitsPerSecondValue = 100000000f
+                        val downloadMaxBandwidthBitsPerSecondValueStep = 10000000
+                        val megaBitsToBitsRatio = 1000000
+                        sliderPreference(
+                            key = Config.DOWNLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getDownloadSpeedTestMaxBandwidthBitsPerSecondsDefault()
+                                .toFloat(),
+                            valueRange = 0f..downloadMaxBandwidthBitsPerSecondValue,
+                            valueSteps = (downloadMaxBandwidthBitsPerSecondValue / downloadMaxBandwidthBitsPerSecondValueStep - 1).toInt(),
+                            valueText = {
+                                Text(
+                                    text = round(it / megaBitsToBitsRatio).toInt().toString()
+                                )
+                            },
+                            title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
+                            summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
+                        )
 
-                    item {
-                        Row {
-                            SignalTrackerOutlinedActionButton(
+                        item {
+                            Row {
+                                SignalTrackerOutlinedActionButton(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .weight(1f),
+                                    text = if (state.value.isIperfDownloadRunning)
+                                        stringResource(id = com.specure.permissions.presentation.R.string.stop)
+                                    else
+                                        stringResource(id = com.specure.permissions.presentation.R.string.test_down),
+                                    isLoading = false
+                                ) {
+                                    onAction(SettingsAction.OnDownloadTestClick)
+                                }
+                            }
+
+                            Row(
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp)
-                                    .weight(1f),
-                                text = if (state.value.isIperfDownloadRunning)
-                                    stringResource(id = com.specure.permissions.presentation.R.string.stop)
-                                else
-                                    stringResource(id = com.specure.permissions.presentation.R.string.test_down),
-                                isLoading = false
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                onAction(SettingsAction.OnDownloadTestClick)
-                            }
-                        }
 
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            state.value.currentIperfDownloadSpeed?.let {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center,
-                                ) {
-                                    Icon(
-                                        imageVector = ArrowDownIcon,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(30.dp)
-                                    )
-                                    Box(
-                                        modifier = Modifier.alignByBaseline()
+                                state.value.currentIperfDownloadSpeed?.let {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center,
                                     ) {
-                                        Text(
-                                            text = it,
-                                            style = MaterialTheme.typography.headlineSmall
+                                        Icon(
+                                            imageVector = ArrowDownIcon,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(30.dp)
                                         )
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Box(
-                                        modifier = Modifier.alignByBaseline()
-                                    ) {
-                                        Text(
-                                            text = state.value.currentIperfDownloadSpeedUnit.toString(),
-                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    state.value.currentIperfDownloadInfoRaw?.let {
                                         Box(
-                                            modifier = Modifier.alignByBaseline(),
+                                            modifier = Modifier.alignByBaseline()
                                         ) {
                                             Text(
                                                 text = it,
+                                                style = MaterialTheme.typography.headlineSmall
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Box(
+                                            modifier = Modifier.alignByBaseline()
+                                        ) {
+                                            Text(
+                                                text = state.value.currentIperfDownloadSpeedUnit.toString(),
                                                 fontSize = MaterialTheme.typography.bodySmall.fontSize
                                             )
+                                        }
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        state.value.currentIperfDownloadInfoRaw?.let {
+                                            Box(
+                                                modifier = Modifier.alignByBaseline(),
+                                            ) {
+                                                Text(
+                                                    text = it,
+                                                    fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    preferenceCategory(
-                        key = "upload_test_category",
-                        title = { Text(text = stringResource(id = R.string.upload_test)) },
-                    )
-                    textFieldPreference(
-                        key = Config.UPLOAD_SPEED_TEST_SERVER_ADDRESS_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getUploadSpeedTestServerAddressDefault(),
-                        title = { Text(text = stringResource(id = R.string.server_url)) },
-                        textToValue = { it },
-                        summary = { Text(text = it) }
-                    )
-                    textFieldPreference(
-                        key = Config.UPLOAD_SPEED_TEST_SERVER_PORT_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getUploadSpeedTestServerPortDefault(),
-                        title = { Text(text = stringResource(id = R.string.server_port)) },
-                        textToValue = {
-                            try {
-                                it.toInt()
-                            } catch (e: Exception) {
-                                Timber.e(e.localizedMessage)
+                        preferenceCategory(
+                            key = "upload_test_category",
+                            title = { Text(text = stringResource(id = R.string.upload_test)) },
+                        )
+                        textFieldPreference(
+                            key = Config.UPLOAD_SPEED_TEST_SERVER_ADDRESS_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getUploadSpeedTestServerAddressDefault(),
+                            title = { Text(text = stringResource(id = R.string.server_url)) },
+                            textToValue = { it },
+                            summary = { Text(text = it) }
+                        )
+                        textFieldPreference(
+                            key = Config.UPLOAD_SPEED_TEST_SERVER_PORT_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getUploadSpeedTestServerPortDefault(),
+                            title = { Text(text = stringResource(id = R.string.server_port)) },
+                            textToValue = {
+                                try {
+                                    it.toInt()
+                                } catch (e: Exception) {
+                                    Timber.e(e.localizedMessage)
+                                }
+                            },
+                            summary = { Text(text = it.toString()) },
+                        )
+                        val uploadMaxBandwidthBitsPerSecondValue = 10000000F
+                        val uploadMaxBandwidthBitsPerSecondValueStep = 10000000
+                        sliderPreference(
+                            key = Config.UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
+                            defaultValue = viewModel.appConfig.getUploadSpeedTestMaxBandwidthBitsPerSecondDefault()
+                                .toFloat(),
+                            valueRange = 0f..uploadMaxBandwidthBitsPerSecondValue,
+                            valueSteps = (uploadMaxBandwidthBitsPerSecondValue / uploadMaxBandwidthBitsPerSecondValueStep - 1).toInt(),
+                            valueText = {
+                                Text(
+                                    text = round(it / megaBitsToBitsRatio).toInt().toString()
+                                )
+                            },
+                            title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
+                            summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
+                        )
+
+                        item {
+                            Row {
+                                SignalTrackerOutlinedActionButton(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .weight(1f),
+                                    text = if (state.value.isIperfUploadRunning)
+                                        stringResource(id = com.specure.permissions.presentation.R.string.stop)
+                                    else
+                                        stringResource(id = com.specure.permissions.presentation.R.string.test_up),
+                                    isLoading = false
+                                ) {
+                                    onAction(SettingsAction.OnUploadTestClick)
+                                }
                             }
-                        },
-                        summary = { Text(text = it.toString()) },
-                    )
-                    val uploadMaxBandwidthBitsPerSecondValue = 10000000F
-                    val uploadMaxBandwidthBitsPerSecondValueStep = 10000000
-                    sliderPreference(
-                        key = Config.UPLOAD_SPEED_TEST_MAX_BANDWIDTH_BITS_PER_SEC_CONFIG_KEY,
-                        defaultValue = viewModel.appConfig.getUploadSpeedTestMaxBandwidthBitsPerSecondDefault()
-                            .toFloat(),
-                        valueRange = 0f..uploadMaxBandwidthBitsPerSecondValue,
-                        valueSteps = (uploadMaxBandwidthBitsPerSecondValue / uploadMaxBandwidthBitsPerSecondValueStep - 1).toInt(),
-                        valueText = {
-                            Text(
-                                text = round(it / megaBitsToBitsRatio).toInt().toString()
-                            )
-                        },
-                        title = { Text(text = stringResource(id = R.string.max_bandwidth)) },
-                        summary = { Text(text = stringResource(id = R.string.max_bandwidth_details)) }
-                    )
 
-                    item {
-                        Row {
-                            SignalTrackerOutlinedActionButton(
+                            Row(
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp)
-                                    .weight(1f),
-                                text = if (state.value.isIperfUploadRunning)
-                                    stringResource(id = com.specure.permissions.presentation.R.string.stop)
-                                else
-                                    stringResource(id = com.specure.permissions.presentation.R.string.test_up),
-                                isLoading = false
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                onAction(SettingsAction.OnUploadTestClick)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            state.value.currentIperfUploadSpeed?.let {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center,
-                                ) {
-                                    Icon(
-                                        imageVector = ArrowUpIcon,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(30.dp)
-                                    )
-                                    Box(
-                                        modifier = Modifier.alignByBaseline()
+                                state.value.currentIperfUploadSpeed?.let {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center,
                                     ) {
-                                        Text(
-                                            text = it,
-                                            style = MaterialTheme.typography.headlineSmall
+                                        Icon(
+                                            imageVector = ArrowUpIcon,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(30.dp)
                                         )
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Box(
-                                        modifier = Modifier.alignByBaseline()
-                                    ) {
-                                        Text(
-                                            text = state.value.currentIperfUploadSpeedUnit.toString(),
-                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    state.value.currentIperfUploadInfoRaw?.let {
                                         Box(
-                                            modifier = Modifier.alignByBaseline(),
+                                            modifier = Modifier.alignByBaseline()
                                         ) {
                                             Text(
                                                 text = it,
+                                                style = MaterialTheme.typography.headlineSmall
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Box(
+                                            modifier = Modifier.alignByBaseline()
+                                        ) {
+                                            Text(
+                                                text = state.value.currentIperfUploadSpeedUnit.toString(),
                                                 fontSize = MaterialTheme.typography.bodySmall.fontSize
                                             )
+                                        }
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        state.value.currentIperfUploadInfoRaw?.let {
+                                            Box(
+                                                modifier = Modifier.alignByBaseline(),
+                                            ) {
+                                                Text(
+                                                    text = it,
+                                                    fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                                )
+                                            }
                                         }
                                     }
                                 }
