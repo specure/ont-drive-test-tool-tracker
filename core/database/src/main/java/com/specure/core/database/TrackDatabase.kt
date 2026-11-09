@@ -9,7 +9,7 @@ import com.specure.core.database.entity.TrackEntity
     entities = [
         TrackEntity::class,
     ],
-    version = 5
+    version = 6
 )
 abstract class TrackDatabase : RoomDatabase() {
 

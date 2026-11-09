@@ -26,6 +26,9 @@ import com.specure.track.domain.intercom.data.StartTestContent
 import com.specure.track.domain.intercom.data.StopTestContent
 import com.specure.track.domain.intercom.data.TestError
 import com.specure.track.domain.intercom.domain.TrackerAction
+import com.specure.track.domain.ping.PingRunner
+import com.specure.track.domain.ping.PingRunnerStatus
+import com.specure.track.domain.ping.toHumanReadableString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,6 +66,7 @@ class MeasurementTracker(
     private val mobileNetworkTracker: NetworkTracker,
     private val iperfDownloadRunner: IperfRunner,
     private val iperfUploadRunner: IperfRunner,
+    private val pingRunner: PingRunner,
     private val trackRepository: TrackRepository,
     private val connectivityObserver: ConnectivityObserver,
     private val intercomService: BluetoothServerService,
@@ -139,6 +143,7 @@ class MeasurementTracker(
                     }
                     iperfUploadRunner.stopTest()
                     iperfDownloadRunner.stopTest()
+                    pingRunner.stopPing()
                     applicationScope.launch {
                         temperatureInfoReceiver.unregister()
                     }
@@ -149,6 +154,13 @@ class MeasurementTracker(
                     if (appConfig.isSpeedTestEnabled()) {
                         iperfUploadRunner.startTest()
                         iperfDownloadRunner.startTest()
+                    }
+                    if (appConfig.isPingTestEnabled()) {
+                        pingRunner.startPing(
+                            appConfig.getPingTestHostAddress() ?: appConfig.getPingTestHostAddressDefault(),
+                            (appConfig.getPingTimeoutMilliseconds() ?: appConfig.getPingTimeoutMillisecondsDefault()).toLong(),
+                            applicationScope
+                        )
                     }
                 }
             }
@@ -226,6 +238,15 @@ class MeasurementTracker(
             _trackData.update {
                 it.copy(
                     iperfTestDownload = updatedTestStatus
+                )
+            }
+        }.launchIn(applicationScope)
+
+        pingRunner.pingState.onEach { pingState ->
+            _trackData.update {
+                println("\nPing test updated ${pingState}")
+                it.copy(
+                    pingTestData = pingState
                 )
             }
         }.launchIn(applicationScope)
@@ -324,18 +345,22 @@ class MeasurementTracker(
 
     private fun extractErrors(trackData: TrackData): List<TestError>? {
         return if (isPreparedForRemoteController) {
+            val errors = mutableListOf<TestError>()
+            if (trackData.isPingTestError()) {
+                errors += TestError.PING_TEST_ERROR
+            }
             if (trackData.isSpeedTestError()) {
-                val errors = mutableListOf<TestError>()
                 if (trackData.isUploadSpeedTestError()) {
                     errors += TestError.UPLOAD_TEST_ERROR
                 }
                 if (trackData.isDownloadSpeedTestError()) {
                     errors += TestError.DOWNLOAD_TEST_ERROR
                 }
-//                errors += TestError.UNKNOWN_ERROR
-                errors
-            } else {
+            }
+            if (errors.isEmpty()) {
                 null
+            } else {
+                errors
             }
         } else {
             null
@@ -447,6 +472,11 @@ class MeasurementTracker(
                 } else null,
                 uploadSpeedTestTimestamp = if (trackData.isSpeedTestEnabled) trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis?.formatMillisToDateString() else null,
                 uploadSpeedTestTimestampRaw = if (trackData.isSpeedTestEnabled) trackData.iperfTestUpload?.testProgress?.lastOrNull()?.timestampMillis else null,
+                pingMs = if (trackData.isPingTestEnabled) trackData.pingTestData?.pingStats?.result?.ms else null,
+                pingTestState = if (trackData.isPingTestEnabled) trackData.pingTestData?.pingRunnerStatus?.toHumanReadableString() else IperfTestStatus.DISABLED.toString(),
+                pingTestError = if (trackData.isPingTestEnabled && trackData.pingTestData?.pingRunnerStatus is PingRunnerStatus.Error) trackData.pingTestData.pingRunnerStatus.toHumanReadableString() else null,
+                pingTestTimestamp = if (trackData.isPingTestEnabled) trackData.pingTestData?.pingStats?.result?.timestamp?.formatMillisToDateString() else null,
+                pingTestTimestampRaw = if (trackData.isPingTestEnabled) trackData.pingTestData?.pingStats?.result?.timestamp else null,
                 latitude = trackData.locations.lastOrNull()?.location?.lat,
                 longitude = trackData.locations.lastOrNull()?.location?.long,
                 locationTimestamp = trackData.locations.lastOrNull()?.timestamp?.inWholeMilliseconds?.formatMillisToDateString(),

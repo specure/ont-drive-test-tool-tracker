@@ -24,7 +24,7 @@ class PingRunnerIcmp4a(
     val pingExecutor = Icmp4a()
 
     private val _pingRunnerState = MutableStateFlow<PingRunnerState>(PingRunnerState())
-    private val pingRunnerStateFlow: StateFlow<PingRunnerState> = _pingRunnerState.asStateFlow()
+    override val pingState: StateFlow<PingRunnerState> = _pingRunnerState.asStateFlow()
 
     private var pingRunnerJob: Job? = null
 
@@ -37,7 +37,7 @@ class PingRunnerIcmp4a(
             )
             handlePingStatus(host, status)
         }
-        return pingRunnerStateFlow
+        return pingState
     }
 
     override suspend fun startPing(host: String, timeoutMs: Long, coroutineScope: CoroutineScope): StateFlow<PingRunnerState> {
@@ -60,7 +60,7 @@ class PingRunnerIcmp4a(
             }
             .launchIn(coroutineScope)
 
-        return pingRunnerStateFlow
+        return pingState
     }
 
     override fun stopPing(): PingRunnerState {

@@ -181,13 +181,28 @@ val databaseModule = module {
             }
         }
 
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN pingMs INTEGER")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN pingTestState TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN pingTestError TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN pingTestTimestamp TEXT")
+                db.execSQL("ALTER TABLE ${Tables.TRACK_ENTITY} ADD COLUMN pingTestTimestampRaw INTEGER")
+            }
+        }
 
         Room.databaseBuilder(
             androidApplication(),
             TrackDatabase::class.java,
             TRACK_DATABASE_NAME
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .addMigrations(
+                MIGRATION_1_2,
+                MIGRATION_2_3,
+                MIGRATION_3_4,
+                MIGRATION_4_5,
+                MIGRATION_5_6
+            )
             .fallbackToDestructiveMigration()
             .build()
 

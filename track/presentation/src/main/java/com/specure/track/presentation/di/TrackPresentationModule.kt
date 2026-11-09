@@ -92,6 +92,7 @@ val trackPresentationModule = module {
             get(named(DI_IPERF_UPLOAD_RUNNER)),
             get(),
             get(),
+            get(),
             get(named(DI_BLUETOOTH_SERVER_SERVICE_CLASSIC)),
             get(),
             get(),

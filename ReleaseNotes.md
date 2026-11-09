@@ -1,6 +1,7 @@
 1.4.4
 ----------------
 
+- Added optional ping test among the tests
 - Improved UI for permissions - added text when there is no more permissions to resolve
 
 1.4.3

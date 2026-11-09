@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface PingRunner {
 
+    val pingState: StateFlow<PingRunnerState>
+
     suspend fun sendPing(host: String = "8.8.8.8", timeoutMs: Long = 1000): StateFlow<PingRunnerState>
 
     suspend fun startPing(host: String = "8.8.8.8", timeoutMs: Long = 1000, coroutineScope: CoroutineScope): StateFlow<PingRunnerState>

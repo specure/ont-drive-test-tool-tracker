@@ -43,6 +43,11 @@ fun TrackEntity.toTrack(): Track {
         cellBandNameInformal = cellBandNameInformal,
         cellBandFrequencyDownload = cellBandFrequencyDownload,
         appVersion = appVersion,
+        pingMs = pingMs,
+        pingTestState = pingTestState,
+        pingTestError = pingTestError,
+        pingTestTimestamp = pingTestTimestamp,
+        pingTestTimestampRaw = pingTestTimestampRaw,
     )
 }
 
@@ -86,5 +91,10 @@ fun Track.toTrackEntity(): TrackEntity {
         cellBandNameInformal = cellBandNameInformal,
         cellBandFrequencyDownload = cellBandFrequencyDownload,
         appVersion = appVersion,
+        pingMs = pingMs,
+        pingTestState = pingTestState,
+        pingTestError = pingTestError,
+        pingTestTimestamp = pingTestTimestamp,
+        pingTestTimestampRaw = pingTestTimestampRaw,
     )
 }
