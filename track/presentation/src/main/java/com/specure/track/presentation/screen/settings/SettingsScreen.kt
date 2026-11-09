@@ -42,6 +42,7 @@ import com.specure.core.presentation.ui.UiText
 import com.specure.track.presentation.R
 import com.specure.track.presentation.util.ping.PingAction
 import com.specure.track.presentation.util.ping.PingViewModel
+import com.specure.track.presentation.util.ping.toUIString
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.preference
 import me.zhanghai.compose.preference.preferenceCategory
@@ -228,8 +229,9 @@ fun SettingsScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                val pingValue = pingState.value.pingStats?.result?.ms ?: 0
 
-                                pingState.value.pingStats?.result?.ms?.let {
+                                pingValue.also {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center,
@@ -258,15 +260,11 @@ fun SettingsScreen(
                                             )
                                         }
                                         Spacer(modifier = Modifier.weight(1f))
-                                        pingState.value.pingRunnerStatus.toString().let {
-                                            Box(
-                                                modifier = Modifier.alignByBaseline(),
-                                            ) {
-                                                Text(
-                                                    text = it,
-                                                    fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                                )
-                                            }
+                                        pingState.value.pingRunnerStatus?.let {
+                                            Text(
+                                                text = it.toUIString(),
+                                                fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                            )
                                         }
                                     }
                                 }

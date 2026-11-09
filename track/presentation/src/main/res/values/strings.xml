@@ -87,6 +87,7 @@
     <string name="download_failed">Download failed</string>
     <string name="downloading">Downloading</string>
     <string name="error">Error</string>
+    <string name="running">Running</string>
     <string name="idle">Idle</string>
     <string name="installing">Installing</string>
     <string name="new_version_found">New version found %1$s</string>

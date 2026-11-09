@@ -12,6 +12,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -41,19 +42,24 @@ class PingRunnerIcmp4a(
 
     override suspend fun startPing(host: String, timeoutMs: Long, coroutineScope: CoroutineScope): StateFlow<PingRunnerState> {
         resetState()
-        safePingExecution(host) {
-            pingRunnerJob = pingExecutor.pingInterval(
-                host = host,
-                count = null,
-                timeoutMillis = timeoutMs,
-                intervalMillis = 1000
-            )
-                .onEach { status ->
-                    handlePingStatus(host, status)
-                    currentCoroutineContext().ensureActive()
-                }
-                .launchIn(coroutineScope)
-        }
+
+        // For continuous pinging, exceptions happen during asynchronous flow collection,
+        // so we use .catch {} instead of trying to wrap launchIn in a standard try-catch.
+        pingRunnerJob = pingExecutor.pingInterval(
+            host = host,
+            count = null,
+            timeoutMillis = timeoutMs,
+            intervalMillis = 1000
+        )
+            .onEach { status ->
+                handlePingStatus(host, status)
+                currentCoroutineContext().ensureActive()
+            }
+            .catch { error ->
+                handleException(host, error)
+            }
+            .launchIn(coroutineScope)
+
         return pingRunnerStateFlow
     }
 
@@ -100,31 +106,32 @@ class PingRunnerIcmp4a(
                 )
             }
         }
-
     }
 
     /**
-     * Unified try-catch mechanism for all ICMP error types.
+     * Unified error handler for both regular execution and asynchronous flow collection.
+     */
+    private fun handleException(host: String, error: Throwable) {
+        when (error) {
+            is Icmp.Error.UnknownHost -> Timber.d("Unknown host $host")
+            is Icmp.Error.SocketException -> Timber.d("Socket Exception $host")
+            is Icmp.Error.ProtocolException -> Timber.d("Protocol Exception $host")
+            else -> Timber.d(error, "Unknown ICMP error for $host")
+        }
+        _pingRunnerState.value = _pingRunnerState.value.copy(
+            pingRunnerStatus = PingRunnerStatus.Error(Exception(error.message))
+        )
+    }
+
+    /**
+     * Unified try-catch mechanism for regular suspending functions (like sendPing).
      */
     private suspend inline fun safePingExecution(host: String, block: suspend () -> Unit) {
         try {
             block()
-        } catch (error: Icmp.Error.UnknownHost) {
-            Timber.d("Unknown host $host")
-            _pingRunnerState.value = _pingRunnerState.value.copy(
-                pingRunnerStatus = PingRunnerStatus.Error(error)
-            )
-        } catch (error: Icmp.Error.SocketException) {
-            Timber.d("Socket Exception $host")
-            _pingRunnerState.value = _pingRunnerState.value.copy(
-                pingRunnerStatus = PingRunnerStatus.Error(error)
-            )
-        } catch (error: Icmp.Error.ProtocolException) {
-            Timber.d("Protocol Exception $host")
-            _pingRunnerState.value = _pingRunnerState.value.copy(
-                pingRunnerStatus = PingRunnerStatus.Error(error)
-            )
+        } catch (error: Throwable) {
+            handleException(host, error)
         }
     }
-
 }
+

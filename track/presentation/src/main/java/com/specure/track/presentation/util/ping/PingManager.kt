@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import timber.log.Timber
 
 class PingManager(
     private val pingRunner: PingRunner
@@ -18,6 +19,7 @@ class PingManager(
         // Pass a callback or let the runner update the manager's state.
         // Alternatively, if PingRunner already has a state flow, you can collect it here.
         pingRunner.startPing(host, timeoutMs, scope).collect { newState ->
+            Timber.d("New Ping state: $newState")
             _pingState.value = newState
         }
     }
