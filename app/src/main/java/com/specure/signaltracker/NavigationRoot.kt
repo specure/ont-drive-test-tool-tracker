@@ -18,12 +18,12 @@ import com.specure.permissions.presentation.screen.permissions.PermissionsScreen
 import com.specure.permissions.presentation.util.openAppSettings
 import com.specure.signaltracker.util.extensions.startTrackingService
 import com.specure.signaltracker.util.extensions.stopTrackingService
-import com.specure.track.presentation.about.AboutScreenNav
-import com.specure.track.presentation.about.AboutScreenRoot
-import com.specure.track.presentation.active_track.ActiveTrackScreenRoot
-import com.specure.track.presentation.settings.SettingsScreenRoot
-import com.specure.track.presentation.settings.navigation.SettingsScreenNav
-import com.specure.track.presentation.track_overview.TrackOverviewScreenRoot
+import com.specure.track.presentation.screen.about.AboutScreenNav
+import com.specure.track.presentation.screen.about.AboutScreenRoot
+import com.specure.track.presentation.screen.active_track.ActiveTrackScreenRoot
+import com.specure.track.presentation.screen.settings.SettingsScreenRoot
+import com.specure.track.presentation.screen.settings.navigation.SettingsScreenNav
+import com.specure.track.presentation.screen.track_overview.TrackOverviewScreenRoot
 
 @Composable
 fun NavigationRoot(

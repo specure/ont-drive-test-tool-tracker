@@ -21,4 +21,8 @@ dependencies {
     implementation(projects.track.domain)
     implementation(projects.core.database)
     implementation(libs.androidx.preference.ktx)
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
 }

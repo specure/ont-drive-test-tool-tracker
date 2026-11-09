@@ -92,6 +92,10 @@ val PersonIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.signal)
 
+val PingIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.network_ping)
+
 val TrackOutlinedIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.measure_outlined)

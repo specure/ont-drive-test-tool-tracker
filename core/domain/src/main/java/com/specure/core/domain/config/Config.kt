@@ -23,6 +23,10 @@ interface Config {
             "TRACKING_LOG_INTERVAL_SEC_CONFIG_KEY"
 
         const val PING_TEST_ENABLED_CONFIG_KEY = "PING_TEST_ENABLED_CONFIG_KEY"
+        const val PING_TEST_HOST_ADDRESS_CONFIG_KEY =
+            "PING_TEST_HOST_ADDRESS_CONFIG_KEY"
+        const val PING_TEST_TIMEOUT_MILLISECONDS_CONFIG_KEY =
+            "PING_TEST_TIMEOUT_MILLISECONDS_CONFIG_KEY"
 
         const val UNKNOWN_VALUE = Integer.MIN_VALUE
     }
@@ -92,4 +96,16 @@ interface Config {
     fun setIsPingTestEnabled(enabled: Boolean)
 
     fun getIsPingTestEnabledDefault(): Boolean
+
+    fun setPingTestHostAddress(hostAddress: String)
+
+    fun getPingTestHostAddress(): String?
+
+    fun getPingTestHostAddressDefault(): String
+
+    fun setPingTimeoutMilliseconds(timeoutMilliseconds: Int)
+
+    fun getPingTimeoutMilliseconds(): Int?
+
+    fun getPingTimeoutMillisecondsDefault(): Int
 }

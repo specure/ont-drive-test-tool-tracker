@@ -19,7 +19,6 @@ data class TrackData(
     val iperfTestUpload: IperfTest? = null,
     val iperfTestDownload: IperfTest? = null,
     val pingTestData: PingRunnerState? = null,
-
     val internetConnectionConnected: Boolean = false,
     val isSpeedTestEnabled: Boolean = false,
     val isPingTestEnabled: Boolean = false,

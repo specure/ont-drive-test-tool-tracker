@@ -14,7 +14,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
         <service
-            android:name=".active_track.service.ActiveTrackService"
+            android:name=".screen.active_track.service.ActiveTrackService"
             android:foregroundServiceType="location" />
 
     </application>

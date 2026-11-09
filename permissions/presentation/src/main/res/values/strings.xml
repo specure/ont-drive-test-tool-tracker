@@ -19,6 +19,7 @@
     <string name="stop">Stop</string>
     <string name="start">Start</string>
     <string name="write_external_storage">Write external storage</string>
+    <string name="test_ping">Test Ping configuration</string>
     <string name="test_down">Test Download Speed configuration</string>
     <string name="test_up">Test Upload Speed configuration</string>
     <string name="bluetooth_connect">Bluetooth connect</string>

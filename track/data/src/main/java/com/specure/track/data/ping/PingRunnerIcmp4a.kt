@@ -27,21 +27,25 @@ class PingRunnerIcmp4a(
 
     private var pingRunnerJob: Job? = null
 
-    override suspend fun sendPing(host: String): StateFlow<PingRunnerState> {
+    override suspend fun sendPing(host: String, timeoutMs: Long): StateFlow<PingRunnerState> {
         resetState()
         safePingExecution(host) {
-            val status = pingExecutor.ping(host = host)
+            val status = pingExecutor.ping(
+                host = host,
+                timeoutMillis = timeoutMs
+            )
             handlePingStatus(host, status)
         }
         return pingRunnerStateFlow
     }
 
-    override suspend fun startPing(host: String, coroutineScope: CoroutineScope): StateFlow<PingRunnerState> {
+    override suspend fun startPing(host: String, timeoutMs: Long, coroutineScope: CoroutineScope): StateFlow<PingRunnerState> {
         resetState()
         safePingExecution(host) {
             pingRunnerJob = pingExecutor.pingInterval(
                 host = host,
                 count = null,
+                timeoutMillis = timeoutMs,
                 intervalMillis = 1000
             )
                 .onEach { status ->

@@ -1,13 +1,14 @@
 package com.specure.signaltracker.util.extensions
 
 import android.content.Context
-import com.specure.track.presentation.active_track.service.ActiveTrackService
+import com.specure.signaltracker.MainActivity
+import com.specure.track.presentation.screen.active_track.service.ActiveTrackService
 
 fun Context.startTrackingService() {
     this.startService(
         ActiveTrackService.createStartIntent(
             context = this,
-            activityClass = com.specure.signaltracker.MainActivity::class.java
+            activityClass = MainActivity::class.java
         )
     )
 }

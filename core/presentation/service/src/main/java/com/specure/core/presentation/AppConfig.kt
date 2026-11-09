@@ -30,6 +30,8 @@ class AppConfig(
         const val FEATURE_PING_TEST_ENABLED =
             com.specure.core.presentation.service.BuildConfig.FEATURE_PING_TEST_ENABLED
         const val IS_PING_TEST_ENABLED_BY_DEFAULT = true
+        const val PING_TEST_HOST_ADDRESS_DEFAULT = "8.8.8.8"
+        const val PING_TEST_TIMEOUT_MILLISECONDS_DEFAULT = 10000
     }
 
     override fun isSpeedTestEnabled(): Boolean {
@@ -234,4 +236,36 @@ class AppConfig(
     override fun getIsPingTestEnabledDefault(): Boolean {
         return IS_PING_TEST_ENABLED_BY_DEFAULT
     }
+
+    override fun setPingTestHostAddress(hostAddress: String) {
+        preferences.edit()
+            .putString(Config.PING_TEST_HOST_ADDRESS_CONFIG_KEY, hostAddress).apply()
+    }
+
+    override fun getPingTestHostAddress(): String? {
+        return preferences.getString(Config.PING_TEST_HOST_ADDRESS_CONFIG_KEY, null)
+    }
+
+    override fun getPingTestHostAddressDefault(): String {
+        return PING_TEST_HOST_ADDRESS_DEFAULT
+    }
+
+    override fun setPingTimeoutMilliseconds(timeoutMilliseconds: Int) {
+        preferences.edit()
+            .putInt(Config.PING_TEST_TIMEOUT_MILLISECONDS_CONFIG_KEY, timeoutMilliseconds).apply()
+    }
+
+    override fun getPingTimeoutMilliseconds(): Int? {
+        val timeoutMilliseconds = preferences.getInt(Config.PING_TEST_TIMEOUT_MILLISECONDS_CONFIG_KEY, Config.UNKNOWN_VALUE)
+        return if (timeoutMilliseconds == Config.UNKNOWN_VALUE) {
+            null
+        } else {
+            timeoutMilliseconds
+        }
+    }
+
+    override fun getPingTimeoutMillisecondsDefault(): Int {
+        return PING_TEST_TIMEOUT_MILLISECONDS_DEFAULT
+    }
+
 }

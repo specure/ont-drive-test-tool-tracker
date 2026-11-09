@@ -17,11 +17,13 @@ import com.specure.iperf.presentation.IperfAndroidParser
 import com.specure.iperf.presentation.IperfDownloadRunner
 import com.specure.iperf.presentation.IperfUploadRunner
 import com.specure.track.domain.MeasurementTracker
-import com.specure.track.presentation.about.AboutScreenViewModel
-import com.specure.track.presentation.active_track.ActiveTrackViewModel
-import com.specure.track.presentation.settings.SettingsScreenStateManager
-import com.specure.track.presentation.settings.SettingsScreenViewModel
-import com.specure.track.presentation.track_overview.TrackOverviewViewModel
+import com.specure.track.presentation.screen.about.AboutScreenViewModel
+import com.specure.track.presentation.screen.active_track.ActiveTrackViewModel
+import com.specure.track.presentation.screen.settings.SettingsScreenStateManager
+import com.specure.track.presentation.screen.settings.SettingsScreenViewModel
+import com.specure.track.presentation.screen.track_overview.TrackOverviewViewModel
+import com.specure.track.presentation.util.ping.PingManager
+import com.specure.track.presentation.util.ping.PingViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
@@ -36,6 +38,7 @@ val trackPresentationModule = module {
     viewModelOf(::AboutScreenViewModel)
     viewModelOf(::ActiveTrackViewModel)
     viewModelOf(::SettingsScreenViewModel)
+    viewModelOf(::PingViewModel)
     viewModel {
 
         TrackOverviewViewModel(
@@ -95,6 +98,7 @@ val trackPresentationModule = module {
             get(),
         )
     }
+    singleOf(::PingManager)
 
     singleOf(::SettingsScreenStateManager)
 
