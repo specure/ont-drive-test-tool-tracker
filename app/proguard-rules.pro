@@ -80,3 +80,4 @@
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn android.os.ProfilingTrigger$Builder
 -dontwarn android.os.ProfilingTrigger
+-dontwarn org.slf4j.impl.StaticLoggerBinder

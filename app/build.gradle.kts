@@ -19,6 +19,10 @@ android {
         release {
             isMinifyEnabled = true // Disable R8 for release builds
             isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 

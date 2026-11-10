@@ -79,6 +79,10 @@ private fun Project.configureBuildTypesCommon(
                             githubRepoApiUrl,
                             githubAccessToken
                         )
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "proguard-rules.pro"
+                        )
                     }
                 }
             }
@@ -103,6 +107,10 @@ private fun Project.configureBuildTypesCommon(
                             pingTestFeatureEnabled,
                             githubRepoApiUrl,
                             githubAccessToken
+                        )
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "proguard-rules.pro"
                         )
                     }
                 }
