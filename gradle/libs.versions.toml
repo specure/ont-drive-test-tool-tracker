@@ -65,8 +65,8 @@ projectApplicationId = "com.specure.signaltracker"
 projectVersionName = "1.4.4"
 projectVersionCode = "12"
 projectMinSdkVersion = "28"
-projectTargetSdkVersion = "35"
-projectCompileSdkVersion = "35"
+projectTargetSdkVersion = "37"
+projectCompileSdkVersion = "37"
 material3Android = "1.3.2"
 
 [libraries]

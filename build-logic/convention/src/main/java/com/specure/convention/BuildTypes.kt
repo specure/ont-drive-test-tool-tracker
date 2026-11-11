@@ -2,6 +2,7 @@ package com.specure.convention
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.BuildType
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.DynamicFeatureExtension
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
@@ -9,38 +10,10 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
 internal fun Project.configureBuildTypes(
-    commonExtension: ApplicationExtension,
+    commonExtension: CommonExtension,
     extensionType: ExtensionType
 ) {
-    commonExtension.run {
-        buildFeatures {
-            buildConfig = true
-        }
-    }
-    configureBuildTypesCommon(extensionType)
-}
-
-internal fun Project.configureBuildTypes(
-    commonExtension: LibraryExtension,
-    extensionType: ExtensionType
-) {
-    commonExtension.run {
-        buildFeatures {
-            buildConfig = true
-        }
-    }
-    configureBuildTypesCommon(extensionType)
-}
-
-internal fun Project.configureBuildTypes(
-    commonExtension: DynamicFeatureExtension,
-    extensionType: ExtensionType
-) {
-    commonExtension.run {
-        buildFeatures {
-            buildConfig = true
-        }
-    }
+    commonExtension.buildFeatures.apply { buildConfig = true }
     configureBuildTypesCommon(extensionType)
 }
 
