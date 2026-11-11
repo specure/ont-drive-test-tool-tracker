@@ -8,7 +8,7 @@ data class PingRunnerState(
         return when (pingRunnerStatus) {
             PingRunnerStatus.Idle -> false
             PingRunnerStatus.Running -> true
-            is PingRunnerStatus.Error -> false
+            is PingRunnerStatus.Error -> true
         }
     }
 }
